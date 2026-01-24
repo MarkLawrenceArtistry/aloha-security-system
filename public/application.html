@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Form - Aloha Security</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="btn btn-outline">Back to Home</a>
+            <h3>Application Form</h3>
+            <span>Step <span id="current-step-label">1</span> of 4</span>
+        </div>
+    </header>
+
+    <div class="app-wrapper">
+        <!-- Visual Stepper -->
+        <div class="stepper">
+            <div class="step active" id="step-ind-1"><span class="step-num">1</span> Info</div>
+            <div class="step" id="step-ind-2"><span class="step-num">2</span> Position</div>
+            <div class="step" id="step-ind-3"><span class="step-num">3</span> Exp</div>
+            <div class="step" id="step-ind-4"><span class="step-num">4</span> Review</div>
+        </div>
+
+        <form id="multi-step-form">
+            
+            <!-- STEP 1 -->
+            <div class="form-step active-step" id="step-1">
+                <h2>Personal Info</h2>
+                <div class="form-group"><label>First Name</label><input type="text" name="first_name" required></div>
+                <div class="form-group"><label>Last Name</label><input type="text" name="last_name" required></div>
+                <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+                <div class="form-group"><label>Mobile</label><input type="text" name="contact_num" required></div>
+                <div class="form-group"><label>Birthdate</label><input type="date" name="birthdate" required></div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender"><option value="Male">Male</option><option value="Female">Female</option></select>
+                </div>
+                <div class="form-group"><label>Address</label><textarea name="address" rows="3" required></textarea></div>
+                
+                <div class="form-actions" style="justify-content: flex-end;">
+                    <!-- Data attribute used by main.js -->
+                    <button type="button" class="btn btn-primary btn-next" data-step="1">Next</button>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="form-step" id="step-2">
+                <h2>Position Details</h2>
+                <div class="form-group">
+                    <label>Position Applied For</label>
+                    <select name="position_applied">
+                        <option value="Security Guard">Security Guard</option>
+                        <option value="Head Guard">Head Guard</option>
+                        <option value="Lady Guard">Lady Guard</option>
+                        <option value="CCTV Operator">CCTV Operator</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline btn-prev" data-step="2">Previous</button>
+                    <button type="button" class="btn btn-primary btn-next" data-step="2">Next</button>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="form-step" id="step-3">
+                <h2>Experience & Documents</h2>
+                <div class="form-group"><label>Years of Experience</label><input type="number" name="years_experience" placeholder="0"></div>
+                <div class="form-group"><label>Previous Employer</label><input type="text" name="previous_employer"></div>
+                <div class="form-group"><label>Upload Resume</label><input type="file" name="resume" accept=".pdf, .jpg, .png" required></div>
+                <div class="form-group"><label>Upload Valid ID</label><input type="file" name="id_image" accept=".jpg, .png" required></div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline btn-prev" data-step="3">Previous</button>
+                    <button type="button" class="btn btn-primary btn-next" data-step="3">Review</button>
+                </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="form-step" id="step-4">
+                <h2>Review & Submit</h2>
+                <p>Please confirm your details.</p>
+                <div style="background: #eee; padding: 15px; margin: 20px 0;">
+                    <ul id="review-list" style="list-style: none;"></ul>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline btn-prev" data-step="4">Previous</button>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- JS Import -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

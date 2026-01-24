@@ -1,0 +1,249 @@
+:root {
+    --primary-black: #232323;
+    --primary-red: #e53828;
+    --primary-red-hover: #c42e20;
+    --off-white: #faf6f7;
+    --gray-border: #ccc;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--off-white);
+    color: var(--primary-black);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 700; /* Bold like Display font */
+    letter-spacing: -0.5px;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Header --- */
+header {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: var(--off-white);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 60px; /* Adjust based on actual logo */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--primary-black);
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-red-hover);
+}
+
+.btn-outline {
+    border: 2px solid var(--primary-black);
+    background: transparent;
+    color: var(--primary-black);
+}
+
+.btn-outline:hover {
+    background: var(--primary-black);
+    color: white;
+}
+
+/* --- Index: Hero --- */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 0;
+}
+
+.hero-text h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    max-width: 500px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.hero-image {
+    width: 400px;
+    height: 400px;
+    background-color: #ddd; /* Placeholder for the Guard Outline */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Index: Requirements --- */
+.requirements {
+    text-align: center;
+    padding: 60px 0;
+    border-top: 1px solid #ddd;
+}
+
+.req-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.req-card {
+    border: 1px solid var(--gray-border);
+    padding: 30px;
+    border-radius: 8px;
+    background: white;
+}
+
+.circle-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #eee;
+    margin: 0 auto 20px;
+}
+
+/* --- Application Form --- */
+.app-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.step {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #999;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+.step.active {
+    color: var(--primary-red);
+    font-weight: bold;
+}
+
+.step-num {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    line-height: 30px;
+}
+
+.step.active .step-num {
+    background: var(--primary-red);
+    color: white;
+}
+
+/* Form Steps */
+.form-step {
+    display: none; /* Hidden by default */
+}
+
+.form-step.active-step {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+/* --- Footer --- */
+footer {
+    border-top: 1px solid #ddd;
+    padding: 40px 0;
+    margin-top: 60px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+}

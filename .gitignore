@@ -1,0 +1,5 @@
+package-lock.json
+.env
+node_modules
+aloha_database.db
+public/uploads
