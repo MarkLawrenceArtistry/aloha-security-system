@@ -1,0 +1,202 @@
+:root {
+    --brand-red: #e53828;
+    --brand-black: #232323;
+    --brand-white: #faf6f7;
+    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--brand-white);
+    color: var(--brand-black);
+    overflow-x: hidden;
+}
+
+/* --- HEADER & BURGER MENU --- */
+.navbar {
+    padding: 20px 0;
+    background: transparent;
+    transition: var(--transition);
+}
+
+.navbar.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 10px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--brand-black) !important;
+}
+.navbar-brand span { color: var(--brand-red); }
+
+.nav-link {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin: 0 15px;
+    color: var(--brand-black) !important;
+}
+
+.nav-link:hover { color: var(--brand-white) !important; }
+
+.navbar-toggler { border: none; padding: 0; }
+.navbar-toggler:focus { box-shadow: none; }
+.toggler-icon {
+    width: 30px;
+    height: 3px;
+    background-color: var(--brand-black);
+    display: block;
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+/* --- HERO SECTION: DESKTOP SPLIT --- */
+.hero-wrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 100px;
+}
+
+.hero-bg-shape {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 55%;
+    height: 100%;
+    background: var(--brand-red);
+    clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+    z-index: -1;
+}
+
+.hero-title {
+    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 25px;
+}
+.hero-title span { color: var(--brand-red); }
+
+.red-dash {
+    width: 60px;
+    height: 5px;
+    background: var(--brand-red);
+    margin-bottom: 30px;
+}
+
+.hero-desc {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 520px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+}
+
+/* --- LOGO --- */
+.hero-image-container {
+    position: relative;
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    padding-right: 0; 
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.hero-logo-img {
+    width: 100%;
+    max-width: 500px; 
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+    animation: float 6s ease-in-out infinite;
+    margin-right: -20px; 
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* --- BUTTONS --- */
+.btn-brand {
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+
+.btn-brand:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background-color: var(--brand-red);
+}
+.btn-red {
+    background: var(--brand-black);
+    color: white;
+    border: none;
+}
+.btn-red:hover {
+    background: var(--brand-red);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(229, 56, 40, 0.3);
+}
+.btn-outline-custom {
+    border: 2px solid var(--brand-black);
+    color: var(--brand-black);
+}
+
+.btn-get-quote {
+    background-color: var(--brand-black);
+    color: white;
+}
+
+.btn-check-status {
+    border: 2px solid var(--brand-black);
+    color: var(--brand-black);
+    background: transparent;
+}
+.btn-check-status:hover {
+    background: var(--brand-black);
+    color: white;
+}
+
+
+@media (max-width: 991px) {
+    .hero-bg-shape { 
+        width: 100%; 
+        height: 50%; 
+        top: auto; 
+        bottom: 0; 
+        clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); 
+    }
+    .hero-wrapper { text-align: center; padding-bottom: 100px; }
+    .hero-image-container { 
+        margin-top: 50px; 
+        justify-content: center; 
+        padding-right: 0;
+    }
+    .hero-logo-img { max-width: 280px; margin-right: 0; }
+    .red-dash { margin: 0 auto 30px; }
+    .hero-desc { margin: 0 auto 40px; color: var(--brand-white) }
+    
+    .navbar-collapse {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .nav-link:hover { color: var(--brand-red) !important; }
+}
+

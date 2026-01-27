@@ -3,77 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aloha Security Agency</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Aloha Security Agency | Professional Protection</title>
+
+    <link rel="icon" type="image/png" href="uploads/logo.png"/>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">  
+    <!-- EXTERNAL CSS LINK -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header>
-        <div class="container nav-container">
-            <div class="logo">
-                <h2>ALOHA SECURITY</h2> 
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">ALOHA <span>SECURITY</span></a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+                    <li class="nav-item"><a class="nav-link check-status-action" href="#">Check Status</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="application.html" class="btn btn-dark btn-sm rounded-pill px-4">Apply Now</a>
+                    </li>
+                </ul>
             </div>
-            <nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="#">Services</a>
-                <a href="#">Contact</a>
-                <!-- Added class 'check-status-action' for JS listener -->
-                <a href="#" class="btn btn-outline check-status-action" style="padding: 5px 15px;">Check App Status</a>
-                <a href="application.html" class="btn btn-primary" style="padding: 5px 15px; color: white;">Apply Now</a>
-            </nav>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-text">
-                <h1>Your Safety,<br> Our Priority</h1>
-                <p>Trusted Security & Manpower Solutions in Zamboanga City Since 2002.</p>
-                <div class="hero-buttons">
-                    <a href="application.html" class="btn btn-primary">Join Our Team</a>
-                    <!-- Added class 'check-status-action' for JS listener -->
-                    <button class="btn btn-outline check-status-action">Check Status</button>
+    <!-- Main Hero -->
+    <main class="hero-wrapper">
+        <div class="hero-bg-shape"></div>
+
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Text Content -->
+                <div class="col-lg-6 order-2 order-lg-1">
+                    <h1 class="hero-title">Your Priority, <br><span>Our </span> Priority </h1>
+                    <div class="red-dash"></div>
+                    <p class="hero-desc">
+                        We provide professional, reliable, and well-trained personnel to safeguard your people, property, and business in Zamboanga City since 2002.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                        <a href="application.html" class="btn btn-brand btn-get-quote">Join Our Team</a>
+                        <button class="btn btn-brand btn-check-status check-status-action">Check Status</button>
+                    </div>
+                </div>
+
+                <!-- Right Side Logo -->
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <div class="hero-image-container">
+                        <div class="logo-wrapper">
+                            <img src="uploads/logo.png" alt="Aloha Logo" class="hero-logo-img">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="uploads/placeholder_guard.png" alt="Guard Illustration" style="max-width:100%;">
-            </div>
-        </section>
-
-        <!-- Requirements Section -->
-        <section class="requirements">
-            <h2>Become an Aloha Security Professional</h2>
-            <p style="margin-bottom: 40px;">Who We Are Looking For</p>
-
-            <div class="req-grid">
-                <div class="req-card">
-                    <div class="circle-icon"></div>
-                    <h3>Age Requirement</h3>
-                    <p>Must be at least 21 years old.</p>
-                </div>
-                <div class="req-card">
-                    <div class="circle-icon"></div>
-                    <h3>Documents</h3>
-                    <p>Must possess valid license, clearances, and readiness for immediate deployment.</p>
-                </div>
-                <div class="req-card">
-                    <div class="circle-icon"></div>
-                    <h3>Integrity</h3>
-                    <p>Clean criminal record and strong work ethic.</p>
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <footer>
-        <!-- Footer Content same as before -->
-        <div class="container">
-            <p>&copy; 2026 Aloha Security Agency</p>
+    <!-- Requirements Section -->
+    <section class="py-5" style="background: #fff;">
+        <div class="container text-center py-5">
+            <h2 class="fw-black mb-5">Our Core Requirements</h2>
+            <div class="row g-4">
+                  <div class="col-md-4">
+                    <div class="p-5 border rounded-4 shadow-sm h-100">
+                        <i class="bi bi-person-check-fill text-danger fs-1"></i>
+                        <h4 class="mt-4 fw-bold">Age 21+</h4>
+                        <p class="text-muted">Must meet the maturity standards for professional deployment.</p>
+                    </div>
+                </div>
+                    <div class="col-md-4">
+                    <div class="p-5 border rounded-4 shadow-sm h-100">
+                        <i class="bi bi-file-earmark-text text-danger fs-1"></i>
+                        <h4 class="mt-4 fw-bold">Documents</h4>
+                        <p class="text-muted">Must possess all valid clearances and professional security licenses.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-5 border rounded-4 shadow-sm h-100">
+                        <i class="bi bi-shield-lock-fill text-danger fs-1"></i>
+                        <h4 class="mt-4 fw-bold">Integrity</h4>
+                        <p class="text-muted">A clean criminal record and a strong work ethic are non-negotiable.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark text-white">
+        <div class="container text-center">
+            <p class="opacity-50 mb-0">&copy; 2026 Aloha Security Agency. 108, Old highway, Guiwan, Zamboanga City.</p>
         </div>
     </footer>
 
-    <!-- JS Import -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="js/main.js"></script>
+    <script>
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
 </body>
 </html>
