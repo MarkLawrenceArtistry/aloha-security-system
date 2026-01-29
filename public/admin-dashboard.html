@@ -15,16 +15,34 @@
         <div class="sidebar-brand">
             <i class="bi bi-shield-check"></i> ALOHA <span>ADMIN</span>
         </div>
-        <a href="admin-dashboard.html" class="nav-item active"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-        <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
-        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
-        <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
-        <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+        
+        <div class="sidebar-section">
+            <span class="section-label">General</span>
+            <a href="admin-dashboard.html" class="nav-item active"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="bi bi-journal-text"></i> Audit Log</a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="section-label">Management</span>
+            <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
+            <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+            <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployments</a>
+            <a href="#" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
+        </div>
+
+        <div class="sidebar-section profile-section">
+            <span class="section-label">Profile</span>
+            <a href="#" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+            <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+        </div>
     </nav>
 
     <main class="main-content">
         <div class="page-header">
             <h1>Dashboard Overview</h1>
+            <button class="btn-print-report" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Reports
+            </button>
         </div>
 
         <div class="stats-grid">
@@ -42,8 +60,72 @@
             </div>
         </div>
 
+        <div class="trends-section">
+            <div class="trends-header">
+                <h3>Application Trends</h3>
+                <div class="trends-legend">
+                    <span class="legend-color"></span>
+                    <span>Total Applicants Per Month</span>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-y-axis">
+                    <span>4000</span>
+                    <span>3000</span>
+                    <span>2000</span>
+                    <span>1000</span>
+                    <span>0</span>
+                </div>
+                <div class="chart-bars">
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-jan" data-value="1,280"></div>
+                        </div>
+                        <span class="bar-label">January</span>
+                        <span class="growth-indicator neutral">Initial</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-feb" data-value="2,880"></div>
+                        </div>
+                        <span class="bar-label">February</span>
+                        <span class="growth-indicator positive">+125%</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-mar" data-value="2,320"></div>
+                        </div>
+                        <span class="bar-label">March</span>
+                        <span class="growth-indicator negative">-19%</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-apr" data-value="3,280"></div>
+                        </div>
+                        <span class="bar-label">April</span>
+                        <span class="growth-indicator positive">+41%</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-may" data-value="880"></div>
+                        </div>
+                        <span class="bar-label">May</span>
+                        <span class="growth-indicator negative">-73%</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-capsule">
+                            <div class="bar-fill bar-jun" data-value="3,520"></div>
+                        </div>
+                        <span class="bar-label">June</span>
+                        <span class="growth-indicator positive">+300%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="table-container">
-            <div style="padding: 20px; border-bottom: 1px solid #eee;">
+            <div class="table-header-alt">
                 <h4>Recent Applications</h4>
             </div>
             <table class="table">

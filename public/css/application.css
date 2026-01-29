@@ -27,9 +27,9 @@ body {
 /* Centered container for the multi-step form */
 .app-wrapper {
     max-width: 800px;
-    margin: 40px auto;
+    margin: 60px auto;
     background: white;
-    padding: 70px 50px 50px;
+    padding: 0; /* Changed to handle internal nav */
     border-radius: 16px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.06);
     position: relative;
@@ -37,8 +37,49 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   3. PROGRESS & STEPPER
+   3. NAVIGATION & PROGRESS
    -------------------------------------------------------------------------- */
+
+.app-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 40px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.btn-back {
+    color: #333;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-back:hover {
+    background: #f9f9f9;
+    border-color: #999;
+}
+
+.app-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #232323;
+    margin: 0;
+}
+
+.step-indicator-text {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #666;
+}
 
 /* Thin strip at the very top of the app-wrapper */
 .top-progress-strip {
@@ -64,6 +105,7 @@ body {
     display: flex;
     justify-content: space-between;
     margin-bottom: 50px;
+    padding: 40px 50px 0;
     position: relative;
 }
 
@@ -233,7 +275,10 @@ body:has(#step-4.active-step) .stepper-progress-bar { width: 80%; }
 }
 
 /* Individual form sections (Step 1, 2, etc.) */
-.form-step { display: none; }
+.form-step { 
+    display: none; 
+    padding: 40px 50px 50px;
+}
 .form-step.active-step {
     display: block;
     animation: slideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);

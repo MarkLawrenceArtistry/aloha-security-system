@@ -15,20 +15,43 @@
         <div class="sidebar-brand">
             <i class="bi bi-shield-check"></i> ALOHA <span>ADMIN</span>
         </div>
-        <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-        <a href="applicants.html" class="nav-item active"><i class="bi bi-people-fill"></i> Applicants</a>
-        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
-        <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
-        <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+        
+        <div class="sidebar-section">
+            <span class="section-label">General</span>
+            <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="bi bi-journal-text"></i> Audit Log</a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="section-label">Management</span>
+            <a href="applicants.html" class="nav-item active"><i class="bi bi-people-fill"></i> Applicants</a>
+            <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+            <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployments</a>
+            <a href="#" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
+        </div>
+
+        <div class="sidebar-section profile-section">
+            <span class="section-label">Profile</span>
+            <a href="#" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+            <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+        </div>
     </nav>
 
     <main class="main-content">
         <div class="page-header">
-            <h1>Recruitment Management</h1>
-            <div class="search-box">
-                <!-- Placeholder for search -->
-            </div>
+            <h1>Applicants</h1>
         </div>
+
+        <div class="actions-bar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search" id="applicant-search">
+            </div>
+            <button class="btn-add-new">
+                <i class="bi bi-plus-lg"></i> Add New
+            </button>
+        </div>
+
 
         <div class="table-container">
             <table class="table">

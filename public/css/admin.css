@@ -49,6 +49,26 @@ a { text-decoration: none; }
 }
 .sidebar-brand span { color: #e53828; }
 
+/* Sidebar Sections */
+.sidebar-section {
+    margin-bottom: 25px;
+}
+
+.section-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
+
+.profile-section {
+    margin-top: auto;
+}
+
 .nav-item {
     padding: 12px 15px;
     color: #aaa;
@@ -103,6 +123,122 @@ a { text-decoration: none; }
     margin: 0;
 }
 
+.btn-print-report {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.btn-print-report:hover {
+    background: #f9f9f9;
+    border-color: #ccc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.btn-print-report i {
+    font-size: 1.1rem;
+}
+
+.btn-print-report i {
+    font-size: 1.1rem;
+}
+
+/* Applicants Page Specifics */
+.btn-add-new {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px 25px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+}
+
+.btn-add-new:hover {
+    background: #f9f9f9;
+    border-color: #ccc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+}
+
+.actions-bar {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-box {
+    background: white;
+    border: 1.5px solid #ddd;
+    border-radius: 15px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 450px;
+    transition: all 0.2s;
+}
+
+.search-box:focus-within {
+    border-color: #232323;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.search-box i {
+    color: #888;
+    font-size: 1.1rem;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Action Dots */
+.btn-action-menu {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #232323;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.btn-action-menu:hover {
+    background: #f0f0f0;
+}
+
+.text-end { text-align: right; }
+
 /* --- 4. DASHBOARD CARDS --- */
 .stats-grid {
     display: grid;
@@ -134,6 +270,190 @@ a { text-decoration: none; }
     font-weight: 700; 
 }
 
+/* --- 4.1 TRENDS CHART --- */
+.trends-section {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.trends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.trends-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #232323;
+}
+
+.trends-legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    background-color: #232323;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.chart-container {
+    display: flex;
+    gap: 20px;
+    height: 250px;
+    padding: 10px 0;
+}
+
+.chart-y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px 0 25px 0;
+    color: #888;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: 40px;
+}
+
+.chart-bars {
+    flex: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    background-image: linear-gradient(to top, 
+        transparent, transparent 24%, 
+        #f0f0f0 24%, #f0f0f0 25%, 
+        transparent 25%, transparent 49%, 
+        #f0f0f0 49%, #f0f0f0 50%, 
+        transparent 50%, transparent 74%, 
+        #f0f0f0 74%, #f0f0f0 75%, 
+        transparent 75%
+    );
+    background-size: 100% 100%;
+}
+
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    height: 100%;
+    position: relative;
+}
+
+.bar-capsule {
+    width: 60px;
+    height: 100%;
+    background-color: transparent; /* Changed to transparent to see grid */
+    border: 1px solid #ddd;
+    border-radius: 40px;
+    position: relative;
+    overflow: visible; /* Allow tooltip to overflow */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.bar-fill {
+    width: 100%;
+    background-color: #232323;
+    border-radius: 40px;
+    transition: height 1s ease-out, transform 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.bar-fill:hover {
+    transform: scaleX(1.1);
+    background-color: #000;
+}
+
+/* Tooltip functionality */
+.bar-fill::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #232323;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.bar-fill:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Tooltip Arrow */
+.bar-fill::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #232323;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.bar-fill:hover::before {
+    opacity: 1;
+}
+
+.bar-label {
+    font-size: 0.8rem;
+    color: #333;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+/* Growth Indicators */
+.growth-indicator {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.growth-indicator.positive { color: #10b981; background: #ecfdf5; }
+.growth-indicator.negative { color: #ef4444; background: #fef2f2; }
+.growth-indicator.neutral { color: #6b7280; background: #f3f4f6; }
+
+/* Bar Height Data */
+.bar-jan { height: 32%; }
+.bar-feb { height: 72%; }
+.bar-mar { height: 58%; }
+.bar-apr { height: 82%; }
+.bar-may { height: 22%; }
+.bar-jun { height: 88%; }
+
+
 /* --- 5. TABLES & BADGES --- */
 .table-container {
     background: white;
@@ -141,6 +461,11 @@ a { text-decoration: none; }
     border: 1px solid #ddd;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.table-header-alt {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
 }
 
 .table {
@@ -381,4 +706,27 @@ a { text-decoration: none; }
     background-color: #fef2f2;
     border-color: #dc2626;
     color: #dc2626;
+}
+
+/* --- 8. PRINT STYLES --- */
+@media print {
+    .sidebar, .btn-print-report, .btn-action, .page-header div {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    .stat-card, .trends-section, .table-container {
+        border: 1px solid #eee !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+    }
+    
+    body {
+        background-color: white !important;
+    }
 }
