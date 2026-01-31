@@ -2,27 +2,25 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { initDB } = require('./database.js');
+const startCronJob = require('./utils/cronJob.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Routes
 const applicantRoutes = require('./routes/applicants.js');
-const branchesRoutes = require('./routes/applicants.js');
-const deploymentRoutes = require('./routes/applicants.js');
+const branchRoutes = require('./routes/branches.js');
+const deploymentRoutes = require('./routes/deployments.js');
 
-// Middlewares
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(cors());
 
-// Mount Routes
 app.use('/api', applicantRoutes);
-app.use('/api/branches', branchesRoutes);
-app.use('/api/deployment', deploymentRoutes);
+app.use('/api/branches', branchRoutes);
+app.use('/api/deployments', deploymentRoutes);
 
-// Initialize DB
 initDB();
+startCronJob();
 
 app.listen(PORT, () => {
     console.log(`Aloha Security System listening at http://localhost:${PORT}`);

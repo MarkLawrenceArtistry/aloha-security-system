@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment - Aloha Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-shield-check"></i> ALOHA <span>ADMIN</span>
+        </div>
+        <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
+        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+        <a href="deployment.html" class="nav-item active"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
+        <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Deployment Management</h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="stat-total">-</div>
+                <div class="stat-label">Total Deployments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-active">-</div>
+                <div class="stat-label">Currently Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-month">-</div>
+                <div class="stat-label">Deployed This Month</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div class="d-flex gap-2">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search guard or branch..." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                    <select id="sort-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="desc">Newest First</option>
+                        <option value="asc">Oldest First</option>
+                    </select>
+                </div>
+                <a href="deploy-form.html" class="btn-hire" style="text-decoration:none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                    <i class="bi bi-plus-lg"></i> Deploy Guard
+                </a>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Guard Name</th>
+                        <th>Branch Assigned</th>
+                        <th>Date Deployed</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="deploy-body"></tbody>
+            </table>
+
+            <div class="p-3 d-flex justify-content-between align-items-center bg-light">
+                <span id="page-info" class="text-muted small">Page 1</span>
+                <div class="d-flex gap-2">
+                    <button id="prev-btn" class="btn-outline-custom" disabled>&lt;</button>
+                    <button id="next-btn" class="btn-outline-custom">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </mai

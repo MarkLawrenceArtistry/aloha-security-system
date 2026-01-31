@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Application Status - Aloha Security</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .status-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; max-width: 500px; width: 100%; border: 1px solid #eee; }
+        .status-header { background: #232323; color: white; padding: 30px; text-align: center; }
+        .status-body { padding: 40px; }
+        .status-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .status-value { font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin: 10px 0 20px; }
+        
+        .st-pending { color: #d69e2e; }
+        .st-hired { color: #047481; }
+        .st-rejected { color: #e53e3e; }
+        .st-interview { color: #3182ce; }
+
+        .search-wrapper { position: relative; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+        .search-wrapper input { padding-left: 40px; height: 50px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="status-card">
+        <div class="status-header">
+            <h3 class="fw-bold mb-0">Application Tracker</h3>
+            <p class="opacity-75 mb-0">Aloha Security Agency</p>
+        </div>
+        
+        <div class="status-body">
+            
+            <!-- Search Form -->
+            <form id="check-form" class="mb-4">
+                <label class="form-label text-muted fw-bold small">ENTER YOUR REGISTERED EMAIL</label>
+                <div class="search-wrapper mb-3">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="email-check" class="form-control" placeholder="juan@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Track Application</button>
+            </form>
+
+            <hr class="my-4">
+
+            <!-- Result Area (Hidden by default) -->
+            <div id="result-area" class="text-center d-none">
+                <i id="res-icon" class="bi status-icon"></i>
+                <h5 class="text-muted">Hello, <span id="res-name">User</span></h5>
+                <div id="res-status" class="status-value">STATUS</div>
+                <p id="res-msg" class="text-secondary small">Message goes here.</p>
+            </div>
+
+            <div id="loading-area" class="text-center d-none">
+                <div class="spinner-border text-danger" role="status"></div>
+                <p class="mt-2 text-muted">Checking database...</p>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="index.html" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left"></i> Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('check-form');
+        const resultArea = document.getElementById('result-area');
+        const loadingArea = document.getElementById('loading-area');
+
+        // Check for URL param passed from Index
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlEmail = urlParams.get('email');
+        if(urlEmail) {
+            document.getElementById('email-check').value = urlEmail;
+            checkStatus(urlEmail);
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email-check').value;
+            checkStatus(email);
+        });
+
+        async function checkStatus(email) {
+            resultArea.classList.add('d-none');
+            loadingArea.classList.remove('d-none');
+
+            try {
+                const res = await fetch(`/api/status?email=${encodeURIComponent(email)}`);
+                const json = await res.json();
+
+                loadingArea.classList.add('d-none');
+                resultArea.classList.remove('d-none');
+
+                if (json.success) {
+                    const app = json.data;
+                    document.getElementById('res-name').innerText = app.first_name;
+                    
+                    const statusEl = document.getElementById('res-status');
+                    const iconEl = document.getElementById('res-icon');
+                    const msgEl = document.getElementById('res-msg');
+
+                    statusEl.innerText = app.status;
+                    
+                    // Style logic
+                    statusEl.className = 'status-value'; // reset
+                    if(app.status === 'Pending') {
+                        statusEl.classList.add('st-pending');
+                        iconEl.className = 'bi bi-hourglass-split status-icon st-pending';
+                        msgEl.innerText = "Your application is currently under review by our HR team.";
+                    } else if(app.status === 'Hired') {
+                        statusEl.classList.add('st-hired');
+                        iconEl.className = 'bi bi-check-circle-fill status-icon st-hired';
+                        msgEl.innerText = "Congratulations! You have been accepted. Please wait for deployment instructions.";
+                    } else if(app.status === 'For Interview') {
+                        statusEl.classList.add('st-interview');
+                        iconEl.className = 'bi bi-calendar-check status-icon st-interview';
+                        msgEl.innerText = "You are shortlisted! Please visit our office for the final interview.";
+                    } else {
+                        statusEl.classList.add('st-rejected');
+                        iconEl.className = 'bi bi-x-circle-fill status-icon st-rejected';
+                        msgEl.innerText = "We regret to inform you that your application was not successful.";
+                    }
+
+                } else {
+                    document.getElementById('res-name').innerText = "Guest";
+                    document.getElementById('res-status').innerText = "NOT FOUND";
+                    document.getElementById('res-status').className = "status-value text-secondary";
+                    document.getElementById('res-icon').className = "bi bi-search status-icon text-secondary";
+                    document.getElementById('res-msg').innerText = "No application found with this email address.";
+                }
+
+            } catch (err) {
+                loadingArea.classList.add('d-none');
+                alert("Connection Error");
+            }
+        }
+    </script>
+</body>
+</html>
