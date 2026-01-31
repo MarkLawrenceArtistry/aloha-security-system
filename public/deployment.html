@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deployment - Aloha Security</title>
+    <title>Deployment - Aloha Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../style.css">
@@ -41,18 +41,21 @@
             </div>
         </div>
 
+        <!-- NEW TABLE CONTAINER STRUCTURE -->
         <div class="table-container">
+            <!-- Toolbar: Search Left, Button Right -->
             <div class="toolbar">
                 <div class="toolbar-left">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search branches...">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search guard or branch...">
                     <select id="sort-select" class="sort-select">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>
                     </select>
                 </div>
-                <button class="btn-toolbar btn-add" onclick="location.href='deploy-form.html'">
+                <!-- Link acts as button -->
+                <a href="deploy-form.html" class="btn-toolbar btn-add" style="text-decoration: none;">
                     <i class="bi bi-plus-lg"></i> Deploy Guard
-                </button>
+                </a>
             </div>
 
             <table class="table">
@@ -69,6 +72,7 @@
                 <tbody id="deploy-body"></tbody>
             </table>
 
+            <!-- Pagination Footer -->
             <div class="pagination-container">
                 <span id="page-info" class="text-muted small">Loading...</span>
                 <div class="d-flex gap-2">

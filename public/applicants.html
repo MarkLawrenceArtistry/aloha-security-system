@@ -26,7 +26,6 @@
             <h1>Applicants</h1>
         </div>
 
-        <!-- KPI Grid (Wireframe: Total, Male, Female, This Month) -->
         <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
             <div class="stat-card">
                 <div class="stat-number" id="kpi-total">-</div>
@@ -46,17 +45,19 @@
             </div>
         </div>
 
-        <!-- Toolbar (Search & Sort) -->
+        <!-- NEW TABLE CONTAINER STRUCTURE -->
         <div class="table-container">
             <div class="toolbar">
                 <div class="toolbar-left">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search branches...">
-                    <select id="sort-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 150px;">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search name or position...">
+                    <select id="sort-select" class="sort-select">
                         <option value="desc">Date: Newest</option>
                         <option value="asc">Date: Oldest</option>
                         <option value="alpha">Alphabetical</option>
                     </select>
                 </div>
+                <!-- Only show Add button if you have a manual add page, otherwise remove button or leave empty div -->
+                <div></div> 
             </div>
 
             <table class="table">
@@ -72,17 +73,14 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="applicants-body">
-                    <!-- JS Populates -->
-                </tbody>
+                <tbody id="applicants-body"></tbody>
             </table>
 
-            <!-- Pagination -->
             <div class="pagination-container">
                 <span id="page-info" class="text-muted small">Loading...</span>
                 <div class="d-flex gap-2">
                     <button id="prev-btn" class="btn-outline-custom" disabled>&lt;</button>
-                    <button id="next-btn" class="btn-outline-custom">&gt;</button>
+                    <button id="next-btn" class="btn-outline-custom" disabled>&gt;</button>
                 </div>
             </div>
         </div>

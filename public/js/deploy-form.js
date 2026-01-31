@@ -19,18 +19,20 @@ async function loadData() {
         const appSelect = document.getElementById('applicant-select');
         const branchSelect = document.getElementById('branch-select');
 
-        // Populate Applicants
-        if(appData.success && appData.data.length > 0) {
+        const hiredApplicants = appData.data.applicants;
+
+        if (appData.success && hiredApplicants && hiredApplicants.length > 0) {
             appSelect.innerHTML = '<option value="" disabled selected>Select a Guard</option>' + 
-                appData.data.map(a => `<option value="${a.id}">${a.first_name} ${a.last_name} (${a.position_applied})</option>`).join('');
+                hiredApplicants.map(a => `<option value="${a.id}">${a.first_name} ${a.last_name} (${a.position_applied})</option>`).join('');
         } else {
             appSelect.innerHTML = '<option value="" disabled>No Hired applicants available</option>';
         }
 
-        // Populate Branches
-        if(branchData.success && branchData.data.branches.length > 0) {
+        const branches = branchData.data.branches;
+        
+        if (branchData.success && branches && branches.length > 0) {
             branchSelect.innerHTML = '<option value="" disabled selected>Select a Branch</option>' + 
-                branchData.data.branches.map(b => `<option value="${b.id}">${b.name} - ${b.location}</option>`).join('');
+                branches.map(b => `<option value="${b.id}">${b.name} - ${b.location}</option>`).join('');
         } else {
             branchSelect.innerHTML = '<option value="" disabled>No branches created yet</option>';
         }
@@ -72,7 +74,7 @@ document.getElementById('deploy-form').addEventListener('submit', async (e) => {
             alert('Guard Deployed Successfully!');
             window.location.href = 'deployment.html';
         } else {
-            alert(result.data); // Error message
+            alert(result.data);
             btn.innerText = "Confirm Deployment";
             btn.disabled = false;
         }

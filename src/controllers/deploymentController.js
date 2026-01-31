@@ -88,26 +88,24 @@ const getDeployments = async (req, res) => {
 
 const updateDeploymentStatus = async (req, res) => {
     try {
-        const { id } = req.params; // Deployment ID
-        const { status } = req.body; // Expecting 'Ended'
+        const { id } = req.params; 
+        const { status } = req.body; 
 
         if (status === 'Ended') {
-            // 1. Get the applicant ID associated with this deployment
             const deployment = await get("SELECT applicant_id FROM deployments WHERE id = ?", [id]);
             
-            if(!deployment) return res.status(404).json({success:false, data: "Deployment not found"});
+            if(!deployment) {
+                return res.status(404).json({success:false, data: "Deployment not found"});
+            }
 
-            // 2. Mark Deployment as Ended
             await run("UPDATE deployments SET status = 'Ended' WHERE id = ?", [id]);
 
-            // 3. Set Applicant back to 'Hired' (Available for pool)
             await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [deployment.applicant_id]);
             
-            res.status(200).json({ success: true, data: "Duty ended. Guard returned to Hired pool." });
+            res.status(200).json({ success: true, data: "Duty ended. Guard has been returned to the Hired pool." });
         } else {
-            // Fallback for other status updates
             await run("UPDATE deployments SET status = ? WHERE id = ?", [status, id]);
-            res.status(200).json({ success: true, data: "Status updated" });
+            res.status(200).json({ success: true, data: "Deployment status updated successfully." });
         }
 
     } catch (err) {
