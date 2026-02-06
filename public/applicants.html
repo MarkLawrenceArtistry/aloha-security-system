@@ -58,12 +58,16 @@
                     </select>
                 </div>
                 <!-- Only show Add button if you have a manual add page, otherwise remove button or leave empty div -->
-                <div></div> 
+                <div></div>
+                <button id="multi-delete-btn" class="btn-reject" style="display: none; padding: 8px 16px; font-size: 0.9rem; align-items:center; gap: 8px;">
+                    Delete Selected
+                </button>
             </div>
 
             <table class="table">
                 <thead>
                     <tr>
+                        <th style="width: 40px;"><input type="checkbox" id="check-all"></th>
                         <th>ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
@@ -87,6 +91,7 @@
         </div>
     </main>
 
+    <script src="js/admin.js"></script>
     <script src="js/applicants.js"></script>
     <script>
         document.getElementById('logout-btn').addEventListener('click', () => {

@@ -1,204 +1,202 @@
+// ================================================
+// FILE: public/js/admin.js (CLEANED & FIXED)
+// ================================================
 const API_URL = '/api';
 
-// Helper: Get Token
+// --- 1. SHARED UTILITIES (Auth & Helpers) ---
+
 function getToken() {
     return localStorage.getItem('admin_token');
 }
 
-// Helper: Check Auth & Redirect
 function checkAuth() {
-    if (!getToken()) {
+    const path = window.location.pathname;
+    // Don't check auth on login page
+    if (!getToken() && !path.includes('login.html')) {
         window.location.href = 'login.html';
     }
 }
 
-// 1. LOGIN
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const btn = e.target.querySelector('button');
-
-    btn.innerText = 'Logging in...';
-    
-    try {
-        const res = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const result = await res.json();
-
-        if (result.success) {
-            localStorage.setItem('admin_token', result.data.token);
-            localStorage.setItem('admin_user', JSON.stringify(result.data.user));
-            window.location.href = 'admin-dashboard.html';
-        } else {
-            alert(result.data);
-            btn.innerText = 'Sign In';
-        }
-    } catch (err) {
-        alert('Login failed');
-        btn.innerText = 'Sign In';
-    }
-}
-
-// 2. LOAD APPLICANTS TABLE
-async function loadApplicants() {
-    const token = getToken();
-    const tbody = document.getElementById('applicants-body');
-
-    try {
-        const res = await fetch(`${API_URL}/applicants`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const result = await res.json();
-
-        if (result.success) {
-            const applicants = result.data;
-            // Update Dashboard Counters if elements exist
-            if(document.getElementById('total-apps')) document.getElementById('total-apps').innerText = applicants.length;
-            if(document.getElementById('pending-apps')) document.getElementById('pending-apps').innerText = applicants.filter(a => a.status === 'Pending').length;
-
-            if (tbody) {
-                tbody.innerHTML = applicants.map(app => `
-                    <tr>
-                        <td>#${String(app.id).padStart(4, '0')}</td>
-                        <td>
-                            <strong>${app.first_name} ${app.last_name}</strong><br>
-                            <span style="font-size:0.8em; color:#888">${app.email}</span>
-                        </td>
-                        <td>${app.position_applied}</td>
-                        <td>${app.contact_num}</td>
-                        <td><span class="badge badge-${app.status.toLowerCase().replace(' ', '-')}">${app.status}</span></td>
-                        <td>
-                            <a href="applicant-details.html?id=${app.id}" class="btn btn-sm btn-outline-custom">View</a>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-        }
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-// 3. LOAD APPLICANT DETAILS
-async function loadApplicantDetails() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const token = getToken();
-
-    if (!id) return;
-
-    try {
-        const res = await fetch(`${API_URL}/status?id=${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const result = await res.json();
-
-        if (result.success) {
-            const app = result.data;
-            
-            // Header Data
-            document.getElementById('app-name').innerText = `${app.first_name} ${app.last_name}`;
-            document.getElementById('app-position').innerText = app.position_applied || 'No Position';
-            document.getElementById('app-status').innerText = app.status;
-            document.getElementById('app-status').className = `badge badge-${app.status.toLowerCase().replace(' ', '-')}`;
-
-            // Personal Info (The clean grid layout)
-            const infoContainer = document.getElementById('personal-info');
-            infoContainer.innerHTML = `
-                <div class="info-group">
-                    <label class="info-label">Email Address</label>
-                    <div class="info-value">${app.email}</div>
-                </div>
-                <div class="info-group">
-                    <label class="info-label">Mobile Number</label>
-                    <div class="info-value">${app.contact_num}</div>
-                </div>
-                <div class="info-group">
-                    <label class="info-label">Date of Birth</label>
-                    <div class="info-value">${app.birthdate}</div>
-                </div>
-                <div class="info-group">
-                    <label class="info-label">Gender</label>
-                    <div class="info-value">${app.gender}</div>
-                </div>
-                <div class="info-group" style="grid-column: span 2;">
-                    <label class="info-label">Home Address</label>
-                    <div class="info-value">${app.address}</div>
-                </div>
-            `;
-            
-            // Experience Info
-             const jobContainer = document.getElementById('job-info');
-             jobContainer.innerHTML = `
-                <div class="info-group">
-                    <label class="info-label">Applied Position</label>
-                    <div class="info-value">${app.position_applied}</div>
-                </div>
-                <div class="info-group">
-                    <label class="info-label">Years of Experience</label>
-                    <div class="info-value">${app.years_experience} Years</div>
-                </div>
-                <div class="info-group" style="grid-column: span 2;">
-                    <label class="info-label">Previous Employer</label>
-                    <div class="info-value">${app.previous_employer || 'N/A'}</div>
-                </div>
-            `;
-
-            // Images
-            document.getElementById('resume-link').href = app.resume_path;
-            document.getElementById('id-img').src = app.id_image_path;
-            
-            setupActionButtons(app.id);
-        }
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-function setupActionButtons(id) {
-    const token = getToken();
-    const update = async (status) => {
-        if(!confirm(`Are you sure you want to mark this applicant as ${status}?`)) return;
-        
-        const res = await fetch(`${API_URL}/applicants/${id}/status`, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-            },
-            body: JSON.stringify({ status })
-        });
-        
-        if(res.ok) {
-            alert('Status Updated');
-            location.reload();
-        }
-    };
-
-    document.getElementById('btn-hire').onclick = () => update('Hired');
-    document.getElementById('btn-interview').onclick = () => update('For Interview');
-    document.getElementById('btn-reject').onclick = () => update('Rejected');
-}
-
-// LOGOUT
 function logout() {
     localStorage.removeItem('admin_token');
     window.location.href = 'login.html';
 }
 
-// INITIALIZER
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('login-form')) {
-        document.getElementById('login-form').addEventListener('submit', handleLogin);
-    } else {
-        checkAuth(); // Protect pages
-        if (document.getElementById('logout-btn')) document.getElementById('logout-btn').addEventListener('click', logout);
-        
-        if (document.getElementById('applicants-body')) loadApplicants();
-        if (document.getElementById('app-name')) loadApplicantDetails();
+// --- 2. UNIVERSAL MULTI-DELETE FUNCTION ---
+// This is now available to any page that includes admin.js
+function setupMultiDelete({ tableBodyId, checkAllId, deleteBtnId, apiBaseUrl, onSuccess }) {
+    const tbody = document.getElementById(tableBodyId);
+    const checkAll = document.getElementById(checkAllId);
+    const deleteBtn = document.getElementById(deleteBtnId);
+
+    // If elements don't exist on this page, stop immediately (prevents errors)
+    if (!tbody || !deleteBtn) return;
+
+    const getSelectedIds = () => Array.from(tbody.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+
+    const updateButtonState = () => {
+        const count = getSelectedIds().length;
+        if (count > 0) {
+            deleteBtn.style.display = 'inline-flex';
+            deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete (${count})`;
+        } else {
+            deleteBtn.style.display = 'none';
+        }
+    };
+
+    if (checkAll) {
+        checkAll.addEventListener('change', (e) => {
+            tbody.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
+            updateButtonState();
+        });
     }
+
+    tbody.addEventListener('change', (e) => {
+        if (e.target.classList.contains('row-checkbox')) {
+            if (checkAll) {
+                const all = tbody.querySelectorAll('.row-checkbox');
+                checkAll.checked = Array.from(all).every(cb => cb.checked);
+            }
+            updateButtonState();
+        }
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        if (!confirm(`Are you sure you want to delete ${ids.length} records?`)) return;
+
+        deleteBtn.disabled = true;
+        deleteBtn.innerText = "Processing...";
+        const token = getToken();
+
+        let successCount = 0;
+        let failCount = 0;
+        let errorMessages = []; // Store specific reasons
+
+        // Loop Fetch Requests
+        const deletePromises = ids.map(id => 
+            fetch(`${apiBaseUrl}/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    successCount++;
+                } else {
+                    failCount++;
+                    // Capture the graceful error message
+                    errorMessages.push(data.data); 
+                }
+            })
+            .catch(err => {
+                failCount++;
+                errorMessages.push("Network Error");
+            })
+        );
+
+        await Promise.all(deletePromises);
+        
+        // --- IMPROVED REPORTING ---
+        let report = `Deletion Complete.\n\n✅ Deleted: ${successCount}\n❌ Failed: ${failCount}`;
+        
+        if (errorMessages.length > 0) {
+            // Show up to 3 specific error reasons so alert isn't too huge
+            const uniqueErrors = [...new Set(errorMessages)];
+            report += `\n\nReasons:\n- ${uniqueErrors.slice(0, 3).join('\n- ')}`;
+            if(uniqueErrors.length > 3) report += `\n...and others.`;
+        }
+
+        alert(report);
+        // --------------------------
+
+        // Reset UI
+        if(checkAll) checkAll.checked = false;
+        deleteBtn.style.display = 'none';
+        deleteBtn.disabled = false;
+        if (onSuccess) onSuccess();
+    });
+}
+
+
+// --- 3. DASHBOARD SPECIFIC LOGIC ---
+// Only runs if we find dashboard-specific elements
+async function initDashboard() {
+    // Check if we are actually on the dashboard
+    if (!document.getElementById('dash-total')) return; 
+
+    try {
+        const token = getToken();
+        // Use the dashboard-stats endpoint we created earlier
+        const res = await fetch(`${API_URL}/dashboard-stats`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const json = await res.json();
+
+        if (json.success) {
+            const data = json.data;
+            document.getElementById('dash-total').innerText = data.counts.total;
+            document.getElementById('dash-pending').innerText = data.counts.pending;
+            document.getElementById('dash-deployed').innerText = data.counts.active_deployments;
+            
+            // Render Chart
+            renderChart(data.chart);
+
+            // Render Recent Table
+            const tbody = document.getElementById('recent-body');
+            if(tbody) {
+                tbody.innerHTML = data.recent.map(a => `
+                    <tr>
+                        <td>#${String(a.id).padStart(4, '0')}</td>
+                        <td><strong>${a.first_name} ${a.last_name}</strong></td>
+                        <td>${a.position_applied}</td>
+                        <td>${new Date(a.created_at).toLocaleDateString()}</td>
+                        <td><span class="badge badge-${a.status.toLowerCase().replace(' ', '-')}">${a.status}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (err) {
+        console.error("Dashboard Load Error:", err);
+    }
+}
+
+// Chart Renderer (Helper for Dashboard)
+function renderChart(chartData) {
+    const container = document.getElementById('chart-bars');
+    if (!container) return;
+    
+    if (!chartData || chartData.length === 0) {
+        container.innerHTML = '<p style="text-align:center; width:100%; color:#999;">No data</p>';
+        return;
+    }
+    
+    const maxVal = Math.max(...chartData.map(d => d.count)) || 1;
+
+    container.innerHTML = chartData.map(d => {
+        const date = new Date(d.month + '-01'); 
+        const label = date.toLocaleString('default', { month: 'short' });
+        const height = (d.count / maxVal) * 80;
+        return `
+            <div class="bar-group">
+                <div class="bar-bg">
+                    <div class="bar" style="height: ${height}%;" title="${d.count} Applicants"></div>
+                </div>
+                <span class="bar-label">${label}</span>
+            </div>`;
+    }).join('');
+}
+
+// --- 4. INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Run Auth Check everywhere (except login)
+    checkAuth();
+
+    // Logout Handler
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    // Try to run dashboard logic (will exit safely if not on dashboard)
+    initDashboard();
 });

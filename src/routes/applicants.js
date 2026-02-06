@@ -17,4 +17,7 @@ router.get('/dashboard-stats', verifyToken, applicantController.getDashboardStat
 router.get('/applicants', verifyToken, applicantController.getAllApplicants);
 router.put('/applicants/:id/status', verifyToken, applicantController.updateStatus);
 
+// Add this route
+router.delete('/applicants/:id', verifyToken, applicantController.deleteApplicant);
+
 module.exports = router;

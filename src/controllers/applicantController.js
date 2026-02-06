@@ -249,6 +249,58 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+const deleteApplicant = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // 1. Get file paths first (so we have them ready)
+        const applicant = await get("SELECT resume_path, id_image_path, first_name, last_name FROM applicants WHERE id = ?", [id]);
+        
+        if (!applicant) {
+            return res.status(404).json({ success: false, data: "Applicant not found." });
+        }
+
+        // 2. Try to Delete from DB FIRST
+        try {
+            await run("DELETE FROM applicants WHERE id = ?", [id]);
+        } catch (dbErr) {
+            // GRACEFUL HANDLING: Check for Foreign Key Constraint
+            if (dbErr.message.includes('FOREIGN KEY constraint failed')) {
+                return res.status(409).json({ 
+                    success: false, 
+                    data: `Cannot delete ${applicant.first_name} ${applicant.last_name}: They have deployment records.` 
+                });
+            }
+            // If it's some other error, throw it to the main catch block
+            throw dbErr;
+        }
+
+        // 3. If DB delete succeeded, NOW delete the files
+        const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public/uploads');
+        
+        const deleteFile = (urlPath) => {
+            if (!urlPath) return;
+            const filename = urlPath.split('/').pop();
+            const filePath = path.join(UPLOAD_PATH, filename);
+            fs.unlink(filePath, (err) => {
+                if (err && err.code !== 'ENOENT') console.error(`Failed to delete ${filePath}`, err);
+            });
+        };
+
+        deleteFile(applicant.resume_path);
+        deleteFile(applicant.id_image_path);
+
+        // 4. Log it
+        await logAction(req, 'DELETE', `Deleted applicant: ${applicant.first_name} ${applicant.last_name}`);
+
+        res.status(200).json({ success: true, data: "Applicant deleted." });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, data: "Internal Server Error" });
+    }
+};
+
 
 // Update exports
-module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats };
+module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats, deleteApplicant };
