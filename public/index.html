@@ -6,12 +6,15 @@
     <title>Aloha Security Agency | Professional Protection</title>
 
     <link rel="icon" type="image/png" href="uploads/logo.png"/>
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">  
+    <!-- Google Fonts: -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet"> 
+    <!-- AOS ANIMATION LIBRARY CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"> 
     <!-- EXTERNAL CSS LINK -->
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -45,26 +48,25 @@
 
     <!-- Main Hero -->
     <main class="hero-wrapper">
-        <div class="hero-bg-shape"></div>
-
+        <!-- Animated Background Shape -->
+        <div class="hero-bg-shape" data-aos="fade-down-left" data-aos-duration="1500"></div>
         <div class="container">
             <div class="row align-items-center">
-                <!-- Text Content -->
                 <div class="col-lg-6 order-2 order-lg-1">
-                    <h1 class="hero-title">Your Safety, <br><span>Our </span> Priority </h1>
-                    <div class="red-dash"></div>
-                    <p class="hero-desc">
+                    <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000">
+                        Your Safety, <br><span>Our </span> Priority 
+                    </h1>
+                    <div class="red-dash" data-aos="fade-right" data-aos-delay="300"></div>
+                    <p class="hero-desc" data-aos="fade-up" data-aos-delay="400">
                         We provide professional, reliable, and well-trained personnel to safeguard your people, property, and business in Zamboanga City since 2002.
                     </p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start" data-aos="fade-up" data-aos-delay="500">
                         <a href="application.html" class="btn btn-brand btn-get-quote">Join Our Team</a>
                         <button class="btn btn-brand btn-check-status" onclick="location.href='status-result.html'">Check Status</button>
                     </div>
                 </div>
-
-                <!-- Right Side Logo -->
                 <div class="col-lg-6 order-1 order-lg-2">
-                    <div class="hero-image-container">
+                    <div class="hero-image-container" data-aos="zoom-in-left" data-aos-duration="1200">
                         <div class="logo-wrapper">
                             <img src="resources/secu.png" alt="Aloha Logo" class="hero-logo-img">
                         </div>
@@ -74,32 +76,185 @@
         </div>
     </main>
 
-    <!-- Requirements Section -->
-    <section class="py-5" style="background: #fff;">
-        <div class="container text-center py-5">
-            <h2 class="fw-black mb-5">Our Core Requirements</h2>
-            <div class="row g-4">
-                  <div class="col-md-4">
-                    <div class="p-5 border rounded-4 shadow-sm h-100">
-                        <i class="bi bi-person-check-fill text-danger fs-1"></i>
-                        <h4 class="mt-4 fw-bold">Age 21+</h4>
-                        <p class="text-muted">Must meet the maturity standards for professional deployment.</p>
+    <section class="py-5 bg-white position-relative" style="z-index: 5;">
+        <div class="container pt-5 pb-3">
+            <div class="row">
+                <div class="col-lg-7" data-aos="fade-up" data-aos-duration="1000">
+                    <h2 class="display-4 fw-black mb-4">
+                        A Security Agency Company<br>
+                        in Zamboanga
+                    </h2>
+                    <p class="lead text-secondary mb-4" style="line-height: 1.8;">
+                        Aloha Security Agency is a trusted and expanding security service for the Zamboanga City area. 
+                        We provide a wide array of security services to businesses and individuals, ensuring safety with professionalism.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards Section -->
+    <section class="overlap-section">
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <div class="col-lg-6 p-0 position-relative min-h-cards">
+                    
+                    <div id="leftSideCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel">
+                        <div class="carousel-indicators justify-content-start ps-5 mb-5" style="margin-left: 10px;">
+                            <button type="button" data-bs-target="#leftSideCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                            <button type="button" data-bs-target="#leftSideCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#leftSideCarousel" data-bs-slide-to="2"></button>
+                        </div>
+
+                        <div class="carousel-inner h-100">
+                            
+                            <!-- SLIDE 1  -->
+                            <div class="carousel-item active h-100 bg-light-section" style="background-image: url('resources/stock\ photos\ 3.jpg'); background-size: cover; background-position: center;">
+                                <div class="carousel-overlay"></div> 
+                                
+                                <div class="content-box-wrapper position-relative z-1 h-100 d-flex flex-column justify-content-center">
+                                    <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Free Risk Analysis</p>
+                                    <h2 class="display-5 fw-black mb-4">
+                                        <span class="text-danger">Aloha</span> Security Agency
+                                    </h2>
+                                    <p class="lead text-secondary mb-4">
+                                        Can provide a total solutions package giving you complete peace of mind. We adapt to the evolving security needs of Zamboanga City.
+                                    </p>
+                                    <div class="arrow-indicator mt-4">
+                                        <a href="application.html" class="btn btn-outline-dark rounded-pill fw-bold px-4">Apply Now</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SLIDE 2 -->
+                            <div class="carousel-item h-100 bg-light-section" style="background-image: url('resources/stock\ photos\ 2.jpg'); background-size: cover; background-position: center;">
+                                <div class="carousel-overlay"></div>
+                                
+                                <div class="content-box-wrapper position-relative z-1 h-100 d-flex flex-column justify-content-center">
+                                    <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">24/7 Monitoring</p>
+                                    <h2 class="display-5 fw-black mb-4">
+                                        Always <span class="text-danger">Watching</span>
+                                    </h2>
+                                    <p class="lead text-secondary mb-4">
+                                        Our command center operates round-the-clock to ensure rapid response to any incident. Your safety never sleeps.
+                                    </p>
+                                    <div class="arrow-indicator mt-4">
+                                        <a href="#services" class="btn btn-outline-dark rounded-pill fw-bold px-4">Our Services</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item h-100 bg-light-section" style="background-image: url('resources/stock-photos.jpg'); background-size: cover; background-position: center;">
+                                <div class="carousel-overlay"></div>
+                                
+                                <div class="content-box-wrapper position-relative z-1 h-100 d-flex flex-column justify-content-center">
+                                    <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Highly Trained</p>
+                                    <h2 class="display-5 fw-black mb-4">
+                                        Elite <span class="text-danger">Personnel</span>
+                                    </h2>
+                                    <p class="lead text-secondary mb-4">
+                                        Our guards undergo rigorous physical and psychological training to handle high-pressure situations with professionalism.
+                                    </p>
+                                    <div class="arrow-indicator mt-4">
+                                        <a href="application.html" class="btn btn-outline-dark rounded-pill fw-bold px-4">Join Us</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#leftSideCarousel" data-bs-slide="prev" style="justify-content: flex-start; margin-left: 20px; opacity: 0.5;">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#leftSideCarousel" data-bs-slide="next" style="justify-content: flex-end; margin-right: 20px; opacity: 0.5;">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
                 </div>
-                    <div class="col-md-4">
-                    <div class="p-5 border rounded-4 shadow-sm h-100">
-                        <i class="bi bi-file-earmark-text text-danger fs-1"></i>
-                        <h4 class="mt-4 fw-bold">Documents</h4>
-                        <p class="text-muted">Must possess all valid clearances and professional security licenses.</p>
+
+                <!-- Right Cards Side -->
+                <div class="col-lg-6 position-relative min-h-cards">
+                    <div class="cards-staircase-wrapper">
+                        <div class="stair-card card-red position-1">
+                            <div data-aos="zoom-in" data-aos-delay="0">
+                                <i class="bi bi-person-badge fs-1 mb-3"></i>
+                                <h4 class="fw-bold">Static Security Guard</h4>
+                                <p class="small opacity-75">Well-trained personnel stationed to protect your premises 24/7.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Middle -->
+                        <div class="stair-card card-black position-2">
+                            <div data-aos="zoom-in" data-aos-delay="200">
+                                <i class="bi bi-car-front-fill fs-1 mb-3"></i>
+                                <h4 class="fw-bold">Mobile Security Patrol</h4>
+                                <p class="small opacity-75">Rapid response units and roving inspections for large areas.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Top -->
+                        <div class="stair-card card-red position-3">
+                            <div data-aos="zoom-in" data-aos-delay="400">
+                                <i class="bi bi-shield-check fs-1 mb-3"></i>
+                                <h4 class="fw-bold">Private Protection</h4>
+                                <p class="small opacity-75">Specialized VIP protection and escort services for high-profile clients.</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="p-5 border rounded-4 shadow-sm h-100">
-                        <i class="bi bi-shield-lock-fill text-danger fs-1"></i>
-                        <h4 class="mt-4 fw-bold">Integrity</h4>
-                        <p class="text-muted">A clean criminal record and a strong work ethic are non-negotiable.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- REQUIREMENTS -->
+    <section class="requirements-section position-relative py-5">
+        <div class="req-bg-overlay"></div>
+        <div class="container position-relative py-5">
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h2 class="fw-black">Our Core Requirements</h2>
+                <p class="text-muted">We ensure quality through strict standards</p>
+            </div>
+            <div class="row justify-content-center position-relative mt-5">
+                
+                <div class="timeline-connector d-none d-md-block" data-aos="fade-in" data-aos-duration="1500"></div>
+                
+                <!-- Req 1 -->
+                <div class="col-md-4 text-center timeline-item mb-5 mb-md-0" data-aos="fade-up" data-aos-delay="100">
+                    <div class="timeline-icon-wrapper">
+                        <div class="icon-circle shadow">
+                            <i class="bi bi-person-check-fill fs-2 text-danger"></i>
+                        </div>
                     </div>
+                    <h4 class="mt-4 fw-bold">Age 21+</h4>
+                    <p class="text-muted px-4 small">Must meet the maturity standards for professional deployment and legal requirements.</p>
                 </div>
+
+                <!-- Req 2 -->
+                <div class="col-md-4 text-center timeline-item mb-5 mb-md-0" data-aos="fade-up" data-aos-delay="300">
+                    <div class="timeline-icon-wrapper">
+                        <div class="icon-circle shadow">
+                            <i class="bi bi-file-earmark-text-fill fs-2 text-danger"></i>
+                        </div>
+                    </div>
+                    <h4 class="mt-4 fw-bold">Documents</h4>
+                    <p class="text-muted px-4 small">Must possess all valid clearances, psych tests, and professional security licenses.</p>
+                </div>
+
+                <!-- Req 3 -->
+                <div class="col-md-4 text-center timeline-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="timeline-icon-wrapper">
+                        <div class="icon-circle shadow">
+                            <i class="bi bi-shield-lock-fill fs-2 text-danger"></i>
+                        </div>
+                    </div>
+                    <h4 class="mt-4 fw-bold">Integrity</h4>
+                    <p class="text-muted px-4 small">A clean criminal record and a strong work ethic are non-negotiable for our team.</p>
+                </div>
+
             </div>
         </div>
     </section>
@@ -111,18 +266,15 @@
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button onclick="scrollToTop()" id="backToTop" class="btn-back-to-top" title="Go to top">
+        <i class="bi bi-arrow-up fs-5"></i>
+    </button>
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-    <script>
-        window.addEventListener('scroll', function() {
-            const nav = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  
+    <!-- AOS ANIMATION LIBRARY JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module" src="js/main.js"></script> 
+    <script src="js/index.js"></script>
 </body>
 </html>

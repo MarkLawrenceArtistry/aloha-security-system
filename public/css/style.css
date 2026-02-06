@@ -26,7 +26,7 @@ body {
     font-family: 'Helvetica', Arial, sans-serif !important;
     background-color: var(--brand-bg);
     color: var(--brand-black);
-    overflow-x: hidden;
+    overflow-x: hidden !important; 
 }
 
 h1, h2, h3, h4, .fw-black, .navbar-brand {
@@ -38,6 +38,10 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     background: transparent;
     transition: var(--transition);
     z-index: 1100;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background 0.4s;
+}
+.navbar-hidden {
+    transform: translateY(-100%);
 }
 
 /* --- NAVIGATION --- */
@@ -87,10 +91,38 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     border-radius: 3px;
 }
 
-@media (min-width: 992px) {
-    .navbar:not(.scrolled) .toggler-icon {
-        background-color: var(--brand-white);
-    }
+.btn-back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--brand-red);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 10px 20px rgba(229, 56, 40, 0.4);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.btn-back-to-top:hover {
+    background-color: var(--brand-black);
+    transform: translateY(-5px);
+    color: white;
 }
 
 /* ---  HERO SECTION --- */
@@ -148,14 +180,9 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     width: 100%;
     max-width: 500px; 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
-    animation: float 6s ease-in-out infinite;
     margin-right: -20px; 
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
 
 /* --- BUTTONS --- */
 .btn-brand {
@@ -189,7 +216,208 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     color: white !important;
 }
 
+.bg-light-section {
+    background-color: #f6f7f9;
+    min-height: 600px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.content-box-wrapper {
+    max-width: 550px;
+    padding: 60px 40px;
+}
+
+.letter-spacing-2 {
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+}
+
+.text-secondary{
+    --bs-text-opacity: 1;
+    color: rgb(51, 56, 59) !important;
+}
+
+
+.carousel-item {
+    transition: transform .6s ease-in-out, opacity .6s ease-in-out;
+}
+
+
+.carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(245,245,245,0.85) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 100%);
+    z-index: 0;
+}
+
+/* Carousel Indicators */
+.carousel-indicators [data-bs-target] {
+    background-color: var(--brand-black);
+    width: 30px;
+    height: 3px;
+}
+
+.content-box-wrapper {
+    max-width: 600px;
+    padding: 60px 50px;
+    margin: 0 auto;
+    width: 100%;
+}
+/* Wrapper for the cards */
+.cards-staircase-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.min-h-cards {
+    min-height: 600px; 
+    background: white;
+}
+
+.stair-card {
+    width: 280px;
+    height: 320px;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    transition: transform 0.4s ease, z-index 0s; 
+    z-index: 1;
+}
+
+.stair-card:hover {
+    z-index: 100 !important;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.card-red {
+    background-color: var(--brand-red);
+    color: white;
+}
+
+.card-black {
+    background-color: var(--brand-black);
+    color: white;
+}
+
+.requirements-section {
+    background-color: #fff;
+    overflow: hidden; 
+}
+
+.req-bg-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%; 
+    height: 100%;
+    background-image: url('../resources/stock\ photos\ 5.jpg');   
+    background-size: cover;
+    background-position: center top;
+    z-index: 0;
+    opacity: 0.15; 
+    -webkit-mask-image: linear-gradient(to right, transparent, black);
+    mask-image: linear-gradient(to right, transparent, black);
+}
+.timeline-connector {
+    position: absolute;
+    top: 50px; 
+    left: 15%; 
+    right: 15%; 
+    height: 2px;
+    background-color: #e9ecef; 
+    z-index: 0;
+}
+
+.timeline-item {
+    position: relative;
+    z-index: 1; 
+}
+
+.timeline-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    border: 10px solid #fff; 
+}
+
+.icon-circle:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(229, 56, 40, 0.2) !important; 
+}
+
+.requirements-section h4 {
+    margin-bottom: 10px;
+    color: var(--brand-black);
+}
+
+.requirements-section p {
+    line-height: 1.6;
+}
+
+
 /* ---  MOBILE RESPONSIVE  --- */
+
+@media (min-width: 992px) {
+    .navbar:not(.scrolled) .toggler-icon {
+        background-color: var(--brand-white);
+    }
+    .stair-card {
+        position: absolute;
+    }
+    .position-1 {
+        bottom: 50px;
+        left: 50px;
+        z-index: 3;
+    }
+    .position-2 {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+    }
+    .position-3 {
+        top: 50px;
+        right: 50px;
+        z-index: 1;
+    }
+
+    .position-1:hover,
+    .position-3:hover {
+        transform: translateY(-10px); 
+        z-index: 100;
+    }
+    .position-2:hover {
+        transform: translate(-50%, calc(-50% - 10px));
+        z-index: 100;
+    }
+
+    
+}
+
 @media (max-width: 991px) {
     .navbar { padding: 15px 0; }
     .navbar .nav-link { 
@@ -228,5 +456,46 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     }   
     .navbar-toggler .toggler-icon {
         background-color: var(--brand-black); 
+    }
+     .bg-light-section {
+        min-height: 500px; 
+        padding: 60px 20px;
+    }
+    
+    .min-h-cards {
+        min-height: auto;
+        padding: 50px 20px;
+        background: white;
+    }
+
+    .cards-staircase-wrapper {
+        flex-direction: column;
+        gap: 20px;
+        padding-bottom: 50px;
+    }
+
+    .stair-card {
+        position: relative; 
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+        min-height: 280px;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+    }
+    .stair-card:hover {
+        transform: translateY(-10px);
+    }
+    .hero-title span { color: var(--brand-white);
+    }
+}
+
+@media (max-width: 768px) {
+    .req-bg-overlay {
+        width: 100%;
+        opacity: 0.05; 
     }
 }
