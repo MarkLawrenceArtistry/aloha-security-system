@@ -1,4 +1,8 @@
+// ================================================
+// FILE: src/controllers/deploymentController.js
+// ================================================
 const { run, all, get } = require('../utils/helper');
+const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 
 const deployGuard = async (req, res) => {
     try {
@@ -17,12 +21,25 @@ const deployGuard = async (req, res) => {
             return res.status(409).json({ success: false, data: "Guard is already deployed." });
         }
 
+        // --- AUDIT LOG ---
+        // Get names for a better log message
+        const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [applicant_id]);
+        const branch = await get("SELECT name FROM branches WHERE id = ?", [branch_id]);
+        // --- END LOG PREP ---
+
         const result = await run(
             "INSERT INTO deployments (applicant_id, branch_id) VALUES (?, ?)",
             [applicant_id, branch_id]
         );
 
         await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [applicant_id]);
+
+        // --- AUDIT LOG ---
+        if (applicant && branch) {
+            const details = `Admin User ID #${req.user.id} deployed ${applicant.first_name} ${applicant.last_name} to branch "${branch.name}".`;
+            await logAction(req, 'DEPLOYMENT_CREATE', details);
+        }
+        // --- END LOG ---
 
         res.status(201).json({ 
             success: true, 
@@ -98,10 +115,20 @@ const updateDeploymentStatus = async (req, res) => {
                 return res.status(404).json({success:false, data: "Deployment not found"});
             }
 
-            await run("UPDATE deployments SET status = 'Ended' WHERE id = ?", [id]);
+            // --- AUDIT LOG ---
+            const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [deployment.applicant_id]);
+            // --- END LOG PREP ---
 
+            await run("UPDATE deployments SET status = 'Ended' WHERE id = ?", [id]);
             await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [deployment.applicant_id]);
             
+            // --- AUDIT LOG ---
+            if(applicant) {
+                const details = `Admin User ID #${req.user.id} ended the deployment for ${applicant.first_name} ${applicant.last_name}.`;
+                await logAction(req, 'DEPLOYMENT_END', details);
+            }
+            // --- END LOG ---
+
             res.status(200).json({ success: true, data: "Duty ended. Guard has been returned to the Hired pool." });
         } else {
             await run("UPDATE deployments SET status = ? WHERE id = ?", [status, id]);

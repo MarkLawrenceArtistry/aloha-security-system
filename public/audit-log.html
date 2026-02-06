@@ -1,0 +1,128 @@
+<!-- ================================================ -->
+<!-- FILE: public/audit-log.html                      -->
+<!-- ================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Aloha Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <!-- We will update all sidebars in the next step -->
+        <div class="sidebar-brand">
+            <i class="bi bi-shield-check"></i> ALOHA <span>ADMIN</span>
+        </div>
+        <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="audit-log.html" class="nav-item active"><i class="bi bi-clipboard-data-fill"></i> Audit Logs</a>
+        <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
+        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+        <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
+        <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Audit Logs</h1>
+            <p style="margin:0; color:#666;">Tracks all significant actions performed by administrators.</p>
+        </div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Admin</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-body">
+                    <!-- JS will render rows here -->
+                </tbody>
+            </table>
+
+            <div class="pagination-container">
+                <span id="page-info" class="text-muted small">Loading...</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="prev-btn" class="btn-outline-custom" disabled>&lt; Prev</button>
+                    <button id="next-btn" class="btn-outline-custom">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentPage = 1;
+        const limit = 15;
+
+        function getToken() { return localStorage.getItem('admin_token'); }
+
+        async function fetchLogs() {
+            const token = getToken();
+            if(!token) { window.location.href = 'login.html'; return; }
+
+            const tbody = document.getElementById('logs-body');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading logs...</td></tr>';
+
+            try {
+                const res = await fetch(`/api/audit/logs?page=${currentPage}&limit=${limit}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    renderTable(result.data);
+                    updatePagination(result.pagination);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${result.data}</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Failed to fetch logs.</td></tr>';
+            }
+        }
+
+        function renderTable(logs) {
+            const tbody = document.getElementById('logs-body');
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No logs found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = logs.map(log => {
+                const date = new Date(log.timestamp).toLocaleString();
+                return `
+                    <tr>
+                        <td>${log.id}</td>
+                        <td><strong>${log.admin_username || 'System'}</strong></td>
+                        <td><span class="badge" style="background:#eee; color:#555;">${log.action}</span></td>
+                        <td style="font-size: 0.9em; color: #444; max-width: 450px;">${log.details}</td>
+                        <td>${date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updatePagination(pagination) {
+            document.getElementById('page-info').innerText = `Page ${pagination.current_page} of ${pagination.total_pages}`;
+            document.getElementById('prev-btn').disabled = pagination.current_page === 1;
+            document.getElementById('next-btn').disabled = pagination.current_page >= pagination.total_pages;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchLogs();
+            document.getElementById('prev-btn').addEventListener('click', () => { if(currentPage > 1) { currentPage--; fetchLogs(); } });
+            document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchLogs(); });
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('admin_token');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>

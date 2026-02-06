@@ -1,4 +1,8 @@
+// ================================================
+// FILE: src/controllers/applicantController.js
+// ================================================
 const { run, get, all } = require('../utils/helper');
+const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 
 // POST /api/apply
 const apply = async (req, res) => {
@@ -166,7 +170,20 @@ const updateStatus = async (req, res) => {
             return res.status(400).json({ success: false, data: "ID and Status are required." });
         }
 
+        // --- AUDIT LOGGING ---
+        // 1. Get applicant details BEFORE the update for a better log message.
+        const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [id]);
+        if (!applicant) {
+            return res.status(404).json({ success: false, data: "Applicant not found." });
+        }
+        
+        // 2. Perform the database update.
         await run("UPDATE applicants SET status = ? WHERE id = ?", [status, id]);
+
+        // 3. Log the action.
+        const details = `Admin User ID #${req.user.id} changed status of ${applicant.first_name} ${applicant.last_name} (Applicant ID: ${id}) to "${status}".`;
+        await logAction(req, 'STATUS_UPDATE', details);
+        // --- END AUDIT LOGGING ---
 
         res.status(200).json({ success: true, data: `Applicant status updated to ${status}` });
     } catch (err) {
