@@ -1,9 +1,12 @@
-const { db } = require('../database');
+// ================================================
+// FILE: src/utils/helper.js
+// ================================================
+const { getDB } = require('../database');
 
-// converted db.run
 const run = (query, params = []) => {
     return new Promise((resolve, reject) => {
-        db.run(query, params, function(err) {
+        // Always get the current active DB instance
+        getDB().run(query, params, function(err) {
             if(err) {
                 reject(err);
             } else {
@@ -13,10 +16,9 @@ const run = (query, params = []) => {
     })
 }
 
-// converted db.all
 const all = (query, params = []) => {
     return new Promise((resolve, reject) => {
-        db.all(query, params, (err, rows) => {
+        getDB().all(query, params, (err, rows) => {
             if(err) {
                 reject(err);
             } else {
@@ -26,10 +28,9 @@ const all = (query, params = []) => {
     })
 }
 
-// converted db.get
 const get = (query, params = []) => {
     return new Promise((resolve, reject) => {
-        db.get(query, params, (err, row) => {
+        getDB().get(query, params, (err, row) => {
             if(err) {
                 reject(err);
             } else {
