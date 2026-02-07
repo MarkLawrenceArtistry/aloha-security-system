@@ -6,19 +6,19 @@ const path = require('path');
 const archiver = require('archiver');
 const AdmZip = require('adm-zip');
 const { logAction } = require('../utils/auditLogger');
+// Import the new DB management functions
+const { closeDB, connectDB, initDB } = require('../database');
 
-// 1. DEFINE PATHS ROBUSTLY
 const VOLUME_ROOT = process.env.VOLUME_PATH || path.join(__dirname, '../../');
 const DB_PATH = process.env.VOLUME_PATH 
     ? path.join(process.env.VOLUME_PATH, 'aloha_database.db') 
     : path.join(__dirname, '../../aloha_database.db');
 
-// Uploads are now consistently in a subfolder
 const UPLOAD_DIR = process.env.VOLUME_PATH 
     ? path.join(process.env.VOLUME_PATH, 'uploads')
     : path.join(__dirname, '../../public/uploads');
 
-// 1. CREATE BACKUP (Download ZIP)
+// 1. CREATE BACKUP
 const createBackup = async (req, res) => {
     try {
         const date = new Date().toISOString().slice(0,10);
@@ -32,15 +32,12 @@ const createBackup = async (req, res) => {
             res.status(500).send({error: err.message});
         });
 
-        // Pipe zip data to response
         archive.pipe(res);
 
-        // A. Add Database File to root of ZIP
         if (fs.existsSync(DB_PATH)) {
             archive.file(DB_PATH, { name: 'aloha_database.db' });
         }
 
-        // B. Add Uploads Directory to 'uploads/' folder in ZIP
         if (fs.existsSync(UPLOAD_DIR)) {
             archive.directory(UPLOAD_DIR, 'uploads');
         }
@@ -54,7 +51,7 @@ const createBackup = async (req, res) => {
     }
 };
 
-// 2. RESTORE BACKUP (Upload ZIP)
+// 2. RESTORE BACKUP (HOT RELOAD)
 const restoreBackup = async (req, res) => {
     try {
         if (!req.file) {
