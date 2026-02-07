@@ -106,7 +106,10 @@ const restoreBackup = async (req, res) => {
 
         await logAction(req, 'SYSTEM_RESTORE', `Admin restored system from backup file.`);
 
-        res.status(200).json({ success: true, data: "System restored successfully. Please refresh." });
+        setTimeout(() => {
+            console.log("Restarting server to apply database restore...");
+            process.exit(0); 
+        }, 1000);
 
     } catch (err) {
         console.error(err);
