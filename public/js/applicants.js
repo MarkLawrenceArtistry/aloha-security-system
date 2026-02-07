@@ -30,11 +30,13 @@ async function fetchApplicants() {
 function renderTable(data) {
     const tbody = document.getElementById('applicants-body');
     
-    // Reset Multi-Delete UI on re-render
+    // Reset Select All
     const checkAll = document.getElementById('check-all');
     if(checkAll) checkAll.checked = false;
-    const delBtn = document.getElementById('multi-delete-btn');
-    if(delBtn) delBtn.style.display = 'none';
+    
+    // Reset Delete Actions Visibility
+    const actionDiv = document.getElementById('delete-actions');
+    if(actionDiv) actionDiv.style.display = 'none';
 
     tbody.innerHTML = data.map(app => {
         const date = new Date(app.created_at).toLocaleDateString();
@@ -83,12 +85,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchApplicants(); });
 
     // INITIALIZE MULTI DELETE
-    // The function 'setupMultiDelete' comes from admin.js
+    // 1. STANDARD DELETE (Fails if deployed)
     setupMultiDelete({
         tableBodyId: 'applicants-body',
         checkAllId: 'check-all',
-        deleteBtnId: 'multi-delete-btn',
-        apiBaseUrl: API_BASE, // Loop will append ID
+        deleteBtnId: 'btn-delete-standard', // ID of first button
+        containerId: 'delete-actions',      // ID of the div holding buttons
+        apiBaseUrl: API_URL,                // /api/applicants/:id
+        onSuccess: fetchApplicants
+    });
+
+    // 2. FORCE DELETE (Cascades deployments)
+    setupMultiDelete({
+        tableBodyId: 'applicants-body',
+        checkAllId: 'check-all',
+        deleteBtnId: 'btn-delete-force',    // ID of second button
+        containerId: 'delete-actions',      // Shared container
+        apiBaseUrl: API_URL,                
+        urlSuffix: '?force=true',           // <--- NEW PARAMETER
         onSuccess: fetchApplicants
     });
 });

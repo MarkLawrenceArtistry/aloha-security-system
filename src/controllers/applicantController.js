@@ -1,6 +1,8 @@
 // ================================================
 // FILE: src/controllers/applicantController.js
 // ================================================
+const fs = require('fs'); // Required for file deletion
+const path = require('path'); // Required for file paths
 const { run, get, all } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 
@@ -13,6 +15,23 @@ const apply = async (req, res) => {
             years_experience, previous_employer 
         } = req.body;
 
+        // --- ANTI-SPAM CHECK (1 DAY COOLDOWN) ---
+        const lastApp = await get("SELECT created_at FROM applicants WHERE email = ? ORDER BY created_at DESC LIMIT 1", [email]);
+        
+        if (lastApp) {
+            const lastDate = new Date(lastApp.created_at).getTime();
+            const now = Date.now();
+            const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+            if (now - lastDate < oneDayMs) {
+                return res.status(429).json({
+                    success: false, 
+                    data: "You have already applied recently. Please wait 24 hours before applying again."
+                });
+            }
+        }
+        // --- END ANTI-SPAM ---
+
         // 1. Validation: Check Files
         if (!req.files || !req.files['resume'] || !req.files['id_image']) {
             return res.status(400).json({success:false, data:"Resume and ID Image are required."});
@@ -21,7 +40,7 @@ const apply = async (req, res) => {
         const resumePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['resume'][0].filename}`;
         const idImagePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['id_image'][0].filename}`;
 
-        // 2. Validation: Age Gating (Must be 21+)
+        // 2. Validation: Age Gating
         const birthDateObj = new Date(birthdate);
         const ageDifMs = Date.now() - birthDateObj.getTime();
         const ageDate = new Date(ageDifMs);
@@ -31,7 +50,7 @@ const apply = async (req, res) => {
             return res.status(400).json({success:false, data:"You must be at least 21 years old to apply."});
         }
 
-        // 3. Validation: Duplicate Prevention
+        // 3. Validation: Duplicate Prevention (Name + Birthdate)
         const existing = await get(
             "SELECT id FROM applicants WHERE first_name = ? AND last_name = ? AND birthdate = ?", 
             [first_name, last_name, birthdate]
@@ -62,6 +81,7 @@ const apply = async (req, res) => {
         }});
 
     } catch(err) {
+        console.error(err);
         return res.status(500).json({success:false, data:`Internal Server Error: ${err.message}`});
     }
 }
@@ -252,15 +272,25 @@ const getDashboardStats = async (req, res) => {
 const deleteApplicant = async (req, res) => {
     try {
         const { id } = req.params;
+        const { force } = req.query; // Check for ?force=true
 
-        // 1. Get file paths first (so we have them ready)
+        // 1. Get file paths first
         const applicant = await get("SELECT resume_path, id_image_path, first_name, last_name FROM applicants WHERE id = ?", [id]);
         
         if (!applicant) {
             return res.status(404).json({ success: false, data: "Applicant not found." });
         }
 
-        // 2. Try to Delete from DB FIRST
+        // --- FORCE DELETE LOGIC ---
+        if (force === 'true') {
+            // Check if user is authorized to do this (Admin only)
+            // Delete deployment records associated with this applicant
+            await run("DELETE FROM deployments WHERE applicant_id = ?", [id]);
+            await logAction(req, 'FORCE_DELETE_DEP', `Cascaded delete of deployments for applicant ID ${id}`);
+        }
+        // --- END FORCE DELETE ---
+
+        // 2. Try to Delete from DB
         try {
             await run("DELETE FROM applicants WHERE id = ?", [id]);
         } catch (dbErr) {
@@ -268,14 +298,13 @@ const deleteApplicant = async (req, res) => {
             if (dbErr.message.includes('FOREIGN KEY constraint failed')) {
                 return res.status(409).json({ 
                     success: false, 
-                    data: `Cannot delete ${applicant.first_name} ${applicant.last_name}: They have deployment records.` 
+                    data: `Cannot delete ${applicant.first_name}: Has deployment records. Use 'Delete with Deployment' option.` 
                 });
             }
-            // If it's some other error, throw it to the main catch block
             throw dbErr;
         }
 
-        // 3. If DB delete succeeded, NOW delete the files
+        // 3. Delete files if DB delete succeeded
         const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public/uploads');
         
         const deleteFile = (urlPath) => {
@@ -291,7 +320,11 @@ const deleteApplicant = async (req, res) => {
         deleteFile(applicant.id_image_path);
 
         // 4. Log it
-        await logAction(req, 'DELETE', `Deleted applicant: ${applicant.first_name} ${applicant.last_name}`);
+        const logMsg = force === 'true' 
+            ? `Force deleted applicant and records: ${applicant.first_name} ${applicant.last_name}`
+            : `Deleted applicant: ${applicant.first_name} ${applicant.last_name}`;
+            
+        await logAction(req, 'DELETE', logMsg);
 
         res.status(200).json({ success: true, data: "Applicant deleted." });
 

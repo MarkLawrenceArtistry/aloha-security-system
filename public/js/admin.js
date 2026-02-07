@@ -24,30 +24,42 @@ function logout() {
 
 // --- 2. UNIVERSAL MULTI-DELETE FUNCTION ---
 // This is now available to any page that includes admin.js
-function setupMultiDelete({ tableBodyId, checkAllId, deleteBtnId, apiBaseUrl, onSuccess }) {
+function setupMultiDelete({ 
+    tableBodyId, checkAllId, deleteBtnId, containerId, // containerId is new
+    apiBaseUrl, urlSuffix = '', onSuccess 
+}) {
     const tbody = document.getElementById(tableBodyId);
     const checkAll = document.getElementById(checkAllId);
     const deleteBtn = document.getElementById(deleteBtnId);
+    
+    // If we passed a containerId (the div holding both buttons), use that for visibility
+    // Otherwise fall back to just the button itself
+    const container = containerId ? document.getElementById(containerId) : deleteBtn;
 
-    // If elements don't exist on this page, stop immediately (prevents errors)
     if (!tbody || !deleteBtn) return;
 
     const getSelectedIds = () => Array.from(tbody.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
 
-    const updateButtonState = () => {
+    const updateVisibility = () => {
         const count = getSelectedIds().length;
         if (count > 0) {
-            deleteBtn.style.display = 'inline-flex';
-            deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete (${count})`;
+            container.style.display = 'inline-flex'; // Show the container/button
+            // Update button text if it's the standard one
+            if(!urlSuffix) deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete Applicant (${count})`;
+            else deleteBtn.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Force Delete (${count})`;
         } else {
-            deleteBtn.style.display = 'none';
+            container.style.display = 'none';
         }
     };
 
+    // Attach Checkbox Listeners (Only once if shared, but safe to re-attach loosely)
+    // To prevent double-binding logic on the 'Select All', strictly bind listeners only if not already bound? 
+    // Easier way: existing logic is fine, it just runs updateVisibility twice which is harmless.
+    
     if (checkAll) {
         checkAll.addEventListener('change', (e) => {
             tbody.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
-            updateButtonState();
+            updateVisibility();
         });
     }
 
@@ -57,63 +69,43 @@ function setupMultiDelete({ tableBodyId, checkAllId, deleteBtnId, apiBaseUrl, on
                 const all = tbody.querySelectorAll('.row-checkbox');
                 checkAll.checked = Array.from(all).every(cb => cb.checked);
             }
-            updateButtonState();
+            updateVisibility();
         }
     });
 
     deleteBtn.addEventListener('click', async () => {
         const ids = getSelectedIds();
         if (ids.length === 0) return;
-        if (!confirm(`Are you sure you want to delete ${ids.length} records?`)) return;
+        
+        const warning = urlSuffix 
+            ? `WARNING: This will delete ${ids.length} applicants AND their deployment history. This cannot be undone.`
+            : `Are you sure you want to delete ${ids.length} applicants?`;
+
+        if (!confirm(warning)) return;
 
         deleteBtn.disabled = true;
-        deleteBtn.innerText = "Processing...";
+        deleteBtn.innerText = "...";
         const token = getToken();
 
-        let successCount = 0;
-        let failCount = 0;
-        let errorMessages = []; // Store specific reasons
-
-        // Loop Fetch Requests
         const deletePromises = ids.map(id => 
-            fetch(`${apiBaseUrl}/${id}`, {
+            fetch(`${apiBaseUrl}/${id}${urlSuffix}`, { // Use Suffix here
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    successCount++;
-                } else {
-                    failCount++;
-                    // Capture the graceful error message
-                    errorMessages.push(data.data); 
-                }
-            })
-            .catch(err => {
-                failCount++;
-                errorMessages.push("Network Error");
-            })
+            }).then(res => res.json())
         );
 
-        await Promise.all(deletePromises);
+        const results = await Promise.all(deletePromises);
         
-        // --- IMPROVED REPORTING ---
-        let report = `Deletion Complete.\n\n✅ Deleted: ${successCount}\n❌ Failed: ${failCount}`;
+        // Simple reporting for now to save space
+        const success = results.filter(r => r.success).length;
+        const failed = results.length - success;
         
-        if (errorMessages.length > 0) {
-            // Show up to 3 specific error reasons so alert isn't too huge
-            const uniqueErrors = [...new Set(errorMessages)];
-            report += `\n\nReasons:\n- ${uniqueErrors.slice(0, 3).join('\n- ')}`;
-            if(uniqueErrors.length > 3) report += `\n...and others.`;
-        }
+        let msg = `Deleted: ${success}`;
+        if(failed > 0) msg += `\nFailed: ${failed} (Likely deployed. Use Force Delete)`;
+        alert(msg);
 
-        alert(report);
-        // --------------------------
-
-        // Reset UI
         if(checkAll) checkAll.checked = false;
-        deleteBtn.style.display = 'none';
+        container.style.display = 'none';
         deleteBtn.disabled = false;
         if (onSuccess) onSuccess();
     });

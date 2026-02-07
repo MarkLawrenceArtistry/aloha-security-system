@@ -54,14 +54,18 @@
                     <select id="sort-select" class="sort-select">
                         <option value="desc">Date: Newest</option>
                         <option value="asc">Date: Oldest</option>
-                        <option value="alpha">Alphabetical</option>
                     </select>
                 </div>
-                <!-- Only show Add button if you have a manual add page, otherwise remove button or leave empty div -->
-                <div></div>
-                <button id="multi-delete-btn" class="btn-reject" style="display: none; padding: 8px 16px; font-size: 0.9rem; align-items:center; gap: 8px;">
-                    Delete Selected
-                </button>
+                
+                <!-- BUTTON GROUP FOR DELETION -->
+                <div id="delete-actions" style="display: none; gap: 10px;">
+                    <button id="btn-delete-standard" class="btn-reject" style="padding: 8px 12px; font-size: 0.85rem;">
+                        <i class="bi bi-person-x-fill"></i> Delete Applicant
+                    </button>
+                    <button id="btn-delete-force" class="btn-reject" style="padding: 8px 12px; font-size: 0.85rem; background: #742a2a; border-color: #742a2a; color: white;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Delete w/ Deployments
+                    </button>
+                </div>
             </div>
 
             <table class="table">

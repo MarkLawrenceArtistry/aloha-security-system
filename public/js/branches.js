@@ -28,15 +28,22 @@ async function fetchBranches() {
 
 function renderTable(branches) {
     const tbody = document.getElementById('branches-body');
+    
+    // Reset UI
+    const checkAll = document.getElementById('check-all');
+    if(checkAll) checkAll.checked = false;
+    const delBtn = document.getElementById('multi-delete-btn');
+    if(delBtn) delBtn.style.display = 'none';
+
     tbody.innerHTML = branches.map(b => `
         <tr>
+            <td><input type="checkbox" class="row-checkbox" value="${b.id}"></td>
             <td>#${b.id}</td>
             <td><strong>${b.name}</strong></td>
             <td>${b.location}</td>
             <td>${b.required_guards}</td>
             <td>
-                <button onclick="editBranch(${b.id}, '${b.name}', '${b.location}', ${b.required_guards})" class="btn-action" style="background:none; color:#2b6cb0;"><i class="bi bi-pencil-square"></i></button>
-                <button onclick="deleteBranch(${b.id})" class="btn-action" style="background:none; color:#c53030; margin-left:10px;"><i class="bi bi-trash-fill"></i></button>
+                <button onclick="editBranch(${b.id}, '${b.name}', '${b.location}', ${b.required_guards})" class="btn-action" style="color:#2b6cb0;"><i class="bi bi-pencil-square"></i></button>
             </td>
         </tr>
     `).join('');
@@ -122,4 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('prev-btn').addEventListener('click', () => { if(currentPage > 1) { currentPage--; fetchBranches(); } });
     document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchBranches(); });
     document.getElementById('branch-form').addEventListener('submit', handleFormSubmit);
+
+    // Initialize Multi Delete
+    setupMultiDelete({
+        tableBodyId: 'branches-body',
+        checkAllId: 'check-all',
+        deleteBtnId: 'multi-delete-btn',
+        apiBaseUrl: '/api/branches',
+        onSuccess: fetchBranches
+    });
 });
