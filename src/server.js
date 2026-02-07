@@ -15,16 +15,14 @@ const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
 
 // --- VOLUME CONFIGURATION ---
-const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../public/uploads');
+const BASE_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../public');
+const UPLOAD_PATH = path.join(BASE_PATH, 'uploads');
 
 // --- ENSURE UPLOAD DIRECTORY EXISTS ---
-// This is crucial for production. It creates the directory on server start
-// if it doesn't already exist, preventing multer from crashing.
 if (!fs.existsSync(UPLOAD_PATH)) {
     fs.mkdirSync(UPLOAD_PATH, { recursive: true });
     console.log(`Upload directory created at: ${UPLOAD_PATH}`);
 }
-// --- END OF FIX ---
 
 const applicantRoutes = require('./routes/applicants.js');
 const branchRoutes = require('./routes/branches.js');

@@ -5,7 +5,8 @@ const multer = require('multer');
 const path = require('path');
 
 // Use the same logic as server.js to determine the destination
-const UPLOAD_PATH = process.env.VOLUME_PATH || 'public/uploads/';
+const BASE_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public');
+const UPLOAD_PATH = path.join(BASE_PATH, 'uploads');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
