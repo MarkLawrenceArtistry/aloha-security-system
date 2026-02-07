@@ -12,6 +12,8 @@ const startCronJob = require('./utils/cronJob.js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', 1);
+
 // --- VOLUME CONFIGURATION ---
 const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../public/uploads');
 

@@ -4,13 +4,14 @@ const applicantController = require('../controllers/applicantController');
 const authController = require('../controllers/authController');
 const upload = require('../middleware/upload');
 const { verifyToken } = require('../middleware/authMiddleware');
+const { applicationLimiter, loginLimiter } = require('../middleware/rateLimiter');
 
 const uploadFields = upload.fields([{ name: 'resume', maxCount: 1 }, { name: 'id_image', maxCount: 1 }]);
 
 // Public Routes
-router.post('/apply', uploadFields, applicantController.apply);
+router.post('/apply', applicationLimiter, uploadFields, applicantController.apply);
 router.get('/status', applicantController.checkStatus);
-router.post('/auth/login', authController.login);
+router.post('/auth/login', loginLimiter, authController.login);
 router.get('/dashboard-stats', verifyToken, applicantController.getDashboardStats);
 
 // Admin Routes (Protected)

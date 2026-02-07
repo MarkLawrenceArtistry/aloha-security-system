@@ -69,9 +69,15 @@ const initDB = () => {
                 status TEXT DEFAULT 'Pending',
                 resume_path TEXT,
                 id_image_path TEXT,
+                ip_address TEXT,  -- <--- ENSURE THIS EXISTS
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-        `);
+        `, (err) => {
+            // MIGRATION: If table exists but column doesn't, add it
+            if (!err) {
+                db.run("ALTER TABLE applicants ADD COLUMN ip_address TEXT", () => {});
+            }
+        });
 
         // 4. Deployments
         db.run(`

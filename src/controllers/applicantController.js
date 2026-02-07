@@ -15,22 +15,32 @@ const apply = async (req, res) => {
             years_experience, previous_employer 
         } = req.body;
 
-        // --- ANTI-SPAM CHECK (1 DAY COOLDOWN) ---
-        const lastApp = await get("SELECT created_at FROM applicants WHERE email = ? ORDER BY created_at DESC LIMIT 1", [email]);
-        
+        const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip;
+
+        // --- ANTI-SPAM LOGIC (STRICT) ---
+        // Check if this Email OR this IP has applied in the last 24 hours
+        const lastApp = await get(
+            "SELECT created_at FROM applicants WHERE email = ? OR ip_address = ? ORDER BY created_at DESC LIMIT 1", 
+            [email, ip_address]
+        );
+
         if (lastApp) {
             const lastDate = new Date(lastApp.created_at).getTime();
             const now = Date.now();
-            const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours
 
             if (now - lastDate < oneDayMs) {
+                // Cleanup uploaded files immediately to save space
+                if(req.files['resume']) fs.unlinkSync(req.files['resume'][0].path);
+                if(req.files['id_image']) fs.unlinkSync(req.files['id_image'][0].path);
+
                 return res.status(429).json({
                     success: false, 
-                    data: "You have already applied recently. Please wait 24 hours before applying again."
+                    data: "System limit reached: You (or this device) have already applied in the last 24 hours."
                 });
             }
         }
-        // --- END ANTI-SPAM ---
+        // --- ANTI-SPAM LOGIC END ---
 
         // 1. Validation: Check Files
         if (!req.files || !req.files['resume'] || !req.files['id_image']) {
@@ -66,13 +76,13 @@ const apply = async (req, res) => {
                 first_name, last_name, email, contact_num, 
                 birthdate, gender, address, position_applied, 
                 years_experience, previous_employer, 
-                resume_path, id_image_path
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                resume_path, id_image_path, ip_address 
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
             first_name, last_name, email, contact_num, 
             birthdate, gender, address, position_applied, 
             years_experience, previous_employer, 
-            resumePath, idImagePath
+            resumePath, idImagePath, ip_address // <--- Pass the IP variable here
         ]);
 
         return res.status(201).json({success:true, data: {
