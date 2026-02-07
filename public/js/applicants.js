@@ -89,20 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMultiDelete({
         tableBodyId: 'applicants-body',
         checkAllId: 'check-all',
-        deleteBtnId: 'btn-delete-standard', // ID of first button
-        containerId: 'delete-actions',      // ID of the div holding buttons
-        apiBaseUrl: API_URL,                // /api/applicants/:id
+        deleteBtnId: 'btn-delete-standard',
+        containerId: 'delete-actions',
+        apiBaseUrl: '/api/applicants', // <--- CHANGE THIS (Was API_URL)
+        entityName: 'applicants',      // <--- ADD THIS (See step 2)
         onSuccess: fetchApplicants
     });
 
-    // 2. FORCE DELETE (Cascades deployments)
+    // 2. FORCE DELETE
     setupMultiDelete({
         tableBodyId: 'applicants-body',
         checkAllId: 'check-all',
-        deleteBtnId: 'btn-delete-force',    // ID of second button
-        containerId: 'delete-actions',      // Shared container
-        apiBaseUrl: API_URL,                
-        urlSuffix: '?force=true',           // <--- NEW PARAMETER
+        deleteBtnId: 'btn-delete-force',
+        containerId: 'delete-actions',
+        apiBaseUrl: '/api/applicants', // <--- CHANGE THIS (Was API_URL)
+        urlSuffix: '?force=true',
+        entityName: 'applicants',      // <--- ADD THIS
         onSuccess: fetchApplicants
     });
 });

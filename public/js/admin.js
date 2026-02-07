@@ -15,6 +15,10 @@ function checkAuth() {
     if (!getToken() && !path.includes('login.html')) {
         window.location.href = 'login.html';
     }
+    // If we have a token and are ON login page, go to dashboard
+    if (getToken() && path.includes('login.html')) {
+        window.location.href = 'admin-dashboard.html';
+    }
 }
 
 function logout() {
@@ -25,8 +29,9 @@ function logout() {
 // --- 2. UNIVERSAL MULTI-DELETE FUNCTION ---
 // This is now available to any page that includes admin.js
 function setupMultiDelete({ 
-    tableBodyId, checkAllId, deleteBtnId, containerId, // containerId is new
-    apiBaseUrl, urlSuffix = '', onSuccess 
+    tableBodyId, checkAllId, deleteBtnId, containerId, 
+    apiBaseUrl, urlSuffix = '', onSuccess, 
+    entityName = 'items' // <--- 1. ADD THIS DEFAULT PARAMETER
 }) {
     const tbody = document.getElementById(tableBodyId);
     const checkAll = document.getElementById(checkAllId);
@@ -45,7 +50,7 @@ function setupMultiDelete({
         if (count > 0) {
             container.style.display = 'inline-flex'; // Show the container/button
             // Update button text if it's the standard one
-            if(!urlSuffix) deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete Applicant (${count})`;
+            if(!urlSuffix) deleteBtn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete Selected (${count})`;
             else deleteBtn.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Force Delete (${count})`;
         } else {
             container.style.display = 'none';
@@ -77,9 +82,10 @@ function setupMultiDelete({
         const ids = getSelectedIds();
         if (ids.length === 0) return;
         
+        // 2. UPDATE THE WARNING TEXT LOGIC HERE:
         const warning = urlSuffix 
-            ? `WARNING: This will delete ${ids.length} applicants AND their deployment history. This cannot be undone.`
-            : `Are you sure you want to delete ${ids.length} applicants?`;
+            ? `WARNING: This will delete ${ids.length} ${entityName} AND their history. This cannot be undone.`
+            : `Are you sure you want to delete ${ids.length} ${entityName}?`;
 
         if (!confirm(warning)) return;
 
@@ -184,11 +190,39 @@ function renderChart(chartData) {
 document.addEventListener('DOMContentLoaded', () => {
     // Run Auth Check everywhere (except login)
     checkAuth();
-
+    
     // Logout Handler
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
+    // --- [NEW] LOGIN FORM HANDLER ---
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const res = await fetch('/api/auth/login', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const json = await res.json();
+
+                if (json.success) {
+                    localStorage.setItem('admin_token', json.data.token);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    alert('Login failed');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+    
     // Try to run dashboard logic (will exit safely if not on dashboard)
     initDashboard();
 });

@@ -43,6 +43,12 @@
                 <div class="toolbar-left">
                     <input type="text" id="search-input" class="search-input" placeholder="Search branches...">
                 </div>
+
+                <select id="sort-select" class="sort-select">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
+        
                 <!-- Delete Button -->
                 <button id="multi-delete-btn" class="btn-reject" style="display: none; margin-right: 10px;">
                     Delete Selected
@@ -55,6 +61,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th style="width: 40px;"><input type="checkbox" id="check-all"></th>
                         <th>ID</th>
                         <th>Branch Name</th>
                         <th>Location</th>
@@ -100,6 +107,7 @@
         </div>
     </div>
 
+    <script src="js/admin.js"></script>
     <script src="js/branches.js"></script>
     <script>
         document.getElementById('logout-btn').addEventListener('click', () => {

@@ -95,22 +95,34 @@ const deleteBranch = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // --- AUDIT LOG ---
-        // Get branch name BEFORE deleting for a better log message.
+        // 1. Check existence
         const branch = await get("SELECT name FROM branches WHERE id = ?", [id]);
         if (!branch) {
             return res.status(404).json({ success: false, data: "Branch not found." });
         }
         
-        await run("DELETE FROM branches WHERE id = ?", [id]);
+        // 2. Try to Delete
+        try {
+            await run("DELETE FROM branches WHERE id = ?", [id]);
+        } catch (dbErr) {
+            // HANDLE FOREIGN KEY ERROR (If guards are deployed here)
+            if (dbErr.message.includes('FOREIGN KEY constraint failed')) {
+                return res.status(409).json({ 
+                    success: false, 
+                    data: `Cannot delete branch "${branch.name}". Guards are currently deployed here.` 
+                });
+            }
+            throw dbErr; // Throw other errors to the main catch block
+        }
         
+        // 3. Log Action
         const details = `Admin User ID #${req.user.id} deleted branch: "${branch.name}" (ID: ${id}).`;
         await logAction(req, 'BRANCH_DELETE', details);
-        // --- END LOG ---
 
         res.status(200).json({ success: true, data: "Branch deleted successfully" });
     } catch (err) {
-        res.status(500).json({ success: false, data: err.message });
+        console.error(err);
+        res.status(500).json({ success: false, data: "Internal Server Error" });
     }
 };
 

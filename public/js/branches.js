@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkAllId: 'check-all',
         deleteBtnId: 'multi-delete-btn',
         apiBaseUrl: '/api/branches',
+        entityName: 'branches', // <--- ADD THIS LINE
         onSuccess: fetchBranches
     });
 });
