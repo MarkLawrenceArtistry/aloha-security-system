@@ -60,60 +60,59 @@ const restoreBackup = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ success: false, data: "No backup file uploaded." });
         }
-
         const zipPath = req.file.path;
-        const zip = new AdmZip(zipPath);
-        const zipEntries = zip.getEntries();
-
-        // iterate over entries to place them correctly
-        zipEntries.forEach((entry) => {
-            const entryName = entry.entryName; // e.g., "aloha_database.db" or "uploads/resume.pdf"
-
-            // 1. Handle Database Restore
-            if (entryName === 'aloha_database.db') {
-                // Extract DB specifically to the DB_PATH location (The Volume Root)
-                // AdmZip extracts to a folder, so we extract to the folder containing DB_PATH
-                const targetDir = path.dirname(DB_PATH);
-                zip.extractEntryTo(entry, targetDir, false, true); 
+        
+        db.close((err) => {
+            if (err) {
+                console.error("WARNING: Failed to close database before restore. This may cause issues.", err);
             }
-            
-            // 2. Handle Uploads Restore
-            else if (entryName.startsWith('uploads/')) {
-                // Remove "uploads/" from the start of the path to keep structure clean
-                // We extract these into the UPLOAD_DIR
-                const targetDir = UPLOAD_DIR;
+            console.log("Database connection closed for restore.");
+
+            try {
+                const zip = new AdmZip(zipPath);
+                const zipEntries = zip.getEntries(); // Get a list of all files/folders in the zip
                 
-                // We extract the full folder structure inside uploads
-                // AdmZip 'extractAllTo' is easier for folders, but let's be precise:
-                // If we extract "uploads/file.jpg" to UPLOAD_DIR, we might get UPLOAD_DIR/uploads/file.jpg
-                // We want UPLOAD_DIR/file.jpg
+                const volumePath = process.env.VOLUME_PATH || path.join(__dirname, '../../');
+                
+                // 1. Restore the Database (should always exist)
+                zip.extractEntryTo('aloha_database.db', volumePath, /*maintainEntryPath*/ false, /*overwrite*/ true);
+                console.log("Database file restored.");
+
+                // --- THE FIX IS HERE ---
+                // 2. Check if an 'uploads' directory exists in the zip before trying to extract it.
+                const uploadsEntryExists = zipEntries.some(entry => entry.entryName.startsWith('uploads/'));
+
+                if (uploadsEntryExists) {
+                    // This command extracts the entire 'uploads' directory and its contents
+                    zip.extractEntryTo('uploads/', volumePath, /*maintainEntryPath*/ true, /*overwrite*/ true);
+                    console.log("Uploads directory restored.");
+                } else {
+                    console.log("No 'uploads' directory found in backup zip. Skipping.");
+                }
+                // --- END OF FIX ---
+
+                // 3. Clean up and restart
+                fs.unlinkSync(zipPath);
+                res.status(200).json({ success: true, data: "Restore successful! Server is restarting..." });
+                
+                setTimeout(() => {
+                    console.log("Forcing server restart to apply restored database.");
+                    process.exit(1);
+                }, 1000);
+
+            } catch (extractErr) {
+                console.error("Error during ZIP extraction:", extractErr);
+                if (!res.headersSent) {
+                   res.status(500).json({ success: false, data: "Restore failed: " + extractErr.message });
+                }
             }
         });
 
-        // SIMPLER RESTORE STRATEGY:
-        // 1. Extract DB to Volume Root
-        zip.extractEntryTo("aloha_database.db", path.dirname(DB_PATH), false, true);
-        
-        // 2. Extract 'uploads' folder content. 
-        // We extract the 'uploads' folder from zip into the parent of UPLOAD_DIR
-        // If local: parent of public/uploads is 'public'.
-        // If prod: parent of /app/railway_data/uploads is '/app/railway_data'.
-        const uploadsParent = path.dirname(UPLOAD_DIR);
-        zip.extractEntryTo("uploads/", uploadsParent, true, true);
-
-        // Cleanup the uploaded temp zip
-        fs.unlinkSync(zipPath);
-
-        await logAction(req, 'SYSTEM_RESTORE', `Admin restored system from backup file.`);
-
-        setTimeout(() => {
-            console.log("Restarting server to apply database restore...");
-            process.exit(0); 
-        }, 1000);
-
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, data: "Restore failed: " + err.message });
+        console.error("Outer restoreBackup error:", err);
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, data: "Restore failed: " + err.message });
+        }
     }
 };
 
