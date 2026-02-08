@@ -91,7 +91,8 @@ const initDB = () => {
                 resume_path TEXT,
                 id_image_path TEXT,
                 ip_address TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
             );
         `);
 

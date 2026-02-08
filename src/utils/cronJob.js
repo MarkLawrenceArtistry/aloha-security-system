@@ -4,46 +4,54 @@
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
-const { db } = require('../database');
+const { db } = require('../database'); // Ensure this imports the active db instance properly
+// If using the helper pattern, you might need to import getDB or pass the DB instance. 
+// Assuming your current import works:
 
-// Use the same logic again to know where the files are stored
 const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public/uploads');
 
 const startCronJob = () => {
-    // This cron job runs every 3 hours as you configured it.
-    cron.schedule('0 0 */3 * *', () => { 
-        console.log('Running cron job: Deleting old rejected applications...');
-        const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    // Schedule: Runs every hour (0 * * * *) to check for cleanups
+    cron.schedule('0 * * * *', () => { 
+        console.log('Running cron job: Checking for expired rejected applications...');
         
-        db.all("SELECT id, resume_path, id_image_path FROM applicants WHERE status = 'Rejected' AND created_at < ?", [threeDaysAgo], (err, rows) => {
+        // FIXED: 72 Hours (3 Days) Logic
+        const retentionPeriod = 72 * 60 * 60 * 1000; 
+        const cutoffDate = new Date(Date.now() - retentionPeriod).toISOString();
+        
+        // FIXED QUERY: Checks 'updated_at', not 'created_at'
+        const query = "SELECT id, resume_path, id_image_path FROM applicants WHERE status = 'Rejected' AND updated_at < ?";
+
+        // Note: You need to access the DB instance correctly. 
+        // If 'db' is null, use the getter from database.js
+        const database = require('../database').getDB();
+
+        database.all(query, [cutoffDate], (err, rows) => {
             if (err) {
-                console.error("Cron job error fetching applicants:", err);
+                console.error("Cron job error:", err);
                 return;
             }
 
             if (rows.length > 0) {
-                 console.log(`Found ${rows.length} rejected applications to delete.`);
+                 console.log(`Found ${rows.length} expired rejected applications to delete.`);
             }
 
             rows.forEach(applicant => {
+                // 1. Delete Files
                 const deleteFile = (urlPath) => {
                     if (!urlPath) return;
                     const filename = urlPath.split('/').pop();
-                    // Construct the full path to the file inside the volume
                     const filePath = path.join(UPLOAD_PATH, filename);
-                    
                     fs.unlink(filePath, (err) => {
-                        // It's okay if the file doesn't exist (ENOENT), but log other errors.
-                        if (err && err.code !== 'ENOENT') {
-                            console.error(`Cron job error deleting file ${filePath}:`, err);
-                        }
+                        if (err && err.code !== 'ENOENT') console.error(`Failed to delete ${filePath}`, err);
                     });
                 };
 
                 deleteFile(applicant.resume_path);
                 deleteFile(applicant.id_image_path);
 
-                db.run("DELETE FROM applicants WHERE id = ?", [applicant.id]);
+                // 2. Delete Record
+                database.run("DELETE FROM applicants WHERE id = ?", [applicant.id]);
             });
         });
     });
