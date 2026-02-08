@@ -170,3 +170,74 @@ footer {
     display: flex;
     justify-content: space-between;
 }
+
+.deployment {
+    padding: 24px;
+}
+
+.btn-hire, .btn-reject {
+    color: white;
+    padding: 15px;
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+}
+
+input[type="file"] {
+  /* Shape & Typography */
+  padding: 10px;
+  font-family: 'Inter', sans-serif;
+  color: #555;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input[type="file"]::file-selector-button {
+  /* The Button Styling */
+  border: none;
+  background: #d6d6d6;
+  color: #4a4a4a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-right: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  
+  /* Smooth transitions for the button */
+  transition: background 0.2s ease-in-out, transform 0.2s ease;
+}
+
+/* Hover States */
+input[type="file"]:hover {
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+input[type="file"]:hover::file-selector-button {
+  transform: scale(1.02);
+}
+
+/* Focus & Active Animation */
+input[type="file"]:active::file-selector-button {
+  transform: scale(0.95);
+}
+
+input[type="file"]:focus {
+  outline: none;
+  border-style: solid;
+}
+
+#restore-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: 0;
+}
