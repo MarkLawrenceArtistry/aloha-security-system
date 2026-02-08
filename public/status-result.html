@@ -105,13 +105,90 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="py-4 bg-dark text-white mt-auto">
-        <div class="container text-center">
-            <p class="opacity-50 mb-0 small">&copy;© 2026 Aloha Security Agency. 108, Old highway, Guiwan, Zamboanga City.</p>
+     <footer class="footer-section text-white position-relative overflow-hidden">
+        <div class="container pt-5 pb-4">
+            
+            <!-- Changed g-5 to g-4 to prevent side overflow on mobile -->
+            <div class="row g-4 justify-content-between">
+                
+                <!-- Col 1: Brand & Social (Full width on mobile for better focus) -->
+                <div class="col-lg-4 col-md-12 mb-md-4">
+                    <a href="#" class="d-inline-block mb-4">
+                        <img src="resources/logo.png" alt="Aloha Logo" height="60">
+                    </a>
+                    <p class="text-white-50 mb-4 pe-lg-5" style="line-height: 1.8;">
+                        Providing top-tier security solutions in Zamboanga City since 2002. Your safety is our unwavering priority.
+                    </p>
+                    <div class="social-links d-flex gap-2">
+                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links (6 cols on mobile to sit side-by-side with Services) -->
+                <div class="col-lg-2 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="status-result.html">Check Status</a></li>
+                        <li><a href="application.html">Careers</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Services (6 cols on mobile) -->
+                <div class="col-lg-3 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Services</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Static Guards</a></li>
+                        <li><a href="#">Mobile Patrol</a></li>
+                        <li><a href="#">VIP Protection</a></li>
+                        <li><a href="#">CCTV Monitoring</a></li>
+                        <li><a href="#">Event Security</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Contact Info (Full width on mobile) -->
+                <div class="col-lg-3 col-md-12">
+                    <h5 class="fw-bold mb-4 text-white mt-4 mt-lg-0">Contact Us</h5>
+                    <ul class="list-unstyled contact-info text-white-50">
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>108, Old Highway, Guiwan,<br>Zamboanga City</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-telephone-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>(062) 991-XXXX</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-envelope-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>info@alohasecurity.com</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Copyright Bar -->
+        <div class="footer-bottom py-3 mt-4 border-top border-secondary border-opacity-25">
+            <div class="container">
+                <div class="row align-items-center text-center text-md-start">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <p class="mb-0 small text-white-50">&copy; 2026 Aloha Security Agency.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-white-50 small text-decoration-none me-3 hover-white">Privacy</a>
+                        <a href="#" class="text-white-50 small text-decoration-none hover-white">Terms</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const searchView = document.getElementById('search-view');

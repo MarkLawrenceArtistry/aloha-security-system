@@ -20,19 +20,38 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
+   <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="resources/logo.png" style="height: 50px;">
-            </a>
             
+            <!-- BRAND LOGO WRAPPER  -->
+            <div class="brand-interaction-wrapper">
+                <a class="navbar-brand position-relative z-3">
+                    <img src="resources/logo.png" style="height: 50px; cursor: pointer;" alt="Aloha Logo" class="logo-img">
+                </a>
+                <div class="brand-hover-modal">
+                    <div class="modal-backdrop-blur"></div>
+                    <div class="modal-content-box">
+                        <div class="modal-logo-wrapper mb-3">
+                            <img src="resources/logo.png" alt="Aloha Logo" class="modal-big-logo">
+                            <div class="logo-glow"></div>
+                        </div>
+                        <h1 class="modal-brand-name">ALOHA</h1>
+                        <div class="red-line-divider"></div>
+                        <h5 class="modal-brand-sub">SECURITY AGENCY</h5>
+                        <p class="modal-tagline">Professional • Reliable • Secure</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TOGGLER BUTTON -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="toggler-icon"></span>
                 <span class="toggler-icon"></span>
                 <span class="toggler-icon"></span>
             </button>
 
+            <!-- NAVIGATION LINKS -->
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
@@ -45,7 +64,6 @@
             </div>
         </div>
     </nav>
-
     <!-- Main Hero -->
     <main class="hero-wrapper">
         <!-- Animated Background Shape -->
@@ -210,6 +228,8 @@
         </div>
     </section>
 
+    
+
     <!-- REQUIREMENTS -->
     <section class="requirements-section position-relative py-5">
         <div class="req-bg-overlay"></div>
@@ -259,10 +279,289 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-5 bg-dark text-white">
-        <div class="container text-center">
-            <p class="opacity-50 mb-0">&copy; 2026 Aloha Security Agency. 108, Old highway, Guiwan, Zamboanga City.</p>
+    <!-- ============================================== -->
+    <!-- NEW SECTION: TESTIMONIALS (Social Proof)   -->
+    <!-- ============================================== -->
+    <section class="testimonials-section py-5">
+        <div class="container py-5">
+            
+            <!-- Section Header -->
+            <div class="row mb-5">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Client Feedback</p>
+                    <h2 class="display-4 fw-black">Trusted by Zamboanga's<br>Finest Businesses</h2>
+                </div>
+                <div class="col-lg-6 d-flex align-items-end justify-content-lg-end" data-aos="fade-left">
+                    <p class="text-muted text-lg-end mb-0" style="max-width: 400px;">
+                        We don't just provide security; we build lasting partnerships based on trust and performance.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Testimonial Cards -->
+            <div class="row g-4">
+                
+                <!-- Client 1 -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
+                    <div class="testimonial-card">
+                        <!-- Big Quote Icon Background -->
+                        <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
+                        
+                        <div class="d-flex align-items-center mb-4 position-relative z-1">
+                            <!-- Placeholder for Client Image -->
+                            <div class="client-img-circle bg-secondary bg-opacity-10">
+                                <i class="bi bi-person-fill text-muted fs-3"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold mb-0">Maria Gonzalez</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Retail Manager</small>
+                            </div>
+                        </div>
+                        
+                        <div class="position-relative z-1">
+                            <div class="stars mb-3 text-warning">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="text-muted" style="line-height: 1.7;">
+                                "Aloha Security has completely transformed how we handle safety at our mall. Their guards are always sharp, polite, and on time. Highly recommended!"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client 2 -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-card">
+                        <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
+                        
+                        <div class="d-flex align-items-center mb-4 position-relative z-1">
+                            <div class="client-img-circle bg-secondary bg-opacity-10">
+                                <i class="bi bi-person-fill text-muted fs-3"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold mb-0">Engr. R. Lim</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Construction Head</small>
+                            </div>
+                        </div>
+                        
+                        <div class="position-relative z-1">
+                            <div class="stars mb-3 text-warning">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="text-muted" style="line-height: 1.7;">
+                                "Security is critical in our construction sites. Aloha's team is strict with protocols and very professional. We haven't had a single incident since hiring them."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client 3 -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="testimonial-card">
+                        <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
+                        
+                        <div class="d-flex align-items-center mb-4 position-relative z-1">
+                            <div class="client-img-circle bg-secondary bg-opacity-10">
+                                <i class="bi bi-person-fill text-muted fs-3"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold mb-0">Sarah Jenkins</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Event Organizer</small>
+                            </div>
+                        </div>
+                        
+                        <div class="position-relative z-1">
+                            <div class="stars mb-3 text-warning">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="text-muted" style="line-height: 1.7;">
+                                "We hired Aloha for a large corporate event. They were invisible when needed but present when it mattered. True professionals."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- ============================================== -->
+    <!-- NEW SECTION: STATS & PARTNERS (Dark Mode)  -->
+    <!-- ============================================== -->
+    <section class="stats-section py-5 text-white position-relative">
+        <!-- Background Overlay -->
+        <div class="stats-bg-pattern"></div>
+        
+        <div class="container position-relative z-2 py-5">
+            
+            <!-- 1. THE NUMBERS (Animated Counter) -->
+            <div class="row text-center g-4 mb-5 pb-5 border-bottom border-secondary">
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="0">
+                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="22">0</span>+</h2>
+                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Years Experience</p>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="150">0</span>+</h2>
+                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Active Guards</p>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="50">0</span>+</h2>
+                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Business Partners</p>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                    <h2 class="display-3 fw-black text-danger">100%</h2>
+                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Client Satisfaction</p>
+                </div>
+            </div>
+
+            <!-- 2. TRUSTED BY (Logos) -->
+            <div class="row align-items-center justify-content-center text-center">
+                <div class="col-12 mb-4">
+                    <p class="small text-uppercase fw-bold text-muted letter-spacing-2">Trusted by Zamboanga's Best</p>
+                </div>
+                
+                <!-- Logo Grid (Replace icons with actual client logos if you have them) -->
+                <div class="col-lg-10">
+                    <div class="row justify-content-center align-items-center g-5 grayscale-logos">
+                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="100">
+                            <i class="bi bi-building fs-1 text-white opacity-50"></i>
+                        </div>
+                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="200">
+                            <i class="bi bi-shop fs-1 text-white opacity-50"></i>
+                        </div>
+                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="300">
+                            <i class="bi bi-bank fs-1 text-white opacity-50"></i>
+                        </div>
+                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="400">
+                            <i class="bi bi-hospital fs-1 text-white opacity-50"></i>
+                        </div>
+                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="500">
+                            <i class="bi bi-airplane fs-1 text-white opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+        <!-- ============================================== -->
+    <!-- FINAL CTA (Call To Action) - The Final Push    -->
+    <!-- ============================================== -->
+    <section class="cta-section text-white text-center">
+        <div class="cta-bg-overlay"></div>
+        <div class="container position-relative z-2 py-5">
+            <div class="py-5">
+                <h2 class="display-4 fw-black mb-4" data-aos="zoom-in">Ready to Secure Your Future?</h2>
+                <p class="lead mb-5 opacity-75" data-aos="fade-up" data-aos-delay="200">
+                    Join the leading security agency in Zamboanga or get a quote for your business today.
+                </p>
+                <div class="d-flex justify-content-center gap-3" data-aos="fade-up" data-aos-delay="300">
+                    <a href="application.html" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-danger">Apply Now</a>
+                    <a href="#" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- ============================================== -->
+    <!-- FOOTER SECTION (Responsive Fix)            -->
+    <!-- ============================================== -->
+    <footer class="footer-section text-white position-relative overflow-hidden">
+        <div class="container pt-5 pb-4">
+            
+            <!-- Changed g-5 to g-4 to prevent side overflow on mobile -->
+            <div class="row g-4 justify-content-between">
+                
+                <!-- Col 1: Brand & Social (Full width on mobile for better focus) -->
+                <div class="col-lg-4 col-md-12 mb-md-4">
+                    <a href="#" class="d-inline-block mb-4">
+                        <img src="resources/logo.png" alt="Aloha Logo" height="60">
+                    </a>
+                    <p class="text-white-50 mb-4 pe-lg-5" style="line-height: 1.8;">
+                        Providing top-tier security solutions in Zamboanga City since 2002. Your safety is our unwavering priority.
+                    </p>
+                    <div class="social-links d-flex gap-2">
+                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links (6 cols on mobile to sit side-by-side with Services) -->
+                <div class="col-lg-2 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="status-result.html">Check Status</a></li>
+                        <li><a href="application.html">Careers</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Services (6 cols on mobile) -->
+                <div class="col-lg-3 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Services</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Static Guards</a></li>
+                        <li><a href="#">Mobile Patrol</a></li>
+                        <li><a href="#">VIP Protection</a></li>
+                        <li><a href="#">CCTV Monitoring</a></li>
+                        <li><a href="#">Event Security</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Contact Info (Full width on mobile) -->
+                <div class="col-lg-3 col-md-12">
+                    <h5 class="fw-bold mb-4 text-white mt-4 mt-lg-0">Contact Us</h5>
+                    <ul class="list-unstyled contact-info text-white-50">
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>108, Old Highway, Guiwan,<br>Zamboanga City</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-telephone-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>(062) 991-XXXX</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-envelope-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>info@alohasecurity.com</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Copyright Bar -->
+        <div class="footer-bottom py-3 mt-4 border-top border-secondary border-opacity-25">
+            <div class="container">
+                <div class="row align-items-center text-center text-md-start">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <p class="mb-0 small text-white-50">&copy; 2026 Aloha Security Agency.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-white-50 small text-decoration-none me-3 hover-white">Privacy</a>
+                        <a href="#" class="text-white-50 small text-decoration-none hover-white">Terms</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 

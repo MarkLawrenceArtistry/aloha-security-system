@@ -33,6 +33,140 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     font-family: 'Helvetica-Bold', sans-serif !important;
 }
 
+/* --- HEADER / NAVBAR --- */
+.brand-interaction-wrapper {
+    position: relative;
+    display: flex;           
+    align-items: center;     
+    margin-right: 15px;     
+}
+
+.navbar-brand {
+    position: relative;
+    z-index: 1050; 
+    transition: transform 0.3s ease;
+    margin-right: 0; 
+    padding: 0;    
+}
+
+.brand-hover-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1040; 
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; 
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.modal-backdrop-blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(35, 35, 35, 0.85); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.modal-content-box {
+    position: relative;
+    text-align: center;
+    color: white;
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+}
+
+.brand-interaction-wrapper:hover .brand-hover-modal {
+    opacity: 1;
+    visibility: visible;
+}
+
+.brand-interaction-wrapper:hover .modal-content-box {
+    transform: scale(1) translateY(0);
+}
+
+.brand-interaction-wrapper:hover .navbar-brand {
+    transform: scale(0.9);
+    filter: brightness(1.2);
+}
+
+.modal-big-logo {
+    height: 120px;
+    width: auto;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
+
+.logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(229, 56, 40, 0.6) 0%, transparent 70%);
+    z-index: 1;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+}
+
+.modal-brand-name {
+    font-family: 'Helvetica-Bold', sans-serif;
+    font-weight: 900;
+    font-size: 4rem;
+    letter-spacing: 5px;
+    margin: 10px 0;
+    line-height: 1;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.red-line-divider {
+    width: 60px;
+    height: 4px;
+    background: var(--brand-red); 
+    margin: 15px auto;
+    border-radius: 2px;
+}
+
+.modal-brand-sub {
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.8);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.modal-tagline {
+    font-size: 0.9rem;
+    color: var(--brand-red);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: 0.3s;
+}
+
+.brand-interaction-wrapper:hover .modal-tagline {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.1s;
+}
+
 .navbar {
     padding: 25px 0;
     background: transparent;
@@ -44,7 +178,6 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     transform: translateY(-100%);
 }
 
-/* --- NAVIGATION --- */
 .navbar .nav-link {
     font-weight: 700;
     text-transform: uppercase;
@@ -67,7 +200,7 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
 }
 
 .navbar.scrolled .nav-link {
-    color: var(--brand-blackr) !important;
+    color: var(--brand-black) !important; /* Fixed typo brand-blackr */
 }
 
 .navbar.scrolled .nav-link:hover {
@@ -91,6 +224,7 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     border-radius: 3px;
 }
 
+/* --- BACK TO TOP --- */
 .btn-back-to-top {
     position: fixed;
     bottom: 30px;
@@ -132,6 +266,7 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     display: flex;
     align-items: center;
     padding-top: 100px;
+    overflow: hidden; /* Fixes overlap on desktop too */
 }
 
 .hero-bg-shape {
@@ -168,7 +303,6 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     line-height: 1.7;
 }
 
-/* --- LOGO & ANIMATION --- */
 .hero-image-container {
     position: relative;
     display: flex;
@@ -182,7 +316,6 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
     margin-right: -20px; 
 }
-
 
 /* --- BUTTONS --- */
 .btn-brand {
@@ -216,6 +349,7 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     color: white !important;
 }
 
+/* --- OVERLAP & CARDS SECTION --- */
 .bg-light-section {
     background-color: #f6f7f9;
     min-height: 600px;
@@ -227,6 +361,8 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
 .content-box-wrapper {
     max-width: 550px;
     padding: 60px 40px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .letter-spacing-2 {
@@ -239,11 +375,9 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     color: rgb(51, 56, 59) !important;
 }
 
-
 .carousel-item {
     transition: transform .6s ease-in-out, opacity .6s ease-in-out;
 }
-
 
 .carousel-overlay {
     position: absolute;
@@ -255,19 +389,12 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     z-index: 0;
 }
 
-/* Carousel Indicators */
 .carousel-indicators [data-bs-target] {
     background-color: var(--brand-black);
     width: 30px;
     height: 3px;
 }
 
-.content-box-wrapper {
-    max-width: 600px;
-    padding: 60px 50px;
-    margin: 0 auto;
-    width: 100%;
-}
 /* Wrapper for the cards */
 .cards-staircase-wrapper {
     position: relative;
@@ -311,9 +438,123 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     color: white;
 }
 
+/* --- STATS SECTION --- */
+.stats-section {
+    background-color: var(--brand-black);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(#333 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+.stats-section .display-3 {
+    font-family: 'Helvetica-Bold', sans-serif;
+    letter-spacing: -2px;
+    margin-bottom: 10px;
+}
+
+.grayscale-logos i {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.grayscale-logos i:hover {
+    opacity: 1 !important;
+    color: var(--brand-red) !important;
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 15px rgba(229, 56, 40, 0.5));
+}
+
+/* --- TESTIMONIALS & CTA --- */
+.testimonials-section {
+    background-color: #f9f9f9; 
+    position: relative;
+    z-index: 2; /* Ensures it sits on top of any overlapping content */
+}
+
+.testimonial-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(229, 56, 40, 0.15);
+}
+
+.client-img-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.quote-bg-icon {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    font-size: 8rem;
+    color: var(--brand-red);
+    opacity: 0.05;
+    font-family: serif;
+    transition: transform 0.4s ease;
+}
+
+.testimonial-card:hover .quote-bg-icon {
+    transform: rotate(10deg) scale(1.1);
+    opacity: 0.1;
+}
+
+.cta-section {
+    position: relative;
+    background-color: var(--brand-red);
+    overflow: hidden;
+    z-index: 2;
+}
+
+.cta-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('resources/secu.png'); 
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1; 
+    mix-blend-mode: multiply;
+}
+
+.cta-section .btn-light:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* --- REQUIREMENTS --- */
 .requirements-section {
     background-color: #fff;
     overflow: hidden; 
+    position: relative;
+    z-index: 2;
 }
 
 .req-bg-overlay {
@@ -330,6 +571,7 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     -webkit-mask-image: linear-gradient(to right, transparent, black);
     mask-image: linear-gradient(to right, transparent, black);
 }
+
 .timeline-connector {
     position: absolute;
     top: 50px; 
@@ -378,124 +620,178 @@ h1, h2, h3, h4, .fw-black, .navbar-brand {
     line-height: 1.6;
 }
 
+/* --- FOOTER --- */
+.footer-section {
+    background-color: #111111;
+    font-size: 0.95rem;
+    width: 100%;
+    overflow-x: hidden; 
+    position: relative;
+    z-index: 3;
+}
 
-/* ---  MOBILE RESPONSIVE  --- */
+.social-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    background: var(--brand-red);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    position: relative;
+    padding-left: 0;
+}
+
+.footer-links a:hover {
+    color: white;
+    padding-left: 10px; 
+}
+
+.footer-links a::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    color: var(--brand-red);
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover::before {
+    opacity: 1;
+    left: 0;
+}
+
+.contact-info i {
+    font-size: 1.1rem;
+}
+
+.footer-bottom {
+    background-color: #0a0a0a;
+}
+
+.hover-white:hover {
+    color: white !important;
+}
+
+/* =========================================
+   CRITICAL MOBILE & DESKTOP LAYOUT FIXES
+   (Applied to prevent Overlap)
+   ========================================= */
 
 @media (min-width: 992px) {
-    .navbar:not(.scrolled) .toggler-icon {
-        background-color: var(--brand-white);
-    }
-    .stair-card {
-        position: absolute;
-    }
-    .position-1 {
-        bottom: 50px;
-        left: 50px;
-        z-index: 3;
-    }
-    .position-2 {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 2;
-    }
-    .position-3 {
-        top: 50px;
-        right: 50px;
-        z-index: 1;
-    }
+    /* Desktop Staircase Layout */
+    .stair-card { position: absolute; }
+    .position-1 { bottom: 50px; left: 50px; z-index: 3; }
+    .position-2 { top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; }
+    .position-3 { top: 50px; right: 50px; z-index: 1; }
 
-    .position-1:hover,
-    .position-3:hover {
-        transform: translateY(-10px); 
-        z-index: 100;
-    }
-    .position-2:hover {
-        transform: translate(-50%, calc(-50% - 10px));
-        z-index: 100;
-    }
-
-    
+    /* Hover Effects */
+    .position-1:hover, .position-3:hover { transform: translateY(-10px); z-index: 100; }
+    .position-2:hover { transform: translate(-50%, calc(-50% - 10px)); z-index: 100; }
 }
 
 @media (max-width: 991px) {
-    .navbar { padding: 15px 0; }
-    .navbar .nav-link { 
-        color: var(--brand-black) !important; 
-        margin: 10px 0;
-        text-align: center;
-    }   
-    .navbar .nav-link:hover { 
-        color: var(--brand-red) !important; }
-    .hero-bg-shape { 
-        width: 100%; 
-        height: 55%; 
-        top: auto; 
-        bottom: 0; 
-        clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%); 
-    }   
+    /* 1. RESET HERO HEIGHT to allow content to push */
     .hero-wrapper { 
-        text-align: center; 
+        height: auto !important;
+        min-height: auto !important; 
         padding-top: 140px; 
-        padding-bottom: 80px; }
+        padding-bottom: 80px; 
+        display: block !important;
+        text-align: center; 
+    }
+    
     .hero-image-container { 
         margin-top: 50px; 
         justify-content: center; 
-        padding-right: 0; }
-    .hero-logo-img { 
-        max-width: 280px; 
-        margin-right: 0; }
-    .hero-desc { 
-        margin: 0 auto 40px; color: var(--brand-white); }
-    .navbar-collapse {
-        background: white;
-        padding: 20px;
-        border-radius: 20px;
-        margin-top: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }   
-    .navbar-toggler .toggler-icon {
-        background-color: var(--brand-black); 
-    }
-     .bg-light-section {
-        min-height: 500px; 
-        padding: 60px 20px;
+        padding-right: 0; 
+        min-height: auto !important;
     }
     
-    .min-h-cards {
-        min-height: auto;
-        padding: 50px 20px;
-        background: white;
+    .hero-logo-img { 
+        max-width: 280px; 
+        margin-right: 0; 
+        display: block;
+        margin-left: auto;
     }
-
-    .cards-staircase-wrapper {
-        flex-direction: column;
-        gap: 20px;
-        padding-bottom: 50px;
+    
+    /* 2. Fix the Red Shape angle on mobile to fit content */
+    .hero-bg-shape { 
+        width: 100%; 
+        height: 50%; /* Only bottom half */
+        top: auto; 
+        bottom: 0; 
+        clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%); 
+        z-index: 0;
+    }
+    
+    .hero-title span { color: var(--brand-white); }
+    .hero-desc { margin: 0 auto 40px; color: var(--brand-white); }
+    
+    /* 3. RESET STAIRCASE CARDS (Stacking them) */
+    .bg-light-section { min-height: auto !important; padding: 60px 20px; }
+    .min-h-cards { min-height: auto !important; padding: 50px 20px; background: white; }
+    
+    .cards-staircase-wrapper { 
+        flex-direction: column; 
+        gap: 30px; 
+        padding-bottom: 50px; 
+        height: auto !important;
     }
 
     .stair-card {
-        position: relative; 
-        width: 100%;
-        max-width: 350px;
-        height: auto;
-        min-height: 280px;
-        top: auto !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
+        position: relative !important; 
+        width: 100%; max-width: 350px;
+        height: auto; min-height: 280px;
+        top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
         transform: none !important;
+        margin: 0 auto;
     }
-    .stair-card:hover {
-        transform: translateY(-10px);
-    }
-    .hero-title span { color: var(--brand-white);
-    }
+    .stair-card:hover { transform: translateY(-10px); }
+    
+    /* 4. NAVBAR MOBILE */
+    .navbar { padding: 15px 0; }
+    .navbar .nav-link { color: var(--brand-black) !important; margin: 10px 0; text-align: center; }   
+    .navbar .nav-link:hover { color: var(--brand-red) !important; }
+    .navbar-collapse {
+        background: white; padding: 20px; border-radius: 20px; margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }   
+    .navbar-toggler .toggler-icon { background-color: var(--brand-black); }
 }
 
 @media (max-width: 768px) {
-    .req-bg-overlay {
-        width: 100%;
-        opacity: 0.05; 
-    }
+    .req-bg-overlay { width: 100%; opacity: 0.05; }
 }
+
+/* SOLID BACKGROUNDS FOR ALL SECTIONS (Prevents transparent overlap) */
+section, header, footer, main {
+    position: relative;
+    background-color: #fff;
+    z-index: 2;
+}
+.stats-section { background-color: var(--brand-black); }
+.testimonials-section { background-color: #f9f9f9; }
+.footer-section { background-color: #111; }
+.cta-section { background-color: var(--brand-red); }

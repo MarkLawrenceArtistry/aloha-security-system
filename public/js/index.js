@@ -42,6 +42,43 @@
             lastScrollTop = scrollTop;
         });
 
+         const counters = document.querySelectorAll('.counter');
+        let hasCounted = false;
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const speed = 200; // The lower the slower
+                
+                const updateCount = () => {
+                    const count = +counter.innerText;
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc);
+                        setTimeout(updateCount, 20); // Speed of count
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        };
+
+        // Trigger animation when stats section is visible
+        window.addEventListener('scroll', () => {
+            const statsSection = document.querySelector('.stats-section');
+            if(!statsSection) return;
+            
+            const sectionPos = statsSection.getBoundingClientRect().top;
+            const screenPos = window.innerHeight / 1.3;
+
+            if(sectionPos < screenPos && !hasCounted) {
+                animateCounters();
+                hasCounted = true; // Ensures it only runs once
+            }
+        });
+
         // 3. SCROLL TO TOP FUNCTION
         function scrollToTop() {
             window.scrollTo({
