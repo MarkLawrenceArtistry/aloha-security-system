@@ -1,471 +1,308 @@
-/* ==========================================================================
-   ALOHA SECURITY - APPLICATION FORM STYLES
-   ========================================================================== 
-   
-   TABLE OF CONTENTS:
-   1. GLOBAL DEFAULTS ........ Basic page settings & background
-   2. LAYOUT WRAPPERS ....... Primary containers (app-wrapper)
-   3. PROGRESS & STEPPER .... Top progress bar & visual stepper icons
-   4. FORM COMPONENTS ....... Floating labels, inputs, and select boxes
-   5. UPLOAD CARDS .......... Drag & drop file upload areas
-   6. FORM ACTIONS .......... Navigation buttons (Next/Prev)
-   7. REVIEW DASHBOARD ...... Final summary cards (Step 4)
-   8. BRAND INTEGRATION ..... Headers, footers, & identity elements
-   ========================================================================== */
+/* --- Imports matching Landing Page --- */
+:root {
+    --brand-red: #e53828;
+    --brand-black: #232323;
+    --brand-white: #ffffff;
+    --brand-bg: #faf6f7;
+    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
 
-/* --------------------------------------------------------------------------
-   1. GLOBAL DEFAULTS
-   -------------------------------------------------------------------------- */
 body {
-    background-color: var(--off-white);
-    overflow-x: hidden;
+    background-color: var(--brand-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* --------------------------------------------------------------------------
-   2. LAYOUT WRAPPERS
-   -------------------------------------------------------------------------- */
-/* Centered container for the multi-step form */
-.app-wrapper {
-    max-width: 800px;
-    margin: 40px auto;
-    background: white;
-    padding: 70px 50px 50px;
-    border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+/* Ensure Navbar is solid */
+.navbar.scrolled-always {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+.navbar.scrolled-always .nav-link { color: var(--brand-black) !important; }
+.navbar.scrolled-always .nav-link:hover { color: var(--brand-red) !important; }
+.navbar.scrolled-always .toggler-icon { background-color: var(--brand-black) !important; }
+
+/* --- Wrapper & Background --- */
+.application-wrapper {
     position: relative;
-    overflow: hidden; /* Clips the top-progress-strip */
+    padding-top: 120px;
+    padding-bottom: 80px;
+    flex: 1;
 }
 
-/* --------------------------------------------------------------------------
-   3. PROGRESS & STEPPER
-   -------------------------------------------------------------------------- */
-
-/* Thin strip at the very top of the app-wrapper */
-.top-progress-strip {
+.app-bg-shape {
     position: absolute;
     top: 0;
-    left: 0;
-    height: 6px;
-    background: #eee;
-    width: 100%;
+    right: 0;
+    width: 30%;
+    height: 60%;
+    background: var(--brand-red);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    z-index: -1;
+    opacity: 0.8;
 }
 
-/* The actual filling bar (controlled via JS percentage) */
-.top-progress-fill {
-    height: 100%;
-    background: linear-gradient(to right, var(--primary-red), #ff6b6b);
-    width: 0%; 
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 15px rgba(229, 56, 40, 0.3);
-}
-
-/* Visual timeline component (1, 2, 3, 4) */
-.stepper {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 50px;
-    position: relative;
-}
-
-/* Gray connecting line behind the steps */
-.stepper::before {
-    content: '';
-    position: absolute;
-    top: 17px;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background: #eee;
-    z-index: 1;
-}
-
-/* Red filling line that advances between steps */
-.stepper-progress-bar {
-    position: absolute;
-    top: 17px;
-    left: 10%;
-    height: 2px;
-    background: var(--primary-red);
-    z-index: 1;
-    transition: 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-    width: 0%;
-}
-
-/* Logic to advance the stepper bar based on active-step presence */
-body:has(#step-1.active-step) .stepper-progress-bar { width: 0%; }
-body:has(#step-2.active-step) .stepper-progress-bar { width: 26.66%; }
-body:has(#step-3.active-step) .stepper-progress-bar { width: 53.33%; }
-body:has(#step-4.active-step) .stepper-progress-bar { width: 80%; }
-
-/* Individual step container */
-.step {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #999;
-    flex: 1;
-    position: relative;
-    z-index: 2;
-    transition: 0.3s;
-}
-
-/* Highlights completed and current steps */
-.step:not(.active ~ .step) {
-    color: var(--primary-red);
-    font-weight: 600;
-}
-
-/* The circle containing the number or checkmark */
-.step-num {
-    display: block;
-    width: 36px;
-    height: 36px;
+/* --- Card Styling --- */
+.app-card {
     background: white;
-    border: 2px solid #eee;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    line-height: 32px;
-    transition: 0.4s;
-    position: relative;
-    font-weight: 700;
+    padding: 50px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: fadeInUp 0.6s ease-out;
 }
 
-/* Active/Completed circle color */
-.step:not(.active ~ .step) .step-num {
-    background: var(--primary-red);
-    border-color: var(--primary-red);
-    color: white;
-}
-
-/* Scale effect for the current active step */
-.step.active .step-num {
-    box-shadow: 0 0 20px rgba(229, 56, 40, 0.4);
-    transform: scale(1.15);
-}
-
-/* Checkmark icon for completed steps */
-.step-num .bi-check-lg {
-    display: none;
-    font-size: 1.2rem;
-}
-
-/* Swap number with checkmark for completed steps */
-.step:not(.active):not(.active ~ .step) .step-num span:first-child { display: none; }
-.step:not(.active):not(.active ~ .step) .step-num .bi-check-lg { display: inline-block; }
-
-/* --------------------------------------------------------------------------
-   4. FORM COMPONENTS
-   -------------------------------------------------------------------------- */
-
-/* Grid layout for fields appearing side-by-side */
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-}
-
-/* Collapse grid to single column on mobile */
-@media (max-width: 600px) {
-    .form-row { grid-template-columns: 1fr; gap: 0; }
-}
-
-/* Wrapper for floating label interaction */
-.floating-group {
-    position: relative;
-    margin-bottom: 25px;
-}
-
-/* Base styles for all textual inputs */
-.floating-group input, 
-.floating-group select, 
-.floating-group textarea {
-    width: 100%;
-    padding: 24px 15px 10px; 
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    background: white;
-    transition: 0.2s all;
-}
-
-/* Custom dropdown arrow to replace browser default */
-.floating-group select {
-    -webkit-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: calc(100% - 15px) center;
-    background-size: 14px;
-    padding-right: 40px;
-}
-
-/* Initial label position (inside the input) */
-.floating-group label {
-    position: absolute;
-    top: 18px; 
-    left: 15px;
-    font-size: 1rem;
-    color: #888;
-    pointer-events: none;
-    transition: 0.2s all;
-    font-weight: 500;
-}
-
-/* Logic to move label into 'float' position when the field is active/filled */
-.floating-group input:focus ~ label,
-.floating-group input:not(:placeholder-shown) ~ label,
-.floating-group select:focus ~ label,
-.floating-group select:not([value=""]) ~ label,
-.floating-group textarea:focus ~ label,
-.floating-group textarea:not(:placeholder-shown) ~ label {
-    top: 4px;
-    font-size: 0.7rem;
-    color: var(--primary-red);
-    font-weight: 700;
-}
-
-/* Focus highlighting for form controls */
-.floating-group input:focus, 
-.floating-group select:focus, 
-.floating-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-red);
-    box-shadow: 0 4px 12px rgba(229, 56, 40, 0.08);
-}
-
-/* Individual form sections (Step 1, 2, etc.) */
-.form-step { display: none; }
-.form-step.active-step {
-    display: block;
-    animation: slideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* Step headings with branding icons */
-.form-step h2 {
-    margin-bottom: 30px;
-    font-size: 1.6rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Smooth entry animation for steps */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --------------------------------------------------------------------------
-   5. UPLOAD CARDS
-   -------------------------------------------------------------------------- */
+/* --- Stepper UI --- */
+.progress-container {
+    position: relative;
+}
 
-/* Clickable area for file selection and drag-drop */
+.top-progress-strip {
+    height: 4px;
+    background: #eee;
+    margin-bottom: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.top-progress-fill {
+    height: 100%;
+    background: var(--brand-red);
+    width: 0%;
+    transition: width 0.4s ease; 
+}
+
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding: 0; 
+    margin: 0;  
+    box-sizing: border-box; 
+    width: 100%; 
+}
+
+.stepper::before {
+    content: '';
+    position: absolute;
+    top: 20px; 
+    left: 20px; 
+    width: calc(100% - 40px); 
+    height: 2px;
+    background: #eee;
+    z-index: 0;
+    box-sizing: border-box;
+}
+
+#stepper-line-fill {
+    position: absolute;
+    top: 20px; 
+    left: 20px; 
+    width: 0%; 
+    height: 2px;
+    background: var(--brand-red);
+    z-index: 1;
+    transition: width 0.4s ease, background-color 0.4s ease; 
+    box-sizing: border-box;
+}
+
+.step {
+    position: relative;
+    z-index: 1; 
+    text-align: center;
+    background: transparent; 
+    padding: 0; 
+    margin: 0;  
+    flex-shrink: 0;
+    flex-basis: auto; 
+    box-sizing: border-box;
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin: 0; 
+    transition: var(--transition); 
+    color: #999;
+    box-sizing: border-box;
+}
+
+/* STEPPER STATES */
+
+/* Default: Hide check, show number */
+.step-circle i { display: none; font-size: 1.2rem; }
+.step-circle span { display: block; }
+
+/* Active Step: Red border, white bg */
+.step.active .step-circle {
+    border-color: var(--brand-red);
+    background: white;
+    color: var(--brand-red);
+    box-shadow: 0 5px 15px rgba(229, 56, 40, 0.3);
+}
+
+.step.completed .step-circle {
+    background: var(--brand-red); 
+    color: white;
+    border-color: var(--brand-red);
+}
+.step.completed .step-circle i { display: block; }
+.step.completed .step-circle span { display: none; }
+
+.step-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    margin-top: 10px;
+    transition: color 0.4s ease; 
+}
+
+.step.active .step-text {
+    color: var(--brand-black);
+}
+.step.completed .step-text {
+    color: var(--brand-black); 
+}
+
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-select:focus {
+    border-color: var(--brand-red);
+    box-shadow: 0 5px 15px rgba(229, 56, 40, 0.1);
+}
+
+/* --- DRAG & DROP UPLOAD CARDS --- */
 .upload-card {
     border: 2px dashed #ddd;
     padding: 30px;
     border-radius: 12px;
     text-align: center;
-    background: #fafafa;
-    transition: 0.3s;
     cursor: pointer;
-    margin-top: 10px;
+    background: #fafafa;
+    transition: var(--transition);
 }
 
-/* Hover and Drag-active states */
-.upload-card:hover, .upload-card.drag-over {
-    border-color: var(--primary-red);
-    background: #fffafa;
-    transform: translateY(-2px);
+/* Hover State */
+.upload-card:hover {
+    border-color: var(--brand-red);
+    background: #fff5f5;
+    transform: translateY(-3px);
 }
 
-/* Extra visual cues for active dragging */
+/* Drag Over State (JS Triggered) */
 .upload-card.drag-over {
     border-style: solid;
-    box-shadow: 0 0 15px rgba(229, 56, 40, 0.1);
+    border-color: var(--brand-red);
+    background: #ffebeb;
+    box-shadow: 0 10px 20px rgba(229, 56, 40, 0.15);
+    transform: scale(1.02);
 }
 
-/* Decorative icon within the upload card */
-.upload-card i {
-    display: block;
-    font-size: 2.5rem;
-    color: var(--primary-red);
-    margin-bottom: 15px;
-    opacity: 0.7;
+/* --- Buttons --- */
+.btn-brand {
+    background: var(--brand-black);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    border: none;
+    transition: var(--transition);
 }
 
-.upload-card-label {
-    display: block;
+.btn-brand:hover {
+    background: var(--brand-red);
+    transform: translateY(-3px);
+}
+
+.btn-outline-dark {
+    border-radius: 50px;
+    padding: 12px 30px;
     font-weight: 600;
-    color: #444;
 }
 
-.upload-hint {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: 8px;
-}
-
-/* Hidden native input; clicked via card proxy */
-.form-group input[type="file"] {
+/* --- Steps Animation --- */
+.form-step {
     display: none;
+    animation: fadeIn 0.4s ease-out forwards; 
 }
 
-/* --------------------------------------------------------------------------
-   6. FORM ACTIONS
-   -------------------------------------------------------------------------- */
-
-/* Bottom container for navigation buttons */
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-    padding-top: 25px;
-    border-top: 1px solid #eee;
+.form-step.active-step {
+    display: block;
 }
 
-/* Alignment helper for Step 1 (only Next button) */
-.form-actions-end { justify-content: flex-end; }
-
-/* --------------------------------------------------------------------------
-   7. REVIEW DASHBOARD
-   -------------------------------------------------------------------------- */
-
-/* Final summary layout in Step 4 */
-.review-box {
-    background: transparent;
-    padding: 0;
-    margin: 30px 0;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-/* Vertical grid of review sections */
+/* --- Review Section --- */
 .review-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
 }
 
-/* Detailed card for each data category (Personal, Job, etc.) */
 .review-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 12px;
+    background: #f8f9fa;
     padding: 20px;
-    transition: 0.3s;
+    border-radius: 12px;
+    border-left: 4px solid var(--brand-red);
 }
 
-.review-card:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+/* Responsive */
+@media (max-width: 768px) {
+    .app-card { padding: 30px 20px; }
+    .step-text { display: none; }
+    .app-bg-shape { width: 100%; height: 30%; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+    .stepper::before,
+    #stepper-line-fill {
+        left: 20px;
+        width: calc(100% - 40px); 
+    }
+
+    .form-actions {
+        flex-direction: column; 
+        gap: 15px; 
+    }
+
+    .form-actions .btn {
+        width: 100%; 
+        padding: 15px 20px; 
+        border-radius: 10px; 
+    }
+    .form-actions .btn-prev {
+        order: 1; 
+    }
+    .form-actions .btn-next,
+    .form-actions .btn[type="submit"] {
+        order: 2; 
+    }
 }
 
-/* Category header within review cards */
-.review-card h3 {
-    font-size: 1.1rem;
-    color: var(--primary-red);
-    margin-bottom: 15px;
-    border-bottom: 1px solid #f4f7f6;
-    padding-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
 
-/* Key-Value pair container */
-.review-details {
-    display: grid;
-    grid-template-columns: 1fr; 
-    gap: 12px;
-}
 
-/* Individual data line in the summary */
-.review-field {
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px dashed #f0f0f0;
-    padding-bottom: 8px;
-}
-
-.review-field:last-child {
-    border-bottom: none;
-}
-
-/* Data label (e.g., EMAIL) */
-.review-field label {
-    display: inline-block;
-    color: #888;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-bottom: 0;
-}
-
-/* Captured data value */
-.review-field span {
-    color: #333;
-    font-weight: 600;
-    word-break: break-all;
-    max-width: 70%;
-    text-align: right;
-}
-
-/* --------------------------------------------------------------------------
-   8. BRAND INTEGRATION
-   -------------------------------------------------------------------------- */
-
-/* Agency name in the header */
-.brand-title {
-    margin: 0;
-    color: var(--primary-red);
-    letter-spacing: 1px;
-    font-weight: 800;
-}
-
-/* Official brand slogan */
-.brand-slogan {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 600;
-    opacity: 0.8;
-}
-
-/* Large numeric display (e.g., Step 1 of 4) */
-.brand-step-counter {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-/* Global brand footer area */
-.brand-footer {
-    margin-top: 60px;
-    padding: 40px 0;
-    border-top: 1px solid #ddd;
-    background: #fff;
-    text-align: center;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.brand-footer-name {
-    font-weight: 700;
-    color: var(--primary-black);
-    margin-bottom: 5px;
-}
-
-/* Founding year tagline */
-.brand-footer-since {
-    margin-top: 15px;
-    font-weight: 600;
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-}
-
-/* Layout tweak for the back button in header */
-.btn-back-home {
-    border-width: 1px;
-    font-weight: 500;
-}
-
-/* General hidden utility */
-.hidden {
-    display: none !important;
-}

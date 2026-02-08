@@ -3,360 +3,510 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Form - Aloha Security</title>
+    <title>Job Application | Aloha Security</title>
+    
+    <link rel="icon" type="image/png" href="uploads/logo.png"/>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- APPLICATION SPECIFIC STYLES -->
     <link rel="stylesheet" href="css/application.css">
 </head>
 <body>
 
-    <header>
-        <div class="container nav-container">
-            <a href="index.html" class="btn btn-outline btn-back-home">
-                <i class="bi bi-arrow-left"></i> Back to Home
-            </a>
-            <div class="header-center">
-                <h3 class="brand-title">ALOHA SECURITY AGENCY</h3>
-                <p class="brand-slogan">YOUR SAFETY, OUR PRIORITY</p>
-            </div>
-            <div class="brand-step-counter">
-                Step <span id="current-step-label">1</span> of 4
-            </div>
-        </div>
-    </header>
-
-
-    <div class="app-wrapper">
-        <!-- Top Progress Strip -->
-        <div class="top-progress-strip">
-            <div class="top-progress-fill" id="top-progress-bar"></div>
-        </div>
-
-
-                <!-- Visual Stepper -->
-                <div class="stepper">
-                    <div class="stepper-progress-bar"></div>
-                    <div class="step active" id="step-ind-1">
-                        <span class="step-num"><span>1</span><i class="bi bi-check-lg"></i></span> Info
-                    </div>
-                    <div class="step" id="step-ind-2">
-                        <span class="step-num"><span>2</span><i class="bi bi-check-lg"></i></span> Position
-                    </div>
-                    <div class="step" id="step-ind-3">
-                        <span class="step-num"><span>3</span><i class="bi bi-check-lg"></i></span> Exp
-                    </div>
-                    <div class="step" id="step-ind-4">
-                        <span class="step-num"><span>4</span><i class="bi bi-check-lg"></i></span> Review
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top scrolled-always">
+        <div class="container">
+            
+            <!-- BRAND LOGO WRAPPER -->
+            <div class="brand-interaction-wrapper">
+                <a class="navbar-brand position-relative z-3" href="index.html">
+                    <img src="resources/logo.png" style="height: 50px;">
+                </a>
+                <!-- Hidden Hover Modal -->
+                <div class="brand-hover-modal">
+                    <div class="modal-backdrop-blur"></div>
+                    <div class="modal-content-box">
+                        <div class="modal-logo-wrapper mb-3">
+                            <img src="resources/logo.png" alt="Aloha Logo" class="modal-big-logo">
+                            <div class="logo-glow"></div>
+                        </div>
+                        <h1 class="modal-brand-name">ALOHA</h1>
+                        <div class="red-line-divider"></div>
+                        <h5 class="modal-brand-sub">SECURITY AGENCY</h5>
+                        <p class="modal-tagline">Professional • Reliable • Secure</p>
                     </div>
                 </div>
+            </div>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+            </button>
 
-                <form id="multi-step-form">
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="status-result.html">Check Status</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <span class="badge bg-danger rounded-pill px-3 py-2">Apply Now</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Wrapper -->
+    <main class="application-wrapper">
+        <div class="app-bg-shape"></div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
                     
-                    <!-- STEP 1 -->
-                    <div class="form-step active-step" id="step-1">
-                        <h2><i class="bi bi-person-lines-fill"></i> Personal Info</h2>
+                    <div class="app-card shadow-lg">
                         
-                        <div class="form-row">
-                            <div class="floating-group">
-                                <input type="text" id="first_name" name="first_name" placeholder=" " required>
-                                <label for="first_name">First Name</label>
-                            </div>
-                            <div class="floating-group">
-                                <input type="text" id="last_name" name="last_name" placeholder=" " required>
-                                <label for="last_name">Last Name</label>
-                            </div>
+                        <div class="text-center mb-5">
+                            <h2 class="fw-black">Join Our Team</h2>
+                            <div class="red-dash mx-auto"></div>
+                            <p class="text-muted">Step <span id="current-step-label" class="fw-bold text-danger">1</span> of 4</p>
                         </div>
 
-                        <div class="form-row">
-                            <div class="floating-group">
-                                <input type="email" id="email" name="email" placeholder=" " required>
-                                <label for="email">Email Address</label>
-                            </div>
-                            <div class="floating-group">
-                                <input type="text" id="contact_num" name="contact_num" placeholder=" " required>
-                                <label for="contact_num">Mobile Number</label>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="floating-group">
-                                <input type="date" id="birthdate" name="birthdate" placeholder=" " required>
-                                <label for="birthdate">Birthdate</label>
-                            </div>
-                            <div class="floating-group">
-                                <select id="gender" name="gender" required>
-                                    <option value="" disabled selected>Select gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                                <label for="gender">Gender</label>
-                            </div>
-                        </div>
-
-                        <div class="floating-group">
-                            <textarea id="address" name="address" rows="3" placeholder=" " required></textarea>
-                            <label for="address">Full Home Address</label>
-                        </div>
-                        
-                        <div class="form-actions form-actions-end">
-                            <button type="button" class="btn btn-primary btn-next" data-step="1">Next Step <i class="bi bi-chevron-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2 -->
-                    <div class="form-step" id="step-2">
-                        <h2><i class="bi bi-briefcase"></i> Position Details</h2>
-                        <div class="floating-group">
-                            <select id="position_applied" name="position_applied" required>
-                                <option value="Security Guard">Security Guard</option>
-                                <option value="Head Guard">Head Guard</option>
-                                <option value="Lady Guard">Lady Guard</option>
-                                <option value="CCTV Operator">CCTV Operator</option>
-                            </select>
-                            <label for="position_applied">Position Applied For</label>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-outline btn-prev" data-step="2"><i class="bi bi-chevron-left"></i> Previous</button>
-                            <button type="button" class="btn btn-primary btn-next" data-step="2">Next Step <i class="bi bi-chevron-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 3 -->
-                    <div class="form-step" id="step-3">
-                        <h2><i class="bi bi-file-earmark-arrow-up"></i> Experience & Documents</h2>
-                        
-                        <div class="form-row">
-                            <div class="floating-group">
-                                <input type="number" id="years_experience" name="years_experience" placeholder=" ">
-                                <label for="years_experience">Years of Experience</label>
-                            </div>
-                            <div class="floating-group">
-                                <input type="text" id="previous_employer" name="previous_employer" placeholder=" ">
-                                <label for="previous_employer">Previous Employer</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="upload-card-label">Attach Resume (PDF, JPG, or PNG)</label>
-                            <div class="upload-card">
-                                <i class="bi bi-cloud-arrow-up"></i>
-                                <span id="resume-label">Click to upload or drag & drop</span>
-                                <div class="upload-hint">Official documents only</div>
-                                <input type="file" id="resume" name="resume" accept=".pdf, .jpg, .png" aria-label="Upload Resume" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="upload-card-label">Valid ID (Government Issued)</label>
-                            <div class="upload-card">
-                                <i class="bi bi-person-badge"></i>
-                                <span id="id-label">Click to upload or drag & drop</span>
-                                <div class="upload-hint">Sharp, clear image required</div>
-                                <input type="file" id="id_image" name="id_image" accept=".jpg, .png" aria-label="Upload ID" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-outline btn-prev" data-step="3"><i class="bi bi-chevron-left"></i> Previous</button>
-                            <button type="button" class="btn btn-primary btn-next" data-step="3">Review Application <i class="bi bi-eye"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 4 -->
-                    <div class="form-step" id="step-4">
-                        <h2><i class="bi bi-clipboard-check"></i> Review & Submit</h2>
-                        <p>Verify your information. You can go back to edit any section.</p>
-                        
-                        <div class="review-box">
-                            <div class="review-grid">
-                                <div class="review-card">
-                                    <h3><i class="bi bi-person"></i> Personal</h3>
-                                    <div class="review-details" id="review-personal-v2"></div>
-                                </div>
-                                <div class="review-card">
-                                    <h3><i class="bi bi-briefcase"></i> Position</h3>
-                                    <div class="review-details" id="review-job-v2"></div>
-                                </div>
-                                <div class="review-card">
-                                    <h3><i class="bi bi-file-earmark-text"></i> Attachments</h3>
-                                    <div class="review-details" id="review-docs-v2"></div>
-                                </div>
+                        <!-- Progress Bar & Stepper -->
+                        <div class="progress-container mb-5">
+                            <div class="top-progress-strip">
+                                <div class="top-progress-fill" id="top-progress-bar"></div>
                             </div>
                             
+                            <!-- Visual Stepper with Checkmarks -->
+                            <div class="stepper">
+                                <div class="stepper-progress-line" id="stepper-line-fill"></div>
+
+                                <div class="step active" id="step-ind-1">
+                                    <div class="step-circle">
+                                        <span>1</span><i class="bi bi-check-lg"></i>
+                                    </div>
+                                    <span class="step-text">Info</span>
+                                </div>
+                                
+                                <div class="step" id="step-ind-2">
+                                    <div class="step-circle">
+                                        <span>2</span><i class="bi bi-check-lg"></i>
+                                    </div>
+                                    <span class="step-text">Job</span>
+                                </div>
+                                
+                                <div class="step" id="step-ind-3">
+                                    <div class="step-circle">
+                                        <span>3</span><i class="bi bi-check-lg"></i>
+                                    </div>
+                                    <span class="step-text">Docs</span>
+                                </div>
+                                
+                                <div class="step" id="step-ind-4">
+                                    <div class="step-circle">
+                                        <span>4</span><i class="bi bi-check-lg"></i>
+                                    </div>
+                                    <span class="step-text">Review</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-outline btn-prev" data-step="4"><i class="bi bi-chevron-left"></i> Previous</button>
-                            <button type="submit" class="btn btn-primary">Submit Application <i class="bi bi-send"></i></button>
-                        </div>
+                        <!-- FORM START -->
+                        <form id="multi-step-form">
+                            
+                            <!-- STEP 1 -->
+                            <div class="form-step active-step" id="step-1">
+                                <h4 class="mb-4 fw-bold"><i class="bi bi-person-lines-fill text-danger me-2"></i> Personal Information</h4>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required>
+                                            <label for="first_name">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" required>
+                                            <label for="last_name">Last Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                                            <label for="email">Email Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="contact_num" name="contact_num" placeholder="Mobile" required>
+                                            <label for="contact_num">Mobile Number</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                                            <label for="birthdate">Birthdate</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="gender" name="gender" required>
+                                                <option value="" disabled selected>Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                            <label for="gender">Gender</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" id="address" name="address" style="height: 100px" placeholder="Address" required></textarea>
+                                            <label for="address">Full Home Address</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions d-flex justify-content-end mt-4">
+                                    <button type="button" class="btn btn-brand btn-next" data-step="1">Next Step <i class="bi bi-arrow-right"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- STEP 2 -->
+                            <div class="form-step" id="step-2">
+                                <h4 class="mb-4 fw-bold"><i class="bi bi-briefcase text-danger me-2"></i> Position Details</h4>
+                                
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="position_applied" name="position_applied" required>
+                                        <option value="Security Guard">Security Guard</option>
+                                        <option value="Head Guard">Head Guard</option>
+                                        <option value="Lady Guard">Lady Guard</option>
+                                        <option value="CCTV Operator">CCTV Operator</option>
+                                    </select>
+                                    <label for="position_applied">Position Applied For</label>
+                                </div>
+
+                                <div class="form-actions d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-dark btn-prev" data-step="2"><i class="bi bi-arrow-left"></i> Previous</button>
+                                    <button type="button" class="btn btn-brand btn-next" data-step="2">Next Step <i class="bi bi-arrow-right"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- STEP 3  -->
+                            <div class="form-step" id="step-3">
+                                <h4 class="mb-4 fw-bold"><i class="bi bi-file-earmark-arrow-up text-danger me-2"></i> Experience & Documents</h4>
+                                
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="years_experience" name="years_experience" placeholder="Years">
+                                            <label for="years_experience">Years of Experience</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="previous_employer" name="previous_employer" placeholder="Employer">
+                                            <label for="previous_employer">Previous Employer</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- DRAG AND DROP ZONE 1 -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Attach Resume (PDF, JPG, PNG)</label>
+                                    <div class="upload-card" id="drop-zone-resume">
+                                        <i class="bi bi-cloud-arrow-up display-4 text-danger mb-2"></i>
+                                        <p class="mb-0 text-muted" id="resume-label">Click to upload or drag & drop</p>
+                                        <input type="file" id="resume" name="resume" accept=".pdf, .jpg, .png" hidden required>
+                                    </div>
+                                </div>
+
+                                <!-- DRAG AND DROP ZONE 2 -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Valid ID (Govt Issued)</label>
+                                    <div class="upload-card" id="drop-zone-id">
+                                        <i class="bi bi-person-badge display-4 text-danger mb-2"></i>
+                                        <p class="mb-0 text-muted" id="id-label">Click to upload or drag & drop</p>
+                                        <input type="file" id="id_image" name="id_image" accept=".jpg, .png" hidden required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-dark btn-prev" data-step="3"><i class="bi bi-arrow-left"></i> Previous</button>
+                                    <button type="button" class="btn btn-brand btn-next" data-step="3">Review <i class="bi bi-eye"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- STEP 4 -->
+                            <div class="form-step" id="step-4">
+                                <h4 class="mb-4 fw-bold"><i class="bi bi-clipboard-check text-danger me-2"></i> Review Application</h4>
+                                <p class="text-muted mb-4">Please verify your information before submitting.</p>
+                                
+                                <div class="review-grid">
+                                    <div class="review-card">
+                                        <h6 class="text-danger fw-bold border-bottom pb-2 mb-3">Personal Details</h6>
+                                        <div class="review-details" id="review-personal-v2"></div>
+                                    </div>
+                                    <div class="review-card">
+                                        <h6 class="text-danger fw-bold border-bottom pb-2 mb-3">Position Details</h6>
+                                        <div class="review-details" id="review-job-v2"></div>
+                                    </div>
+                                    <div class="review-card">
+                                        <h6 class="text-danger fw-bold border-bottom pb-2 mb-3">Documents</h6>
+                                        <div class="review-details" id="review-docs-v2"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-dark btn-prev" data-step="4"><i class="bi bi-arrow-left"></i> Previous</button>
+                                    <button type="submit" class="btn btn-brand">Submit Application <i class="bi bi-send"></i></button>
+                                </div>
+                            </div>
+
+                        </form>
                     </div>
+                    <!-- End Card -->
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-section text-white position-relative overflow-hidden">
+        <div class="container pt-5 pb-4">
+            <div class="row g-4 justify-content-between">
+                
+                <div class="col-lg-4 col-md-12 mb-md-4">
+                    <a href="#" class="d-inline-block mb-4">
+                        <img src="resources/logo.png" alt="Aloha Logo" height="60">
+                    </a>
+                    <p class="text-white-50 mb-4 pe-lg-5" style="line-height: 1.8;">
+                        Providing top-tier security solutions in Zamboanga City since 2002. Your safety is our unwavering priority.
+                    </p>
+                    <div class="social-links d-flex gap-2">
+                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="status-result.html">Check Status</a></li>
+                        <li><a href="application.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <h5 class="fw-bold mb-4 text-white">Services</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Static Guards</a></li>
+                        <li><a href="#">Mobile Patrol</a></li>
+                        <li><a href="#">VIP Protection</a></li>
+                        <li><a href="#">CCTV Monitoring</a></li>
+                        <li><a href="#">Event Security</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-12">
+                    <h5 class="fw-bold mb-4 text-white mt-4 mt-lg-0">Contact Us</h5>
+                    <ul class="list-unstyled contact-info text-white-50">
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>108, Old Highway, Guiwan,<br>Zamboanga City</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-telephone-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>(062) 991-XXXX</span>
+                        </li>
+                        <li class="d-flex mb-3">
+                            <i class="bi bi-envelope-fill text-danger me-3 flex-shrink-0 mt-1"></i>
+                            <span>info@alohasecurity.com</span>
+                        </li>
+                    </ul>
+                </div>
 
             </div>
-        </form>
-    </div>
+        </div>
 
-    <footer class="brand-footer">
-        <div class="container">
-            <p class="brand-footer-name">ALOHA SECURITY AGENCY</p>
-            <p>108, Old highway, Guiwan, Zamboanga City, 7000</p>
-            <p>Hotline: 09352854814</p>
-            <p class="brand-footer-since">SINCE 2002</p>
+        <!-- Copyright Bar -->
+        <div class="footer-bottom py-3 mt-4 border-top border-secondary border-opacity-25">
+            <div class="container">
+                <div class="row align-items-center text-center text-md-start">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <p class="mb-0 small text-white-50">&copy; 2026 Aloha Security Agency.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-white-50 small text-decoration-none me-3 hover-white">Privacy</a>
+                        <a href="#" class="text-white-50 small text-decoration-none hover-white">Terms</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/main.js"></script>
 
+    <!-- LOGIC SCRIPT  -->
     <script>
+        // 1. DRAFT SAVING LOGIC
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('multi-step-form');
             const formFields = form.querySelectorAll('input, select, textarea');
             const DRAFT_KEY = 'aloha_application_draft';
 
-            // Function to save the form data to localStorage
             const saveDraft = () => {
                 const formData = new FormData(form);
                 const formObject = Object.fromEntries(formData.entries());
-                // Don't save file inputs, as they can't be restored
                 delete formObject.resume;
                 delete formObject.id_image;
                 localStorage.setItem(DRAFT_KEY, JSON.stringify(formObject));
             };
 
-            // Function to load the saved draft
             const loadDraft = () => {
                 const draft = localStorage.getItem(DRAFT_KEY);
                 if (draft) {
                     const data = JSON.parse(draft);
-                    let hasData = false;
                     for (const key in data) {
                         const field = form.querySelector(`[name="${key}"]`);
-                        if (field && data[key]) {
-                            field.value = data[key];
-                            hasData = true;
-                        }
-                    }
-                    if (hasData) {
-                        console.log('Application draft loaded.');
-                        // Trigger the floating labels to move up
-                        form.querySelectorAll('input, select, textarea').forEach(el => {
-                            if (el.value) {
-                                el.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
-                        });
+                        if (field && data[key]) field.value = data[key];
                     }
                 }
             };
 
-            // Load draft when the page loads
             loadDraft();
-
-            // Save draft whenever any field changes
             formFields.forEach(field => {
-                if (field.type !== 'file') {
-                    field.addEventListener('input', saveDraft);
-                }
+                if (field.type !== 'file') field.addEventListener('input', saveDraft);
             });
         });
-    </script>
-    
-    <!-- JS Import -->
-    <script type="module" src="js/main.js"></script>
 
-    
-    <script>
-        // --- REAL-TIME PROGRESS TRACKING ---
+        // 2. PROGRESS & STEPPER LOGIC (With Checkmarks)
         const formInputs = document.querySelectorAll('input, select, textarea');
         const progressBar = document.getElementById('top-progress-bar');
         
         function updateProgress() {
-            // Find which step is currently active
             const activeStepDiv = document.querySelector('.form-step.active-step');
             if(!activeStepDiv) return;
             
             const currentStepNum = parseInt(activeStepDiv.id.replace('step-', ''));
-            const baseProgress = (currentStepNum - 1) * 25; // 0, 25, 50, or 75
             
-            // Calculate progress WITHIN the current step
-            const requiredInStep = activeStepDiv.querySelectorAll('[required]');
-            let filledInStepCount = 0;
-            
-            requiredInStep.forEach(field => {
-                if (field.type === 'file') {
-                    if (field.files.length > 0) filledInStepCount++;
-                } else if (field.value && field.value.trim() !== "") {
-                    filledInStepCount++;
+            //  Top Bar Width
+            const totalSteps = 4;
+            const progressPercent = ((currentStepNum - 1) / (totalSteps - 1)) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        
+            const stepperLineFill = document.getElementById('stepper-line-fill');
+            if (stepperLineFill) {
+                stepperLineFill.style.width = `${progressPercent}%`;
+            }
+
+            //  Stepper UI (Active & Checkmarks)
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index + 1;
+                
+                step.classList.remove('active', 'completed');
+
+                if (stepNum === currentStepNum) {
+                    step.classList.add('active'); 
+                } else if (stepNum < currentStepNum) {
+                    step.classList.add('completed'); 
                 }
             });
             
-            const stepContribution = requiredInStep.length > 0 ? (filledInStepCount / requiredInStep.length) * 25 : 25;
-            
-            // Special Case: Step 4 is the Review step, so it should be near 100%
-            const totalProgress = currentStepNum === 4 ? 100 : baseProgress + stepContribution;
-            
-            progressBar.style.width = `${totalProgress}%`;
+            document.getElementById('current-step-label').innerText = currentStepNum;
         }
 
-        formInputs.forEach(input => {
-            input.addEventListener('input', updateProgress);
-            input.addEventListener('change', updateProgress);
-        });
-
-        // Trigger progress on step navigation buttons
-        document.querySelectorAll('.btn-next, .btn-prev').forEach(btn => {
+        // 3. NAVIGATION BUTTONS
+        document.querySelectorAll('.btn-next').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Wait slightly for main.js to update the active class
-                setTimeout(updateProgress, 10);
+                const currentStep = btn.closest('.form-step');
+                const inputs = currentStep.querySelectorAll('input[required], select[required], textarea[required]');
+                let valid = true;
+                inputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        valid = false;
+                    }
+                });
+
+                if(valid) {
+                    const nextStepId = `step-${parseInt(btn.getAttribute('data-step')) + 1}`;
+                    const nextStep = document.getElementById(nextStepId);
+                    
+                    if (nextStep) { 
+                        currentStep.classList.remove('active-step');
+                        nextStep.classList.add('active-step');
+                        updateProgress();
+                        window.scrollTo(0, 0);
+                    }
+                }
             });
         });
 
-        // --- DASHBOARD REVIEW POPULATION ---
+        document.querySelectorAll('.btn-prev').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const currentStep = btn.closest('.form-step');
+                const prevStepId = `step-${parseInt(btn.getAttribute('data-step')) - 1}`;
+                const prevStep = document.getElementById(prevStepId);
+                
+                if (prevStep) { 
+                    currentStep.classList.remove('active-step');
+                    prevStep.classList.add('active-step');
+                    updateProgress();
+                    window.scrollTo(0, 0);
+                }
+            });
+        });
+
+        // 4. REVIEW SECTION POPULATION
         const nextToReviewBtn = document.querySelector('.btn-next[data-step="3"]');
         if(nextToReviewBtn) {
             nextToReviewBtn.addEventListener('click', () => {
                 const formData = new FormData(document.getElementById('multi-step-form'));
                 
-                // Personal Section
-                const personalDiv = document.getElementById('review-personal-v2');
-                personalDiv.innerHTML = `
-                    <div class="review-field"><label>Full Name</label><span>${formData.get('first_name')} ${formData.get('last_name')}</span></div>
-                    <div class="review-field"><label>Email</label><span>${formData.get('email')}</span></div>
-                    <div class="review-field"><label>Mobile</label><span>${formData.get('contact_num')}</span></div>
-                    <div class="review-field"><label>Birthdate</label><span>${formData.get('birthdate')}</span></div>
-                    <div class="review-field"><label>Gender</label><span>${formData.get('gender') || 'Not selected'}</span></div>
-                    <div class="review-field"><label>Address</label><span>${formData.get('address')}</span></div>
+                document.getElementById('review-personal-v2').innerHTML = `
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Full Name</span><span class="fw-bold">${formData.get('first_name')} ${formData.get('last_name')}</span></div>
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Email</span><span class="fw-bold">${formData.get('email')}</span></div>
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Mobile</span><span class="fw-bold">${formData.get('contact_num')}</span></div>
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Address</span><span class="fw-bold text-end">${formData.get('address')}</span></div>
                 `;
 
-                // Job Section
-                const jobDiv = document.getElementById('review-job-v2');
-                const exp = formData.get('years_experience') || '0';
-                jobDiv.innerHTML = `
-                    <div class="review-field"><label>Position</label><span>${formData.get('position_applied')}</span></div>
-                    <div class="review-field"><label>Experience</label><span>${exp} Years</span></div>
-                    <div class="review-field"><label>Prev. Employer</label><span>${formData.get('previous_employer') || 'None'}</span></div>
+                document.getElementById('review-job-v2').innerHTML = `
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Position</span><span class="fw-bold">${formData.get('position_applied')}</span></div>
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Experience</span><span class="fw-bold">${formData.get('years_experience') || '0'} Years</span></div>
                 `;
 
-                // Docs Section
-                const docsDiv = document.getElementById('review-docs-v2');
                 const resumeName = document.getElementById('resume').files[0]?.name || "Not attached";
                 const idName = document.getElementById('id_image').files[0]?.name || "Not attached";
-                docsDiv.innerHTML = `
-                    <div class="review-field"><label>Resume</label><span>${resumeName}</span></div>
-                    <div class="review-field"><label>ID Check</label><span>${idName}</span></div>
+                
+                document.getElementById('review-docs-v2').innerHTML = `
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Resume</span><span class="fw-bold text-success"><i class="bi bi-check-circle"></i> ${resumeName}</span></div>
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Valid ID</span><span class="fw-bold text-success"><i class="bi bi-check-circle"></i> ${idName}</span></div>
                 `;
             });
         }
 
-        // --- DRAG AND DROP & CLICK UPLOAD ---
+        // 5. DRAG AND DROP & CLICK UPLOAD LOGIC
         const uploadCards = document.querySelectorAll('.upload-card');
 
         uploadCards.forEach(card => {
             const input = card.querySelector('input[type="file"]');
-             const label = card.querySelector('span');
+            const label = card.querySelector('p.text-muted');
 
-            // Handle Click (Replacing inline onclick for better control)
             card.addEventListener('click', () => input.click());
 
-            // Visual feedback on drag
             ['dragenter', 'dragover'].forEach(eventName => {
                 card.addEventListener(eventName, (e) => {
                     e.preventDefault();
@@ -373,35 +523,26 @@
                 });
             });
 
-            // Handle drop
             card.addEventListener('drop', (e) => {
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
-                    // Standard way to programmatically set file input
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(files[0]);
-                    input.files = dataTransfer.files;
-                    
-                    // Trigger label update and progress
+                    input.files = files;
                     label.textContent = files[0].name;
-                    input.dispatchEvent(new Event('change', { bubbles: true }));
-                    updateProgress();
+                    card.style.borderColor = 'var(--brand-black)'; // Indicate file dropped
+                }
+            });
+
+            input.addEventListener('change', (e) => {
+                if (input.files.length > 0) {
+                    label.textContent = input.files[0].name;
+                    card.style.borderColor = 'var(--brand-black)'; // Indicate file selected
                 }
             });
         });
 
-        // --- FILE UPLOAD FEEDBACK (CLICK) ---
-        // This handles cases where user clicks and selects via dialog
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const label = e.target.closest('.upload-card').querySelector('span');
-                label.textContent = e.target.files[0]?.name || 'Click to upload or drag & drop';
-                updateProgress();
-            });
-        });
-
-        // Initial Progress Call
+        // Initial progress update on page load
         updateProgress();
     </script>
 </body>
 </html>
+
