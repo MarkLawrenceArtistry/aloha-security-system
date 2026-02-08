@@ -1920,11 +1920,10 @@ a { text-decoration: none; }
     font-weight: 600;
 }
 
-/* ==========================================================================
-   MOBILE RESPONSIVENESS (Add to bottom of public/css/admin.css)
-   ========================================================================== */
 
-/* 1. Mobile Header (Hidden on Desktop) */
+
+
+/* 1. Mobile Header (No changes here) */
 .mobile-header {
     display: none;
     align-items: center;
@@ -1933,152 +1932,100 @@ a { text-decoration: none; }
     margin-bottom: 20px;
     border-bottom: 1px solid #e0e0e0;
 }
-
 .mobile-toggle-btn {
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    color: #232323;
-    cursor: pointer;
-    padding: 0;
+    background: none; border: none; font-size: 1.8rem;
+    color: #232323; cursor: pointer; padding: 0;
 }
-
 .mobile-logo {
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: #232323;
-    letter-spacing: 1px;
+    font-weight: 800; font-size: 1.2rem; color: #232323; letter-spacing: 1px;
 }
 .mobile-logo span { color: #e53828; }
 
-/* 2. Media Query for Tablets & Mobile */
+
+/* 2. Media Query for Tablets & Mobile (FINAL) */
 @media (max-width: 991px) {
     
     /* Show Mobile Header */
-    .mobile-header {
-        display: flex;
-    }
+    .mobile-header { display: flex; }
 
     /* Transform Sidebar to Off-Canvas */
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: none;
-        width: 280px; /* Slightly wider for touch */
+        box-shadow: none; width: 280px;
     }
-
-    /* Class added via JS to show sidebar */
     .sidebar.active {
         transform: translateX(0);
         box-shadow: 10px 0 50px rgba(0,0,0,0.5);
     }
 
     /* Reset Main Content Margins */
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-        padding: 20px; /* Reduce padding */
-    }
+    .main-content { margin-left: 0; width: 100%; padding: 20px; }
 
     /* Stats Grid: Stack on mobile */
-    .stats-grid {
-        grid-template-columns: 1fr; /* 1 column */
-    }
+    .stats-grid { grid-template-columns: 1fr; }
 
-    /* Make Tables Scrollable */
-    .table-container {
+    /* --- THE CORE FIX FOR TOOLBAR & TABLE --- */
+
+    /* 1. Add a clean border to the main container */
+    .table-container { border: 1px solid #e0e0e0; }
+    
+    /* 2. Make the NEW table-wrapper scrollable, NOT the whole container */
+    .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
-    .table {
-        min-width: 800px; /* Force table width so it scrolls */
-    }
+    .table { min-width: 800px; }
 
-    /* Toolbar: Stack vertical on mobile */
+    /* 3. Style the TOOLBAR to look "pretty" and be fixed */
     .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        height: auto;
-        gap: 15px;
-        padding: 20px;
-    }
-    
-    .toolbar-left, .toolbar-right {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background-color: #f8f9fa; /* Lighter background for separation */
+        border-bottom: 1px solid #e0e0e0; /* Clean line */
+        min-height: auto; /* Allow height to be flexible */
+        overflow-x: auto;
     }
 
-    .search-input, .sort-select, .btn-toolbar, .btn-reject {
-        width: 100%; /* Full width controls */
+    .toolbar-left, .toolbar-right {
+        width: 100%;
+        gap: 12px;
     }
+
+    .search-input, .sort-select {
+        height: 44px; /* Better touch height */
+    }
+
+    /* --- END CORE FIX --- */
 
     /* Modals: Full width on mobile */
     .modal-content-wrapper {
-        width: 95%;
-        margin: 10px;
-        max-height: 90vh;
-        overflow-y: auto;
+        width: 95%; margin: 10px; max-height: 90vh; overflow-y: auto;
     }
 
     /* Applicant Details Profile Hero */
-    .profile-hero {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-    }
+    .profile-hero { flex-direction: column; text-align: center; gap: 20px; }
+    .hero-content { flex-direction: column; }
+    .hero-actions-group { align-items: center; width: 100%; }
+    .btn-hero-back { width: 100%; justify-content: center; }
 
-    .hero-content {
-        flex-direction: column;
-    }
-
-    .hero-actions-group {
-        align-items: center;
-        width: 100%;
-    }
-    
-    .btn-hero-back {
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Hiring Stepper: Scrollable or Smaller */
-    .stepper-wrapper {
-        padding: 20px;
-        overflow-x: auto;
-    }
-    .stepper-container {
-        min-width: 600px; /* Force scroll for stepper */
-    }
+    /* Hiring Stepper: Scrollable */
+    .stepper-wrapper { padding: 20px; overflow-x: auto; }
+    .stepper-container { min-width: 600px; }
 
     /* Profile Grid (Details Page) */
-    .profile-grid {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .left-col, .right-col {
-        width: 100%;
-    }
+    .profile-grid { display: flex; flex-direction: column; }
+    .left-col, .right-col { width: 100%; }
+
 }
 
-/* 3. Overlay Backdrop */
+
+/* 3. Overlay Backdrop (No changes here) */
 .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 90; /* Behind sidebar (100), above content */
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 90;
+    opacity: 0; visibility: hidden; transition: 0.3s;
     backdrop-filter: blur(2px);
 }
-
-.sidebar-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
+.sidebar-overlay.active { opacity: 1; visibility: visible; }
