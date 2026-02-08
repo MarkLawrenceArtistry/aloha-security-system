@@ -6,18 +6,25 @@
     <title>Audit Logs - Aloha Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
     <nav class="sidebar">
         <div class="sidebar-brand">
-            <i class="bi bi-shield-check"></i> ALOHA <span>ADMIN</span>
+            <img src="resources/logo.png" alt="Aloha Logo" class="sidebar-logo"> ALOHA <span>ADMIN</span>
         </div>
+        
+        <div class="sidebar-category">Main Menu</div>
         <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
         <a href="audit-log.html" class="nav-item active"><i class="bi bi-clipboard-data-fill"></i> Audit Logs</a>
+        
+        <div class="sidebar-category">Operations</div>
         <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
         <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
         <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
+        
+        <div class="sidebar-category">System</div>
         <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
         <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
         <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
@@ -63,11 +70,12 @@
         </div>
     </main>
 
+    <script src="js/admin.js"></script>
     <script>
         let currentPage = 1;
         const limit = 15;
 
-        function getToken() { return localStorage.getItem('admin_token'); }
+        // getToken is now provided by admin.js
 
         async function fetchLogs() {
             const token = getToken();
@@ -134,11 +142,8 @@
                 currentPage = 1; // Reset to page 1 for new search
                 fetchLogs();
             });
-
-            document.getElementById('logout-btn').addEventListener('click', () => {
-                localStorage.removeItem('admin_token');
-                window.location.href = 'login.html';
-            });
+            
+            // Logout is handled by admin.js
         });
     </script>
 </body>
