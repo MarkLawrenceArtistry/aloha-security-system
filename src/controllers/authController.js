@@ -41,12 +41,21 @@ const getSecurityQuestion = async (req, res) => {
         const { email } = req.body;
         const user = await get("SELECT security_question FROM users WHERE email = ?", [email]);
 
-        if (!user) return res.status(404).json({ success: false, data: "Email not found." });
-        if (!user.security_question) return res.status(400).json({ success: false, data: "No security question set for this account." });
+        // FIXED: Generic error message to prevent account harvesting/enumeration.
+        // Whether the user doesn't exist OR simply hasn't set a question, we return the same vague error.
+        if (!user || !user.security_question) {
+            // We use a generic 400 status and message so hackers can't distinguish between "User Missing" vs "Config Missing"
+            return res.status(400).json({ 
+                success: false, 
+                data: "Unable to retrieve security details. Please contact support if this persists." 
+            });
+        }
 
         res.status(200).json({ success: true, data: { question: user.security_question } });
     } catch (err) {
-        res.status(500).json({ success: false, data: err.message });
+        // Even server errors should be generic in production, but for now we keep the log
+        console.error(err);
+        res.status(500).json({ success: false, data: "An unexpected error occurred." });
     }
 };
 
