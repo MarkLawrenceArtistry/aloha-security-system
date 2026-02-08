@@ -269,6 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
+            // Disable button to prevent double-clicks
+            const btn = loginForm.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "Checking...";
+            btn.disabled = true;
+
             try {
                 const res = await fetch('/api/auth/login', { 
                     method: 'POST',
@@ -282,10 +288,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('admin_role', json.data.user.role); 
                     window.location.href = 'admin-dashboard.html';
                 } else {
-                    alert('Login failed');
+                    // --- THE FIX IS HERE ---
+                    // Display the ACTUAL message from the server (json.data)
+                    // instead of a hardcoded "Login failed"
+                    alert(json.data); 
                 }
             } catch (err) {
                 console.error(err);
+                alert("Connection error. Is the server running?");
+            } finally {
+                // Re-enable button
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         });
     }
