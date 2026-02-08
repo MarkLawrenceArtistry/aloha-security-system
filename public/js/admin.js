@@ -213,15 +213,55 @@ function applyRBAC() {
 
 // --- 4. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Run Auth Check everywhere (except login)
+    // 1. Run Auth Check
     checkAuth();
     applyRBAC();
-    
-    // Logout Handler
+
+    // 2. Logout Handler
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
-    // --- [NEW] LOGIN FORM HANDLER ---
+    // --- NEW: MOBILE MENU LOGIC ---
+    const mainContent = document.querySelector('.main-content');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (mainContent && sidebar) {
+        // A. Inject Mobile Header Button
+        const mobileHeader = document.createElement('div');
+        mobileHeader.className = 'mobile-header';
+        mobileHeader.innerHTML = `
+            <div class="mobile-logo">ALOHA <span>ADMIN</span></div>
+            <button class="mobile-toggle-btn"><i class="bi bi-list"></i></button>
+        `;
+        // Insert at the very top of main-content
+        mainContent.insertBefore(mobileHeader, mainContent.firstChild);
+
+        // B. Inject Overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        // C. Toggle Logic
+        const toggleBtn = mobileHeader.querySelector('.mobile-toggle-btn');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar); // Close when clicking outside
+
+        // Close sidebar when clicking a link (optional, good for UX)
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if(window.innerWidth <= 991) toggleSidebar();
+            });
+        });
+    }
+    // --- END MOBILE MENU LOGIC ---
+
+    // 4. Login Form Handler (Existing)
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
@@ -239,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (json.success) {
                     localStorage.setItem('admin_token', json.data.token);
-                    localStorage.setItem('admin_role', json.data.user.role); // SAVE ROLE HERE
+                    localStorage.setItem('admin_role', json.data.user.role); 
                     window.location.href = 'admin-dashboard.html';
                 } else {
                     alert('Login failed');
@@ -250,6 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Try to run dashboard logic (will exit safely if not on dashboard)
+    // 5. Init Dashboard
     initDashboard();
 });
