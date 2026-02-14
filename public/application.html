@@ -168,10 +168,41 @@
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" id="address" name="address" style="height: 100px" placeholder="Address" required></textarea>
-                                            <label for="address">Full Home Address</label>
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Permanent Address</label>
+                                        <div class="row g-2">
+                                            <div class="col-md-12 mb-2">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control address-part" id="addr_street" placeholder="House No. / Street" required>
+                                                    <label for="addr_street">House No. / Street / Subd.</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control address-part" id="addr_brgy" placeholder="Barangay" required>
+                                                    <label for="addr_brgy">Barangay</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control address-part" id="addr_city" placeholder="City" required>
+                                                    <label for="addr_city">City / Municipality</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control address-part" id="addr_province" placeholder="Province" required>
+                                                    <label for="addr_province">Province</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control address-part" id="addr_zip" placeholder="Zip" required>
+                                                    <label for="addr_zip">Zip Code</label>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <!-- Hidden input to store the combined value for the backend -->
+                                        <input type="hidden" id="address" name="address">
                                     </div>
                                 </div>
                                 
@@ -419,7 +450,7 @@
         // 1. DRAFT SAVING LOGIC
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('multi-step-form');
-            const formFields = form.querySelectorAll('input, select, textarea');
+            const formFields = form.querySelectorAll('input, select, textarea, .address-part');
             const DRAFT_KEY = 'aloha_application_draft';
 
             const saveDraft = () => {
@@ -529,13 +560,27 @@
         const nextToReviewBtn = document.querySelector('.btn-next[data-step="3"]');
         if(nextToReviewBtn) {
             nextToReviewBtn.addEventListener('click', () => {
+                const street = document.getElementById('addr_street').value;
+                const brgy = document.getElementById('addr_brgy').value;
+                const city = document.getElementById('addr_city').value;
+                const prov = document.getElementById('addr_province').value;
+                const zip = document.getElementById('addr_zip').value;
+
+                // Format: Street, Brgy, City, Province, Zip
+                const fullAddress = `${street}, ${brgy}, ${city}, ${prov} ${zip}`;
+                
+                // Set the hidden input value so FormData picks it up later
+                document.getElementById('address').value = fullAddress;
+                // ----------------------------------------
+
                 const formData = new FormData(document.getElementById('multi-step-form'));
                 
                 document.getElementById('review-personal-v2').innerHTML = `
                     <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Full Name</span><span class="fw-bold">${formData.get('first_name')} ${formData.get('last_name')}</span></div>
                     <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Email</span><span class="fw-bold">${formData.get('email')}</span></div>
                     <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Mobile</span><span class="fw-bold">${formData.get('contact_num')}</span></div>
-                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Address</span><span class="fw-bold text-end">${formData.get('address')}</span></div>
+                    <!-- Display the Combined Address -->
+                    <div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">Address</span><span class="fw-bold text-end" style="max-width: 50%;">${fullAddress}</span></div>
                 `;
 
                 document.getElementById('review-job-v2').innerHTML = `
