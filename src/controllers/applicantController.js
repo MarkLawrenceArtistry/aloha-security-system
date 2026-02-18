@@ -27,16 +27,18 @@ const apply = async (req, res) => {
         if (lastApp) {
             const lastDate = new Date(lastApp.created_at).getTime();
             const now = Date.now();
-            const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours
+            
+            // CHANGED: From 24 hours to 2 hours
+            const timeLimitMs = 2 * 60 * 60 * 1000; // 2 hours
 
-            if (now - lastDate < oneDayMs) {
+            if (now - lastDate < timeLimitMs) {
                 // Cleanup uploaded files immediately to save space
                 if(req.files['resume']) fs.unlinkSync(req.files['resume'][0].path);
                 if(req.files['id_image']) fs.unlinkSync(req.files['id_image'][0].path);
 
                 return res.status(429).json({
                     success: false, 
-                    data: "System limit reached: You (or this device) have already applied in the last 24 hours."
+                    data: "System limit reached: You have already applied recently. Please try again in 2 hours."
                 });
             }
         }

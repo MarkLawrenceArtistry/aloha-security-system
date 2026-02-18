@@ -15,10 +15,6 @@ function checkAuth() {
     if (!getToken() && !path.includes('login.html')) {
         window.location.href = 'login.html';
     }
-    // If we have a token and are ON login page, go to dashboard
-    if (getToken() && path.includes('login.html')) {
-        window.location.href = 'admin-dashboard.html';
-    }
 }
 
 function logout() {
