@@ -181,14 +181,20 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-floating">
-                                                    <input type="text" class="form-control address-part" id="addr_city" placeholder="City" required>
-                                                    <label for="addr_city">City / Municipality</label>
+                                                    <select class="form-select address-part" id="addr_province" required>
+                                                        <option value="" disabled selected>Select Province</option>
+                                                        <!-- Options populated via JS -->
+                                                    </select>
+                                                    <label for="addr_province">Province</label>
                                                 </div>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-6">
                                                 <div class="form-floating">
-                                                    <input type="text" class="form-control address-part" id="addr_province" placeholder="Province" required>
-                                                    <label for="addr_province">Province</label>
+                                                    <select class="form-select address-part" id="addr_city" required disabled>
+                                                        <option value="" disabled selected>Select City/Municipality</option>
+                                                        <!-- Options populated via JS -->
+                                                    </select>
+                                                    <label for="addr_city">City / Municipality</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -500,7 +506,81 @@
             formFields.forEach(field => {
                 if (field.type !== 'file') field.addEventListener('input', saveDraft);
             });
+
+
+            const provinceSelect = document.getElementById('addr_province');
+            const citySelect = document.getElementById('addr_city');
+            const BASE_API = 'https://psgc.gitlab.io/api';
+            
+            // NCR Region Code (Fixed Constant)
+            const NCR_CODE = '130000000'; 
+
+            // 1. Fetch Provinces + Add NCR Manually
+            fetch(`${BASE_API}/provinces/`)
+                .then(res => res.json())
+                .then(data => {
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+
+                    // A. Add "Metro Manila" explicitly at the top
+                    const ncrOption = document.createElement('option');
+                    ncrOption.value = "Metro Manila";
+                    ncrOption.textContent = "Metro Manila (NCR)";
+                    ncrOption.dataset.code = NCR_CODE;
+                    ncrOption.dataset.type = "region"; // Mark as Region
+                    provinceSelect.appendChild(ncrOption);
+                    
+                    // B. Add the rest of the provinces
+                    data.forEach(prov => {
+                        const option = document.createElement('option');
+                        option.value = prov.name; 
+                        option.dataset.code = prov.code; 
+                        option.dataset.type = "province"; // Mark as Province
+                        option.textContent = prov.name;
+                        provinceSelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error("Failed to load provinces:", err);
+                });
+
+            // 2. Fetch Cities Logic (Handles both Provinces and NCR)
+            provinceSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const code = selectedOption.dataset.code;
+                const type = selectedOption.dataset.type;
+
+                // Reset City Select
+                citySelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
+                citySelect.disabled = true;
+
+                if (code) {
+                    // Determine Endpoint: Region (NCR) vs Province
+                    let endpoint = (type === 'region') 
+                        ? `${BASE_API}/regions/${code}/cities-municipalities/`
+                        : `${BASE_API}/provinces/${code}/cities-municipalities/`;
+
+                    fetch(endpoint)
+                        .then(res => res.json())
+                        .then(data => {
+                            data.sort((a, b) => a.name.localeCompare(b.name));
+                            
+                            // Clear & Enable
+                            citySelect.innerHTML = '<option value="" disabled selected>Select City/Municipality</option>';
+                            
+                            data.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city.name;
+                                option.textContent = city.name;
+                                citySelect.appendChild(option);
+                            });
+                            
+                            citySelect.disabled = false;
+                        })
+                        .catch(err => console.error("Failed to load cities:", err));
+                }
+            });
         });
+
 
         // 2. PROGRESS & STEPPER LOGIC (With Checkmarks)
         const formInputs = document.querySelectorAll('input, select, textarea');
@@ -586,8 +666,8 @@
             nextToReviewBtn.addEventListener('click', () => {
                 const street = document.getElementById('addr_street').value;
                 const brgy = document.getElementById('addr_brgy').value;
-                const city = document.getElementById('addr_city').value;
-                const prov = document.getElementById('addr_province').value;
+                const city = document.getElementById('addr_city').value; // Works!
+                const prov = document.getElementById('addr_province').value; // Works!
                 const zip = document.getElementById('addr_zip').value;
 
                 // Format: Street, Brgy, City, Province, Zip
