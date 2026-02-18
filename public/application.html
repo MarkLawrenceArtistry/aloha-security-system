@@ -6,16 +6,13 @@
     <title>Job Application | Aloha Security</title>
     
     <link rel="icon" type="image/png" href="uploads/logo.png"/>
-    
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <!-- APPLICATION SPECIFIC STYLES -->
     <link rel="stylesheet" href="css/application.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
 
@@ -153,7 +150,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                                            <input type="text" class="form-control" id="birthdate" name="birthdate" placeholder="Select Date" required>
                                             <label for="birthdate">Birthdate</label>
                                         </div>
                                     </div>
@@ -263,10 +260,19 @@
                                 <!-- DRAG AND DROP ZONE 2 -->
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Valid ID (Govt Issued)</label>
+                                    
+                                    <!-- NEW: Valid IDs Helper Text -->
+                                    <div class="alert alert-light border small text-muted">
+                                        <i class="bi bi-info-circle-fill text-info"></i> <strong>Accepted IDs:</strong> 
+                                        Philippine National ID, Driver's License, Passport, SSS/UMID, PhilHealth, Voter's ID etc.
+                                        <br>
+                                        <strong>Formats:</strong> JPG or PNG (Clear, readable copy).
+                                    </div>
+
                                     <div class="upload-card" id="drop-zone-id">
                                         <i class="bi bi-person-badge display-4 text-danger mb-2"></i>
                                         <p class="mb-0 text-muted" id="id-label">Click to upload or drag & drop</p>
-                                        <input type="file" id="id_image" name="id_image" accept=".jpg, .png" hidden required>
+                                        <input type="file" id="id_image" name="id_image" accept=".jpg, .png, .jpeg" hidden required>
                                     </div>
                                 </div>
                                 
@@ -279,6 +285,16 @@
                             <!-- STEP 4 -->
                             <div class="form-step" id="step-4">
                                 <h4 class="mb-4 fw-bold"><i class="bi bi-clipboard-check text-danger me-2"></i> Review Application</h4>
+
+                                <div class="alert alert-warning border-warning d-flex align-items-center mb-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                    <div>
+                                        <strong>Important:</strong> Please review your details carefully. 
+                                        To prevent spam, you can only submit <strong>one application every 2 hours</strong>. 
+                                        Ensure all data is correct before proceeding.
+                                    </div>
+                                </div>
+                                
                                 <p class="text-muted mb-4">Please verify your information before submitting.</p>
                                 
                                 <div class="review-grid">
@@ -449,6 +465,14 @@
     <script>
         // 1. DRAFT SAVING LOGIC
         document.addEventListener('DOMContentLoaded', () => {
+            flatpickr("#birthdate", {
+                altInput: true,
+                altFormat: "F j, Y", // e.g., February 18, 2000
+                dateFormat: "Y-m-d",
+                maxDate: new Date().fp_incr(-21 * 365), // Blocks dates less than 21 years ago
+                disableMobile: "true" // Forces custom picker on mobile
+            });
+            
             const form = document.getElementById('multi-step-form');
             const formFields = form.querySelectorAll('input, select, textarea, .address-part');
             const DRAFT_KEY = 'aloha_application_draft';
