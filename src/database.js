@@ -96,6 +96,17 @@ const initDB = () => {
             );
         `);
 
+        // --- MIGRATION FIX: FORCE ADD 'updated_at' COLUMN ---
+        // This attempts to add the column. If it exists, it ignores the error.
+        database.run(`ALTER TABLE applicants ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`, (err) => {
+            // Error "duplicate column name" is expected if the column already exists, so we ignore it.
+            if (err && !err.message.includes('duplicate column name')) {
+                console.log("Migration Note (updated_at):", err.message);
+            } else if (!err) {
+                console.log("Migration Success: Added 'updated_at' column to applicants table.");
+            }
+        });
+
         // --- 4. Deployments ---
         database.run(`
             CREATE TABLE IF NOT EXISTS deployments (
@@ -121,14 +132,15 @@ const initDB = () => {
             );
         `);
 
+        // --- 6. Settings ---
         database.run(`
             CREATE TABLE IF NOT EXISTS settings (
                 key TEXT PRIMARY KEY,
                 value TEXT
             );
         `);
-
-        // Create default Admin if not exists
+        
+        // Insert Defaults
         bcrypt.hash("Admin123!", 10, (err, passHash) => {
             bcrypt.hash("aloha", 10, (err, answerHash) => {
                 database.run(`INSERT OR IGNORE INTO users 
@@ -138,9 +150,10 @@ const initDB = () => {
                 );
             });
         });
-        
+
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_email', 'noreply@alohasecurity.com')`);
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_name', 'Aloha HR Team')`);
+        
         console.log('Database tables initialized.');
     });
 };
