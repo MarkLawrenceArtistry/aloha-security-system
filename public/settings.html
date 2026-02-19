@@ -31,6 +31,7 @@
         
         <div class="sidebar-category">Operations</div>
         <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
+        <a href="roster.html" class="nav-item"><i class="bi bi-person-badge-fill"></i> Active Roster</a>
         <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
         <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
         
@@ -48,6 +49,7 @@
         <div class="settings-tabs">
             <button class="tab-btn active" onclick="switchTab('profile')">My Profile</button>
             <button class="tab-btn" onclick="switchTab('system')" id="system-tab-btn">System Maintenance</button>
+            <button class="tab-btn" onclick="switchTab('email')">Email Notifications</button>
         </div>
 
         <!-- TAB 1: PROFILE -->
@@ -104,6 +106,26 @@
                 <form id="restore-form">
                     <input type="file" id="backup-file" accept=".zip" required style="margin-bottom: 15px;">
                     <button type="submit" class="btn-reject" style="font-size: 0.9rem;">Upload & Restore</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add this new Tab Content div -->
+        <div id="tab-email" class="tab-content" style="max-width: 600px;">
+            <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid #ddd;">
+                <h4 class="mb-3">Brevo Sender Configuration</h4>
+                <p class="text-muted small mb-4">Ensure your API Key is set in the .env file. Use this form to set the visible sender.</p>
+                
+                <form id="email-settings-form">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Sender Name</label>
+                        <input type="text" id="sender-name" class="search-input" style="width:100%;" placeholder="e.g. Aloha HR">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Sender Email</label>
+                        <input type="email" id="sender-email" class="search-input" style="width:100%;" placeholder="e.g. hr@alohasecurity.com">
+                    </div>
+                    <button type="submit" class="btn-hire" style="border:none;">Save Configuration</button>
                 </form>
             </div>
         </div>
@@ -221,6 +243,38 @@
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
+        });
+
+        async function loadEmailSettings() {
+            const res = await fetch('/api/system/email-settings', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+            });
+            const json = await res.json();
+            if(json.success) {
+                document.getElementById('sender-name').value = json.data.sender_name;
+                document.getElementById('sender-email').value = json.data.sender_email;
+            }
+        }
+        
+        // Call it
+        loadEmailSettings();
+
+        // Handle Form Submit
+        document.getElementById('email-settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sender_name = document.getElementById('sender-name').value;
+            const sender_email = document.getElementById('sender-email').value;
+
+            const res = await fetch('/api/system/email-settings', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${localStorage.getItem('admin_token')}` 
+                },
+                body: JSON.stringify({ sender_name, sender_email })
+            });
+            
+            if(res.ok) alert("Email settings saved!");
         });
     </script>
 </body>

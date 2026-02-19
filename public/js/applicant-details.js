@@ -67,7 +67,16 @@ async function loadApplicant() {
 
 function setupButtons(id) {
     const updateStatus = async (newStatus) => {
-        if(!confirm(`Mark this applicant as ${newStatus}?`)) return;
+        let message = null;
+
+        // NEW: Ask for instructions if setting interview
+        if (newStatus === 'For Interview') {
+            message = prompt("Enter interview instructions (Time, Date, Location):", 
+                             "Please visit our main office on Monday at 9:00 AM.");
+            if (message === null) return; // User cancelled
+        } else if (!confirm(`Mark this applicant as ${newStatus}?`)) {
+            return;
+        }
 
         try {
             const res = await fetch(`/api/applicants/${id}/status`, {
@@ -76,7 +85,7 @@ function setupButtons(id) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify({ status: newStatus, message: message }) // Send message
             });
             const json = await res.json();
             if(json.success) {

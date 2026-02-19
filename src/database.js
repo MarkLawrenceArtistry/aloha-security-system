@@ -121,6 +121,13 @@ const initDB = () => {
             );
         `);
 
+        database.run(`
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            );
+        `);
+
         // Create default Admin if not exists
         bcrypt.hash("Admin123!", 10, (err, passHash) => {
             bcrypt.hash("aloha", 10, (err, answerHash) => {
@@ -132,6 +139,8 @@ const initDB = () => {
             });
         });
         
+        database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_email', 'noreply@alohasecurity.com')`);
+        database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_name', 'Aloha HR Team')`);
         console.log('Database tables initialized.');
     });
 };

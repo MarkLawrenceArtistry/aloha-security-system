@@ -4,7 +4,8 @@
 const fs = require('fs'); // Required for file deletion
 const path = require('path'); // Required for file paths
 const { run, get, all } = require('../utils/helper');
-const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
+const { logAction } = require('../utils/auditLogger');
+const { sendStatusEmail } = require('../utils/emailService');
 
 // POST /api/apply
 const apply = async (req, res) => {
@@ -212,23 +213,26 @@ const getAllApplicants = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; 
+        const { status, message } = req.body; // <-- Accept 'message' for interview instructions
 
         if (!id || !status) {
             return res.status(400).json({ success: false, data: "ID and Status are required." });
         }
 
-        const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [id]);
+        // 1. Get Applicant Details (Email is needed for sending)
+        const applicant = await get("SELECT * FROM applicants WHERE id = ?", [id]);
         if (!applicant) {
             return res.status(404).json({ success: false, data: "Applicant not found." });
         }
         
-        // --- FIXED QUERY HERE ---
-        // We now update 'updated_at' to CURRENT_TIMESTAMP whenever status changes
+        // 2. Update DB
         await run("UPDATE applicants SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", [status, id]);
 
-        const details = `Admin User ID #${req.user.id} changed status of ${applicant.first_name} ${applicant.last_name} (Applicant ID: ${id}) to "${status}".`;
+        const details = `Admin User ID #${req.user.id} changed status of ${applicant.first_name} ${applicant.last_name} to "${status}".`;
         await logAction(req, 'STATUS_UPDATE', details);
+
+        // 3. Send Email (Async, don't await so UI doesn't freeze)
+        sendStatusEmail(applicant, status, message);
 
         res.status(200).json({ success: true, data: `Applicant status updated to ${status}` });
     } catch (err) {
