@@ -38,28 +38,29 @@
         </div>
 
         <div class="table-container">
-            <!-- ADD THIS TOOLBAR SECTION -->
             <div class="toolbar">
-                <div class="toolbar-left">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search logs or admin username...">
+                <div class="toolbar-left" style="width: 100%;">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search logs or admin username..." style="width: 100%;">
                 </div>
             </div>
-            <!-- END OF ADDITION -->
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Admin</th>
-                        <th>Action</th>
-                        <th>Details</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody id="logs-body">
-                    <!-- JS will render rows here -->
-                </tbody>
-            </table>
+            <!-- WE ADDED THIS WRAPPER -->
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Admin</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-body">
+                        <!-- JS will render rows here -->
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-container">
                 <span id="page-info" class="text-muted small">Loading...</span>

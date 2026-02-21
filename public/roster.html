@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Active Roster - Aloha Admin</title>
-    <!-- Include CSS links same as applicants.html -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
@@ -35,73 +34,144 @@
     <main class="main-content">
         <div class="page-header">
             <h1>Active Roster</h1>
-            <p style="color:#666;">Pool of hired guards ready for deployment or currently deployed.</p>
+            <p style="color:#666;">Pool of hired guards ready for deployment or currently active.</p>
         </div>
 
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Experience</th>
-                        <th>Hired Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="roster-body"></tbody>
-            </table>
+        <div class="table-container deployment">
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <input type="text" id="roster-search" class="search-input" placeholder="Search guard name...">
+                </div>
+                <div class="toolbar-right">
+                    <a href="deploy-form.html" class="btn-toolbar btn-add">
+                        <i class="bi bi-send-check"></i> Assign Duty
+                    </a>
+                </div>
+            </div>
+
+            <div class="facility-grid" id="roster-grid">
+                <!-- Cards injected via JS -->
+            </div>
         </div>
     </main>
 
     <script src="js/admin.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('admin_token');
-            // Fetch ONLY 'Hired' status
-            const res = await fetch('/api/applicants?status=Hired&limit=100', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const json = await res.json();
-            
-            if(json.success) {
-                const tbody = document.getElementById('roster-body');
-                if(json.data.applicants.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hired applicants yet.</td></tr>';
-                    return;
-                }
+        let rosterData = [];
 
-                tbody.innerHTML = json.data.applicants.map(app => `
-                    <tr>
-                        <td>#${app.id}</td>
-                        <td><strong>${app.first_name} ${app.last_name}</strong></td>
-                        <td>${app.position_applied}</td>
-                        <td>${app.years_experience} Years</td>
-                        <td>${new Date(app.updated_at).toLocaleDateString()}</td>
-                        <td>
-                            <button onclick="rejectGuard(${app.id})" class="btn-outline-custom" style="color:red; border-color:red; font-size:0.8rem;">
-                                <i class="bi bi-x-circle"></i> Revoke
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchRoster();
+            
+            // Client-side search for speed
+            document.getElementById('roster-search').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = rosterData.filter(app => 
+                    app.first_name.toLowerCase().includes(query) || 
+                    app.last_name.toLowerCase().includes(query)
+                );
+                renderRoster(filtered, query);
+            });
         });
 
+        async function fetchRoster() {
+            const token = localStorage.getItem('admin_token');
+            const grid = document.getElementById('roster-grid');
+            grid.innerHTML = '<div style="padding: 20px;">Loading personnel...</div>';
+
+            try {
+                const res = await fetch('/api/applicants?status=Hired&limit=500', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const json = await res.json();
+                
+                if(json.success) {
+                    rosterData = json.data.applicants;
+                    renderRoster(rosterData, '');
+                }
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div style="padding: 20px; color: red;">Failed to load data.</div>';
+            }
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function renderRoster(data, query) {
+            const grid = document.getElementById('roster-grid');
+            
+            if(data.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b; background: white; border-radius: 16px; border: 1px dashed #cbd5e1;">
+                        <i class="bi bi-person-badge" style="font-size: 2rem; display: block; margin-bottom: 12px;"></i>
+                        No hired guards found in the roster.
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = data.map(app => {
+                const hiredDate = new Date(app.updated_at).toLocaleDateString();
+                
+                return `
+                    <div class="deployment-card">
+                        <div class="tag-container">
+                            <div class="card-tag secured" style="position:static;">
+                                <i class="bi bi-shield-check"></i> Cleared for Duty
+                            </div>
+                        </div>
+
+                        <div class="guard-profile">
+                            <div class="guard-avatar-placeholder" style="background: #ecfdf5; color: #10b981;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div class="guard-info">
+                                <h3>${highlightText(app.first_name + ' ' + app.last_name, query)}</h3>
+                                <p style="margin:0; font-weight: 600;"><i class="bi bi-person-badge"></i> ${app.position_applied}</p>
+                            </div>
+                        </div>
+
+                        <div class="deployment-timeline" style="margin-top: 15px;">
+                            <div class="timeline-header">
+                                <span>Experience</span>
+                                <span>${app.years_experience} Years</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
+                                <i class="bi bi-calendar-check"></i> Hired On: ${hiredDate}
+                            </div>
+                        </div>
+
+                        <div class="card-footer-actions">
+                            <span class="deployment-id">ID #${String(app.id).padStart(4, '0')}</span>
+                            <div style="display:flex; gap: 8px;">
+                                <a href="applicant-details.html?id=${app.id}" class="btn-outline-custom" style="padding: 6px 12px; font-size: 0.75rem;">View</a>
+                                <button onclick="rejectGuard(${app.id})" class="btn-outline-custom" style="padding: 6px 12px; color:#ef4444; border-color:#fee2e2; background:#fef2f2; font-size:0.75rem;">Revoke</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         async function rejectGuard(id) {
-            if(!confirm("Are you sure? This will move the guard back to 'Rejected' status.")) return;
+            if(!confirm("Are you sure? This will remove the guard from the active roster and mark them as 'Rejected'.")) return;
             
             const token = localStorage.getItem('admin_token');
-            await fetch(`/api/applicants/${id}/status`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({ status: 'Rejected' })
-            });
-            location.reload();
+            try {
+                await fetch(`/api/applicants/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ status: 'Rejected' })
+                });
+                fetchRoster(); // Refresh the grid automatically without reloading page
+            } catch (err) {
+                alert("Error revoking guard.");
+            }
         }
     </script>
 </body>

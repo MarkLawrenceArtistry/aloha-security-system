@@ -178,12 +178,36 @@ a { text-decoration: none; }
     margin-bottom: 40px;
 }
 
-.stat-card {
+/* .stat-card {
     background: white;
     padding: 25px;
     border-radius: 12px;
     border: 1px solid #ddd;
     box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+} */
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.stat-card .bg-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    color: #cbd5e1; /* Light gray */
+    opacity: 0.3;
+    z-index: 0;
+}
+.stat-card > div {
+    position: relative;
+    z-index: 1;
 }
 
 .stat-number { 
@@ -209,6 +233,16 @@ a { text-decoration: none; }
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     margin-top: 30px;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.table-responsive .table {
+    min-width: 700px; /* Forces table to scroll instead of squishing */
+    margin-bottom: 0;
 }
 
 /* New Toolbar Class for perfect alignment */
@@ -402,6 +436,11 @@ a { text-decoration: none; }
     align-items: center;
     gap: 10px;
     transition: 0.3s;
+}
+
+.btn-hire {
+    background-color: #10b981;
+    color: white;
 }
 
 .btn-hero-back:hover {
@@ -1573,22 +1612,33 @@ a { text-decoration: none; }
 
 /* --- 11. ENHANCED DISCOVERY --- */
 
-/* Filter Chips */
 .filter-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;       /* Forces scrolling */
+    max-width: 100% !important;        /* Stops it from breaking the container */
+    padding: 15px 20px !important;
+    gap: 10px !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
+/* Hide the ugly scrollbar but keep functionality */
 .filter-container::-webkit-scrollbar {
-    display: none;
+    height: 6px !important;
+}
+.filter-container::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+    border-radius: 10px !important;
+}
+.filter-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 10px !important;
 }
 
 .filter-chip {
+    flex: 0 0 auto !important;
+    min-width: max-content !important; /* Forces chip to fit its text */
+    white-space: nowrap !important;
     padding: 8px 18px;
     background: white;
     border: 1px solid #e2e8f0;
@@ -1598,11 +1648,9 @@ a { text-decoration: none; }
     color: #64748b;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 8px;
-    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -1963,35 +2011,62 @@ a { text-decoration: none; }
     .main-content { margin-left: 0; width: 100%; padding: 20px; }
 
     /* Stats Grid: Stack on mobile */
-    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid { 
+        grid-template-columns: repeat(2, 1fr) !important; 
+        gap: 12px;
+    }
+    .stat-card { padding: 15px; }
+    .stat-number { font-size: 1.8rem; }
+    .stat-label { font-size: 0.7rem; }
+    .stat-card .bg-icon { font-size: 2rem; right: 10px; }
 
     /* --- THE CORE FIX FOR TOOLBAR & TABLE --- */
 
     /* 1. Add a clean border to the main container */
-    .table-container { border: 1px solid #e0e0e0; }
+    /* .table-container { 
+        border: 1px solid #e0e0e0; 
+        width: 100%;
+        overflow-x: hidden !important; 
+        -webkit-overflow-scrolling: touch;
+        display: block;
+    } */
+
+    .table-container { 
+        overflow: hidden !important; 
+        width: 100% !important;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .toolbar-left, .toolbar-right { width: 100%; justify-content: space-between; }
     
     /* 2. Make the NEW table-wrapper scrollable, NOT the whole container */
     .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    .table { min-width: 800px; }
+    .table { 
+        min-width: 800px; /* Forces the table to be wider than the phone screen */
+        width: 100%;
+    }
 
     /* 3. Style the TOOLBAR to look "pretty" and be fixed */
-    .toolbar {
+    /* .toolbar {
         display: flex;
-        gap: 16px;
-        padding: 16px;
-        background-color: #f8f9fa; /* Lighter background for separation */
-        border-bottom: 1px solid #e0e0e0; /* Clean line */
-        min-height: auto; /* Allow height to be flexible */
-        overflow-x: auto;
+        flex-direction: column; 
+        gap: 10px;
+        padding: 15px;
+        height: auto;
     }
 
     .toolbar-left, .toolbar-right {
         width: 100%;
-        gap: 12px;
-    }
+        justify-content: space-between;
+    } */
 
     .search-input, .sort-select {
         height: 44px; /* Better touch height */
@@ -2018,6 +2093,10 @@ a { text-decoration: none; }
     .profile-grid { display: flex; flex-direction: column; }
     .left-col, .right-col { width: 100%; }
 
+    .page-header {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 

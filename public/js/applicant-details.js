@@ -51,8 +51,25 @@ async function loadApplicant() {
             `;
 
             // --- DOCUMENTS ---
-            document.getElementById('resume-link').href = app.resume_path;
+            const resumeBtn = document.getElementById('resume-link');
+            if (resumeBtn) {
+                resumeBtn.href = app.resume_path;
+                
+                // Remove target="_blank" so it doesn't open a new tab
+                resumeBtn.removeAttribute('target');
+                
+                // Add 'download' attribute to force the file to save to disk
+                // We also give it a nice filename
+                resumeBtn.setAttribute('download', `Resume_${app.last_name}_${app.first_name}.pdf`);
+            }
             document.getElementById('id-img').src = app.id_image_path;
+
+            const idDownloadBtn = document.getElementById('id-download');
+            if (idDownloadBtn) {
+                idDownloadBtn.href = app.id_image_path; // Set the link to the file
+                // Force download attribute so it doesn't just open
+                idDownloadBtn.setAttribute('download', `ID_${app.last_name}_${app.first_name}.jpg`); 
+            }
 
             // --- SETUP BUTTONS ---
             setupButtons(app.id);

@@ -9,16 +9,92 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
     <style>
-        /* CSS Chart for Wireframe Look */
-        .chart-container { background: white; border-radius: 12px; padding: 25px; border: 1px solid #ddd; height: 350px; display: flex; flex-direction: column; }
-        .chart-title { font-weight: 700; margin-bottom: 20px; font-size: 1.1rem; }
-        .bars-wrapper { display: flex; align-items: flex-end; justify-content: space-around; height: 100%; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .bar-group { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; width: 40px; }
-        .bar { width: 100%; background: #232323; border-radius: 4px 4px 0 0; position: relative; transition: height 1s ease; min-height: 5px; }
-        .bar:hover { background: #e53828; }
-        .bar-label { margin-top: 10px; font-size: 0.8rem; color: #666; font-weight: 500; }
-        /* Empty bar look */
-        .bar-bg { width: 100%; background: #f0f0f0; border-radius: 4px; height: 200px; position: relative; display: flex; align-items: flex-end; }
+        /* --- PREMIUM CSS BAR CHART --- */
+        .chart-container { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 30px; 
+            border: 1px solid #e2e8f0; 
+            height: 380px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .chart-title { 
+            font-weight: 800; 
+            margin-bottom: 25px; 
+            font-size: 1.15rem; 
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-title i { color: #e53828; padding: 8px; background: #fef2f2; border-radius: 8px; font-size: 1rem;}
+        
+        .bars-wrapper { 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: space-around; 
+            height: 100%; 
+            border-bottom: 2px solid #cbd5e1; 
+            padding-bottom: 10px; 
+            position: relative;
+        }
+        
+        /* Subtle Grid Lines */
+        .bars-wrapper::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(to bottom, transparent, transparent calc(20% - 1px), #f1f5f9 calc(20%), transparent calc(20% + 1px));
+            z-index: 0;
+        }
+
+        .bar-group { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; width: 45px; z-index: 1; }
+        
+        .bar-bg { 
+            width: 100%; 
+            background: rgba(241, 245, 249, 0.4); 
+            border-radius: 6px 6px 0 0; 
+            height: 220px; /* Fixed height for scale */
+            position: relative; 
+            display: flex; 
+            align-items: flex-end; 
+            border: 1px dashed #cbd5e1;
+            border-bottom: none;
+        }
+        
+        .bar { 
+            width: 100%; 
+            background: linear-gradient(180deg, #e53828 0%, #b91c1c 100%); 
+            border-radius: 4px 4px 0 0; 
+            position: relative; 
+            transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            min-height: 5px; 
+            box-shadow: 0 -4px 12px rgba(229, 56, 40, 0.25);
+        }
+        .bar:hover { filter: brightness(1.15); cursor: pointer; }
+        .bar-label { margin-top: 12px; font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        /* Tooltip hack */
+        .bar::after {
+            content: attr(title);
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 4px 8px; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 700; opacity: 0; transition: 0.2s; pointer-events: none;
+            white-space: nowrap;
+        }
+        .bar:hover::after { opacity: 1; top: -35px; }
+
+        /* Custom Table Header for Dashboard */
+        .dash-table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #f1f5f9;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dash-table-header h4 { margin: 0; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
     </style>
 </head>
 <body>
@@ -48,46 +124,52 @@
             <h1>Dashboard Overview</h1>
         </div>
 
-        <!-- Wireframe: Overview Cards -->
+        <!-- REFINED KPI CARDS -->
         <div class="stats-grid">
             <div class="stat-card">
+                <i class="bi bi-people-fill bg-icon"></i>
                 <div class="stat-number" id="dash-total">-</div>
                 <div class="stat-label">Total Applicants</div>
             </div>
             <div class="stat-card">
+                <i class="bi bi-hourglass-split bg-icon"></i>
                 <div class="stat-number" id="dash-pending">-</div>
                 <div class="stat-label">Pending Reviews</div>
             </div>
             <div class="stat-card">
+                <i class="bi bi-shield-check bg-icon"></i>
                 <div class="stat-number" id="dash-deployed">-</div>
                 <div class="stat-label">Active Deployments</div>
             </div>
         </div>
 
-        <!-- Wireframe: Application Trends (CSS Bar Chart) -->
+        <!-- REFINED CHART -->
         <div class="chart-container">
-            <div class="chart-title"><i class="bi bi-bar-chart-fill"></i> Total Applicants Per Month</div>
+            <div class="chart-title"><i class="bi bi-bar-chart-fill"></i> Application Volume (Last 6 Months)</div>
             <div class="bars-wrapper" id="chart-bars">
                 <!-- Bars injected via JS -->
             </div>
         </div>
 
-        <div style="margin-top: 30px;" class="table-container">
-            <div style="padding: 20px; border-bottom: 1px solid #eee;">
-                <h4>Recent Applications</h4>
+        <!-- REFINED TABLE -->
+        <div class="table-container">
+            <div class="dash-table-header">
+                <i class="bi bi-clock-history text-danger"></i> <h4>Recent Applications</h4>
             </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="recent-body"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Date Applied</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-body"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -109,7 +191,7 @@
 
                     // A. Populate Overview Cards
                     document.getElementById('dash-total').innerText = data.counts.total;
-                    document.getElementById('dash-pending').innerText = data.counts.pending; // Real DB Count
+                    document.getElementById('dash-pending').innerText = data.counts.pending;
                     document.getElementById('dash-deployed').innerText = data.counts.active_deployments;
 
                     // B. Populate Real Chart
@@ -117,15 +199,20 @@
 
                     // C. Populate Recent Applications Table
                     const tbody = document.getElementById('recent-body');
-                    tbody.innerHTML = data.recent.map(a => `
-                        <tr>
-                            <td>#${String(a.id).padStart(4, '0')}</td>
-                            <td><strong>${a.first_name} ${a.last_name}</strong></td>
-                            <td>${a.position_applied}</td>
-                            <td>${new Date(a.created_at).toLocaleDateString()}</td>
-                            <td><span class="badge badge-${a.status.toLowerCase().replace(' ', '-')}">${a.status}</span></td>
-                        </tr>
-                    `).join('');
+                    
+                    if(data.recent.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px; color:#64748b;">No recent applications found.</td></tr>';
+                    } else {
+                        tbody.innerHTML = data.recent.map(a => `
+                            <tr>
+                                <td style="color:#64748b; font-family:monospace;">#${String(a.id).padStart(4, '0')}</td>
+                                <td><strong>${a.first_name} ${a.last_name}</strong></td>
+                                <td style="color:#475569;"><i class="bi bi-briefcase" style="font-size:0.8rem; margin-right:5px;"></i>${a.position_applied}</td>
+                                <td style="color:#475569;">${new Date(a.created_at).toLocaleDateString()}</td>
+                                <td><span class="badge badge-${a.status.toLowerCase().replace(' ', '-')}">${a.status}</span></td>
+                            </tr>
+                        `).join('');
+                    }
                 }
 
             } catch (err) {
@@ -139,7 +226,7 @@
             
             // If no data, show empty state
             if (!chartData || chartData.length === 0) {
-                container.innerHTML = '<p style="width:100%; text-align:center; color:#999; margin-top:50px;">No data available</p>';
+                container.innerHTML = '<p style="width:100%; text-align:center; color:#94a3b8; margin-top:80px; font-weight:600;"><i class="bi bi-inbox" style="font-size:2rem; display:block; margin-bottom:10px;"></i>No data available yet</p>';
                 return;
             }
 
@@ -147,17 +234,21 @@
             const counts = chartData.map(d => d.count);
             const maxVal = Math.max(...counts) || 1; // Prevent division by zero
 
-            const html = chartData.map(d => {
+            const html = chartData.map((d, index) => {
                 // Convert '2026-01' to 'Jan'
                 const date = new Date(d.month + '-01'); 
                 const label = date.toLocaleString('default', { month: 'short' });
                 
-                const height = (d.count / maxVal) * 80; // Scale to 80% container height
+                // Scale to 90% max container height so it doesn't touch the top
+                const height = (d.count / maxVal) * 90; 
+                
+                // Add staggered animation delay
+                const delay = index * 0.1;
 
                 return `
                     <div class="bar-group">
                         <div class="bar-bg">
-                            <div class="bar" style="height: ${height}%;" title="${d.count} Applicants"></div>
+                            <div class="bar" style="height: 0%; animation: growBar 1s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s forwards;" title="${d.count} Applications" data-height="${height}%"></div>
                         </div>
                         <span class="bar-label">${label}</span>
                     </div>
@@ -165,6 +256,13 @@
             }).join('');
 
             container.innerHTML = html;
+
+            // Trigger animation
+            setTimeout(() => {
+                document.querySelectorAll('.bar').forEach(bar => {
+                    bar.style.height = bar.getAttribute('data-height');
+                });
+            }, 50);
         }
     </script>
 </body>

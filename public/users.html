@@ -41,27 +41,29 @@
         <div class="table-container">
             <div class="toolbar">
                 <div class="toolbar-left">
-                    <!-- Simple client-side filter logic could be added here later -->
-                    <span style="font-weight:600; color:#555;">Admin List</span>
+                    <span style="font-weight:700; color:#1e293b; font-size: 1.1rem;"><i class="bi bi-shield-lock"></i> Admin Access</span>
                 </div>
                 <button onclick="openModal()" class="btn-toolbar btn-add">
                     <i class="bi bi-plus-lg"></i> Add User
                 </button>
             </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Created At</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="users-body"></tbody>
-            </table>
+            <!-- WE ADDED THIS WRAPPER -->
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-body"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -97,8 +99,9 @@
                 </div>
 
                 <div class="d-flex gap-2 justify-content-end">
+                    <button type="submit" class="btn-hire" style="padding:10px 20px; border:none; border-radius:6px; cursor:pointer; min-width: 100;">Save User</button>
                     <button type="button" onclick="closeModal()" style="padding:10px 20px; border:1px solid #ddd; background:white; border-radius:6px; cursor:pointer;">Cancel</button>
-                    <button type="submit" class="btn-hire" style="padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">Save User</button>
+                    
                 </div>
             </form>
         </div>
