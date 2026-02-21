@@ -10,16 +10,42 @@ async function fetchDeployments() {
     const search = document.getElementById('search-input').value;
     const sort = document.getElementById('sort-select').value;
     
+    // FETCH BRANCHES FOR MINI-MAP (Cache this too!)
     try {
-        const res = await fetch(`${API_BASE}?page=${currentPage}&limit=${limit}&search=${search}&sort=${sort}`, {
+        const branchRes = await fetchData('/api/branches?limit=1000', {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
-        const result = await res.json();
+        if (branchRes.success && branchRes.data.branches) {
+            allBranchesMap = branchRes.data.branches.reduce((acc, b) => {
+                acc[b.id] = { ...b, active_count: 0 };
+                return acc;
+            }, {});
+        }
+    } catch (bErr) { console.warn("Could not load branches for map"); }
+
+    // FETCH DEPLOYMENTS
+    try {
+        const url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${search}&sort=${sort}`;
+        
+        // USE THE NEW HELPER
+        const result = await fetchData(url, {
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
         
         if (result.success) {
-            renderTable(result.data.deployments);
+            allDeployments = result.data.deployments || [];
+            
+            // Recalculate maps logic since we have data
+            Object.values(allBranchesMap).forEach(b => b.active_count = 0);
+            allDeployments.forEach(d => {
+                if (d.status === 'Active') {
+                    const branch = Object.values(allBranchesMap).find(b => b.name === d.branch_name);
+                    if (branch) branch.active_count++;
+                }
+            });
+
+            applyFilters();
             updateStats(result.data.stats);
-            updatePagination(result.data.pagination);
         }
     } catch (err) {
         console.error(err);

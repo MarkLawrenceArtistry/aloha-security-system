@@ -12,15 +12,14 @@ async function fetchApplicants() {
     const search = document.getElementById('search-input').value;
     const sort = document.getElementById('sort-select').value;
 
-    try {
-        // Append status filter to URL if one is selected
-        let url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}&sort=${sort}`;
-        if (currentFilter) url += `&status=${currentFilter}`;
+    let url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}&sort=${sort}`;
+    if (currentFilter) url += `&status=${currentFilter}`;
 
-        const res = await fetch(url, {
+    try {
+        // USE THE NEW HELPER
+        const result = await fetchData(url, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
-        const result = await res.json();
 
         if (result.success) {
             renderCards(result.data.applicants);
@@ -29,6 +28,8 @@ async function fetchApplicants() {
         }
     } catch (err) {
         console.error(err);
+        document.getElementById('applicants-grid').innerHTML = 
+            '<div class="text-center p-5 text-muted"><i class="bi bi-wifi-off"></i> Offline mode: No cached data found.</div>';
     }
 }
 

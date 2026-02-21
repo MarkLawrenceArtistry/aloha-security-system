@@ -10,11 +10,14 @@ async function fetchBranches() {
     const search = document.getElementById('search-input').value;
     const sort = document.getElementById('sort-select').value;
     
+    // Create the full URL string
+    const url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${search}&sort=${sort}`;
+
     try {
-        const res = await fetch(`${API_BASE}?page=${currentPage}&limit=${limit}&search=${search}&sort=${sort}`, {
+        // USE THE NEW HELPER: fetchData instead of fetch
+        const result = await fetchData(url, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
-        const result = await res.json();
         
         if (result.success) {
             renderTable(result.data.branches);
@@ -22,7 +25,9 @@ async function fetchBranches() {
             updatePagination(result.data.pagination);
         }
     } catch (err) {
-        console.error(err);
+        console.error("Offline and no cache available:", err);
+        document.getElementById('facility-grid').innerHTML = 
+            '<div class="no-data"><i class="bi bi-wifi-off"></i> No offline data available for this page.</div>';
     }
 }
 

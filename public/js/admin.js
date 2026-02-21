@@ -79,7 +79,7 @@ function setupMultiDelete({
             alert("Action unavailable while offline.");
             return;
         }
-        
+
         const ids = getSelectedIds();
         if (ids.length === 0) return;
         
@@ -346,4 +346,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(err => console.error('Service Worker Failed!', err));
         });
     }
+
+
+    // ============================================================
+    // 1. AFK AUTO-LOGOUT SYSTEM (30 Minutes)
+    // ============================================================
+    let afkTimer;
+    const AFK_LIMIT = 30 * 60 * 1000; // 30 Minutes
+
+    function resetAfkTimer() {
+        clearTimeout(afkTimer);
+        if (localStorage.getItem('admin_token')) { // Only run if logged in
+            afkTimer = setTimeout(() => {
+                alert("Session expired due to inactivity.");
+                logout();
+            }, AFK_LIMIT);
+        }
+    }
+
+    // Listen for user activity to reset the timer
+    window.onload = resetAfkTimer;
+    document.onmousemove = resetAfkTimer;
+    document.onkeypress = resetAfkTimer;
+    document.onclick = resetAfkTimer;
+    document.onscroll = resetAfkTimer;
+
+
+    // ============================================================
+    // 2. SMART FETCH (Network First -> LocalStorage Fallback)
+    // ============================================================
+    window.fetchData = async function(url, options = {}) {
+        const storageKey = 'cache_' + url; // Unique key for every API call
+
+        try {
+            // A. Try Network
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const result = await response.json();
+
+            // B. If success, save to LocalStorage (Overwrite old data)
+            if (result.success) {
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(result));
+                    console.log(`Saved live data to ${storageKey}`);
+                } catch (e) {
+                    console.warn("LocalStorage full, could not cache data");
+                }
+            }
+            return result;
+
+        } catch (err) {
+            // C. If Network Fails (Offline), try LocalStorage
+            console.warn("Network failed, checking LocalStorage...");
+            const cached = localStorage.getItem(storageKey);
+
+            if (cached) {
+                // Trigger the Offline Toast specifically for Data
+                const offlinePill = document.querySelector('.offline-pill');
+                if(offlinePill) {
+                    offlinePill.innerHTML = '<i class="bi bi-database-check"></i> <span>Viewing offline data</span>';
+                    offlinePill.classList.add('show');
+                }
+                return JSON.parse(cached);
+            }
+
+            // D. If neither works, throw error
+            throw err;
+        }
+    };
 });
