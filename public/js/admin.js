@@ -334,4 +334,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Run once on load just in case
     updateOnlineStatus();
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Admin Service Worker Registered!', reg.scope))
+                .catch(err => console.error('Service Worker Failed!', err));
+        });
+    }
 });
