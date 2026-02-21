@@ -175,31 +175,26 @@
 
     <script src="js/admin.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        window.initDashboard = async function() {
             const token = localStorage.getItem('admin_token');
             if(!token) { window.location.href = 'login.html'; return; }
 
             try {
-                // 1. Fetch Real Stats & Chart Data
-                const res = await fetch('/api/dashboard-stats', { 
+                // CHANGED: Use fetchData
+                const json = await fetchData('/api/dashboard-stats', { 
                     headers: { 'Authorization': `Bearer ${token}` } 
                 });
-                const json = await res.json();
 
                 if (json.success) {
                     const data = json.data;
 
-                    // A. Populate Overview Cards
                     document.getElementById('dash-total').innerText = data.counts.total;
                     document.getElementById('dash-pending').innerText = data.counts.pending;
                     document.getElementById('dash-deployed').innerText = data.counts.active_deployments;
 
-                    // B. Populate Real Chart
                     renderChart(data.chart);
-
-                    // C. Populate Recent Applications Table
-                    const tbody = document.getElementById('recent-body');
                     
+                    const tbody = document.getElementById('recent-body');
                     if(data.recent.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px; color:#64748b;">No recent applications found.</td></tr>';
                     } else {
@@ -214,11 +209,12 @@
                         `).join('');
                     }
                 }
-
             } catch (err) {
                 console.error("Dashboard Load Error:", err);
             }
-        });
+        };
+
+        document.addEventListener('DOMContentLoaded', window.initDashboard);
 
         // Chart Renderer for Real Data
         function renderChart(chartData) {

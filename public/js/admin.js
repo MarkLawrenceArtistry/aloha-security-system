@@ -334,23 +334,44 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.appendChild(styleSheet);
 
-    // B. Create Element
-    const offlinePill = document.createElement('div');
-    offlinePill.className = 'offline-pill';
-    document.body.appendChild(offlinePill);
+    if (!document.querySelector('.offline-pill')) {
+        const offlinePill = document.createElement('div');
+        offlinePill.className = 'offline-pill';
+        document.body.appendChild(offlinePill);
+    }
 
-    // C. Logic
+    const offlinePill = document.querySelector('.offline-pill');
+
     const updateOnlineStatus = () => {
         if (!navigator.onLine) {
-            // OFFLINE STATE
+            // --- WENT OFFLINE ---
             offlinePill.innerHTML = '<i class="bi bi-wifi-off" style="color:#f59e0b;"></i> <span>You are currently offline.</span>';
             offlinePill.classList.remove('online-flash');
             offlinePill.classList.add('show');
+            
+            // Disable buttons that require network
+            document.querySelectorAll('button[type="submit"], .btn-action').forEach(btn => btn.disabled = true);
         } else {
-            // BACK ONLINE STATE (Flash Green)
+            // --- CAME ONLINE ---
             if (offlinePill.classList.contains('show')) {
-                offlinePill.innerHTML = '<i class="bi bi-wifi" style="color:white;"></i> <span>Back online.</span>';
+                offlinePill.innerHTML = '<i class="bi bi-cloud-check-fill"></i> <span>Connection restored. Refreshing...</span>';
                 offlinePill.classList.add('online-flash');
+                
+                // Re-enable buttons
+                document.querySelectorAll('button[type="submit"], .btn-action').forEach(btn => btn.disabled = false);
+
+                // AUTO REFRESH DATA LOGIC
+                // We check if specific page fetch functions exist and run them
+                console.log("Network restored: Refreshing data...");
+                
+                if (typeof initDashboard === 'function') initDashboard(); // Dashboard
+                if (typeof fetchApplicants === 'function') fetchApplicants(); // Applicants
+                if (typeof fetchBranches === 'function') fetchBranches(); // Branches
+                if (typeof fetchDeployments === 'function') fetchDeployments(); // Deployment
+                if (typeof fetchRoster === 'function') fetchRoster(); // Roster
+                if (typeof fetchUsers === 'function') fetchUsers(); // Users
+                if (typeof fetchLogs === 'function') fetchLogs(); // Audit
+
                 setTimeout(() => {
                     offlinePill.classList.remove('show');
                 }, 3000);
@@ -361,8 +382,51 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     
-    // Check on Load
+    // Check status immediately on load
     if (!navigator.onLine) updateOnlineStatus();
+
+    // ============================================================
+    // 4. SMART FETCH (Network First -> LocalStorage Fallback)
+    // ============================================================
+    window.fetchData = async function(url, options = {}) {
+        const storageKey = 'cache_' + url; // Unique key for every API call
+
+        try {
+            // A. Try Network
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const result = await response.json();
+
+            // B. If success, save to LocalStorage (Overwrite old data)
+            if (result.success) {
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(result));
+                } catch (e) {
+                    console.warn("LocalStorage full, could not cache data");
+                }
+            }
+            return result;
+
+        } catch (err) {
+            // C. If Network Fails (Offline), try LocalStorage
+            console.warn(`Network failed for ${url}, checking LocalStorage...`);
+            const cached = localStorage.getItem(storageKey);
+
+            if (cached) {
+                // Trigger visual indicator that we are viewing cached data
+                const pill = document.querySelector('.offline-pill');
+                if(pill) {
+                    pill.innerHTML = '<i class="bi bi-database"></i> <span>Viewing offline data</span>';
+                    pill.classList.add('show');
+                }
+                return JSON.parse(cached);
+            }
+
+            // D. If neither works, throw error
+            throw err;
+        }
+    };
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {

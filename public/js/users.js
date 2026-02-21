@@ -9,10 +9,10 @@ function getToken() {
 
 async function fetchUsers() {
     try {
-        const res = await fetch(API_BASE, {
+        // CHANGED: Use fetchData instead of fetch
+        const result = await fetchData(API_BASE, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
-        const result = await res.json();
         
         if (result.success) {
             renderTable(result.data);
@@ -20,7 +20,8 @@ async function fetchUsers() {
             console.error(result.data);
         }
     } catch (err) {
-        console.error(err);
+        console.error("Offline & No Cache:", err);
+        document.getElementById('users-body').innerHTML = '<tr><td colspan="6" class="text-center">No offline data available.</td></tr>';
     }
 }
 

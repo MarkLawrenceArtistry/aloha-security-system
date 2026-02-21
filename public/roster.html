@@ -79,10 +79,10 @@
             grid.innerHTML = '<div style="padding: 20px;">Loading personnel...</div>';
 
             try {
-                const res = await fetch('/api/applicants?status=Hired&limit=500', {
+                // CHANGED: Use fetchData
+                const json = await fetchData('/api/applicants?status=Hired&limit=500', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const json = await res.json();
                 
                 if(json.success) {
                     rosterData = json.data.applicants;

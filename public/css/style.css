@@ -796,25 +796,28 @@ section, header, footer, main {
 .footer-section { background-color: #111; }
 .cta-section { background-color: var(--brand-red); }
 
+/* --- OFFLINE PILL (Fixed & High Z-Index) --- */
 .offline-pill {
     position: fixed;
     bottom: 24px;
     left: 24px;
-    background: #232323;
+    background: #1e1e1e;
     color: #fff;
-    padding: 12px 20px;
-    border-radius: 30px;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    z-index: 99999;
-    transform: translateY(100px);
+    gap: 12px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    z-index: 2147483647; /* Max Z-Index to stay on top of modals */
+    transform: translateY(150%); /* Hidden by default */
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .offline-pill.show {
@@ -824,21 +827,19 @@ section, header, footer, main {
 }
 
 .offline-pill.online-flash {
-    background: #10b981; /* Green flash when reconnected */
+    background: #10b981; /* Green success color */
+    color: white;
 }
 
-.offline-pill i { font-size: 1.1rem; }
-.offline-pill .bi-wifi-off { color: #f59e0b; }
-.offline-pill .bi-wifi { color: #fff; }
-
-/* Center it on mobile screens just like Messenger */
+/* Mobile Adjustment */
 @media (max-width: 768px) {
     .offline-pill {
         bottom: 20px;
         left: 50%;
-        transform: translateX(-50%) translateY(100px);
+        transform: translateX(-50%) translateY(150%);
         width: max-content;
         max-width: 90%;
+        justify-content: center;
     }
     .offline-pill.show {
         transform: translateX(-50%) translateY(0);
