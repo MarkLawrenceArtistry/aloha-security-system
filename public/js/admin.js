@@ -311,20 +311,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- SLEEK OFFLINE INDICATOR ---
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `
+        .offline-pill {
+            position: fixed; bottom: 24px; left: 24px;
+            background: #232323; color: #fff;
+            padding: 12px 20px; border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 999999;
+            transform: translateY(100px); opacity: 0; visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .offline-pill.show { transform: translateY(0); opacity: 1; visibility: visible; }
+        .offline-pill.online-flash { background: #10b981; }
+        .offline-pill i { font-size: 1.1rem; }
+        @media (max-width: 768px) {
+            .offline-pill { bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); width: max-content; }
+            .offline-pill.show { transform: translateX(-50%) translateY(0); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // B. Create Element
     const offlinePill = document.createElement('div');
     offlinePill.className = 'offline-pill';
-    offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
     document.body.appendChild(offlinePill);
 
+    // C. Logic
     const updateOnlineStatus = () => {
         if (!navigator.onLine) {
-            offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+            // OFFLINE STATE
+            offlinePill.innerHTML = '<i class="bi bi-wifi-off" style="color:#f59e0b;"></i> <span>You are currently offline.</span>';
             offlinePill.classList.remove('online-flash');
             offlinePill.classList.add('show');
         } else {
-            // Flash green "Back online" before hiding (Messenger style)
+            // BACK ONLINE STATE (Flash Green)
             if (offlinePill.classList.contains('show')) {
-                offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
+                offlinePill.innerHTML = '<i class="bi bi-wifi" style="color:white;"></i> <span>Back online.</span>';
                 offlinePill.classList.add('online-flash');
                 setTimeout(() => {
                     offlinePill.classList.remove('show');
@@ -336,14 +361,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     
-    // Check immediately on load
+    // Check on Load
     if (!navigator.onLine) updateOnlineStatus();
 
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Admin Service Worker Registered!', reg.scope))
-                .catch(err => console.error('Service Worker Failed!', err));
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.error('SW Fail', err));
         });
     }
 

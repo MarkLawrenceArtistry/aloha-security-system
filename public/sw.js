@@ -51,7 +51,7 @@ self.addEventListener('fetch', (event) => {
     // Only cache GET requests
     if (event.request.method !== 'GET') return;
 
-    // 1. API DATA CACHING (Network First, Fallback to Cache)
+    // 1. API DATA: Network First -> Cache Fallback
     if (event.request.url.includes('/api/')) {
         event.respondWith(
             fetch(event.request)
@@ -60,16 +60,20 @@ self.addEventListener('fetch', (event) => {
                     caches.open(DATA_CACHE_NAME).then((cache) => cache.put(event.request, clonedResponse));
                     return response;
                 })
-                .catch(() => {
-                    // IF OFFLINE: Serve the last known database state!
-                    return caches.match(event.request);
-                })
+                .catch(() => caches.match(event.request)) // Return cached data if offline
         );
         return;
     }
 
-    // 2. HTML/CSS/JS CACHING (Network First, Fallback to Cache)
+    // 2. STATIC FILES (HTML/CSS/JS): Network First -> Cache Fallback
     event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
+        fetch(event.request)
+            .catch(() => {
+                return caches.match(event.request).then((response) => {
+                    // FIX: If response is undefined (not in cache), return a 404 instead of crashing
+                    if (response) return response;
+                    return new Response("Offline - File Not Found", { status: 404, statusText: "Not Found" });
+                });
+            })
     );
 });
