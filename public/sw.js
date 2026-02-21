@@ -1,7 +1,6 @@
-// public/sw.js
-const CACHE_NAME = 'aloha-cache-v2'; // Changed to v2 to force the browser to update
+const CACHE_NAME = 'aloha-static-v3';
+const DATA_CACHE_NAME = 'aloha-data-v1';
 
-// Added Admin files to the cache
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -23,29 +22,51 @@ const ASSETS_TO_CACHE = [
     '/resources/logo.png'
 ];
 
-// 1. Install Event: Save files to cache when user first visits
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Forces the new service worker to activate immediately
+    self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('Service Worker: Caching Files');
-            return cache.addAll(ASSETS_TO_CACHE);
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    );
+});
+
+// Cleanup old caches
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
     );
 });
 
-// 2. Fetch Event: Intercept network requests
 self.addEventListener('fetch', (event) => {
+    // Only cache GET requests
     if (event.request.method !== 'GET') return;
 
+    // 1. API DATA CACHING (Network First, Fallback to Cache)
+    if (event.request.url.includes('/api/')) {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    const clonedResponse = response.clone();
+                    caches.open(DATA_CACHE_NAME).then((cache) => cache.put(event.request, clonedResponse));
+                    return response;
+                })
+                .catch(() => {
+                    // IF OFFLINE: Serve the last known database state!
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    // 2. HTML/CSS/JS CACHING (Network First, Fallback to Cache)
     event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                // IF NETWORK FAILS (OFFLINE), PULL FROM THE CACHE!
-                return caches.match(event.request);
-            })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });

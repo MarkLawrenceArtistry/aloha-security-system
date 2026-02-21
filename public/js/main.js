@@ -97,33 +97,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 1. Create the banner element
-    const offlineBanner = document.createElement('div');
-    offlineBanner.id = 'offline-alert';
-    offlineBanner.style.cssText = `
-        position: fixed; bottom: 0; left: 0; width: 100%;
-        background-color: #dc2626; color: white; text-align: center;
-        padding: 12px; font-weight: 700; z-index: 9999;
-        transform: translateY(100%); transition: transform 0.3s ease;
-        box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
-    `;
-    offlineBanner.innerHTML = '<i class="bi bi-wifi-off"></i> No Internet Connection. Check your network.';
-    document.body.appendChild(offlineBanner);
+    const offlinePill = document.createElement('div');
+    offlinePill.className = 'offline-pill';
+    offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+    document.body.appendChild(offlinePill);
 
-    // 2. Define toggle function
     const updateOnlineStatus = () => {
         if (!navigator.onLine) {
-            offlineBanner.style.transform = 'translateY(0)'; // Show
+            offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+            offlinePill.classList.remove('online-flash');
+            offlinePill.classList.add('show');
         } else {
-            offlineBanner.style.transform = 'translateY(100%)'; // Hide
-            // Optional: Show brief "Back Online" green message then hide
+            // Flash green "Back online" before hiding
+            if (offlinePill.classList.contains('show')) {
+                offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
+                offlinePill.classList.add('online-flash');
+                setTimeout(() => {
+                    offlinePill.classList.remove('show');
+                }, 3000);
+            }
         }
     };
 
-    // 3. Listen for events
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    
-    // 4. Initial check
-    updateOnlineStatus();
+    if (!navigator.onLine) updateOnlineStatus();
 });

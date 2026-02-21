@@ -2153,3 +2153,52 @@ a { text-decoration: none; }
         text-align: center;
     }
 }
+
+.offline-pill {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: #232323;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 99999;
+    transform: translateY(100px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.offline-pill.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.offline-pill.online-flash {
+    background: #10b981; /* Green flash when reconnected */
+}
+
+.offline-pill i { font-size: 1.1rem; }
+.offline-pill .bi-wifi-off { color: #f59e0b; }
+.offline-pill .bi-wifi { color: #fff; }
+
+/* Center it on mobile screens just like Messenger */
+@media (max-width: 768px) {
+    .offline-pill {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        width: max-content;
+        max-width: 90%;
+    }
+    .offline-pill.show {
+        transform: translateX(-50%) translateY(0);
+    }
+}

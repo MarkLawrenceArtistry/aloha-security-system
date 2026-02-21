@@ -75,6 +75,11 @@ function setupMultiDelete({
     });
 
     deleteBtn.addEventListener('click', async () => {
+        if (!navigator.onLine) {
+            alert("Action unavailable while offline.");
+            return;
+        }
+        
         const ids = getSelectedIds();
         if (ids.length === 0) return;
         
@@ -305,35 +310,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    // 1. Create the banner element
-    const offlineBanner = document.createElement('div');
-    offlineBanner.id = 'offline-alert';
-    // Changed to TOP: 0 and using DISPLAY instead of TRANSFORM
-    offlineBanner.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%;
-        background-color: #dc2626; color: white; text-align: center;
-        padding: 15px; font-weight: 800; z-index: 999999;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        display: none;
-    `;
-    offlineBanner.innerHTML = '<i class="bi bi-wifi-off" style="margin-right: 8px; font-size: 1.2rem;"></i> CONNECTION LOST. PLEASE CHECK YOUR INTERNET.';
-    document.body.appendChild(offlineBanner);
+    // --- SLEEK OFFLINE INDICATOR ---
+    const offlinePill = document.createElement('div');
+    offlinePill.className = 'offline-pill';
+    offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+    document.body.appendChild(offlinePill);
 
     const updateOnlineStatus = () => {
         if (!navigator.onLine) {
-            offlineBanner.style.display = 'block'; // Show
-            document.body.style.paddingTop = '50px'; // Push content down so it doesn't hide navbar
+            offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+            offlinePill.classList.remove('online-flash');
+            offlinePill.classList.add('show');
         } else {
-            offlineBanner.style.display = 'none'; // Hide
-            document.body.style.paddingTop = '0'; // Reset
+            // Flash green "Back online" before hiding (Messenger style)
+            if (offlinePill.classList.contains('show')) {
+                offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
+                offlinePill.classList.add('online-flash');
+                setTimeout(() => {
+                    offlinePill.classList.remove('show');
+                }, 3000);
+            }
         }
     };
 
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     
-    // Run once on load just in case
-    updateOnlineStatus();
+    // Check immediately on load
+    if (!navigator.onLine) updateOnlineStatus();
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
