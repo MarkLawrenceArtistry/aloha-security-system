@@ -308,30 +308,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Create the banner element
     const offlineBanner = document.createElement('div');
     offlineBanner.id = 'offline-alert';
+    // Changed to TOP: 0 and using DISPLAY instead of TRANSFORM
     offlineBanner.style.cssText = `
-        position: fixed; bottom: 0; left: 0; width: 100%;
+        position: fixed; top: 0; left: 0; width: 100%;
         background-color: #dc2626; color: white; text-align: center;
-        padding: 12px; font-weight: 700; z-index: 9999;
-        transform: translateY(100%); transition: transform 0.3s ease;
-        box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        padding: 15px; font-weight: 800; z-index: 999999;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        display: none;
     `;
-    offlineBanner.innerHTML = '<i class="bi bi-wifi-off"></i> No Internet Connection. Check your network.';
+    offlineBanner.innerHTML = '<i class="bi bi-wifi-off" style="margin-right: 8px; font-size: 1.2rem;"></i> CONNECTION LOST. PLEASE CHECK YOUR INTERNET.';
     document.body.appendChild(offlineBanner);
 
-    // 2. Define toggle function
     const updateOnlineStatus = () => {
         if (!navigator.onLine) {
-            offlineBanner.style.transform = 'translateY(0)'; // Show
+            offlineBanner.style.display = 'block'; // Show
+            document.body.style.paddingTop = '50px'; // Push content down so it doesn't hide navbar
         } else {
-            offlineBanner.style.transform = 'translateY(100%)'; // Hide
-            // Optional: Show brief "Back Online" green message then hide
+            offlineBanner.style.display = 'none'; // Hide
+            document.body.style.paddingTop = '0'; // Reset
         }
     };
 
-    // 3. Listen for events
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     
-    // 4. Initial check
+    // Run once on load just in case
     updateOnlineStatus();
 });
