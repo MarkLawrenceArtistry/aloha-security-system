@@ -61,4 +61,23 @@ router.post('/trigger-cron', verifyToken, verifyAdmin, async (req, res) => {
     }
 });
 
+router.get('/force-migration', verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const { getDB } = require('../database');
+        const db = getDB();
+        
+        db.run(`ALTER TABLE applicants ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`, (err) => {
+            if (err) {
+                if (err.message.includes('duplicate column name')) {
+                    return res.status(200).json({ success: true, data: "Column already exists. No action needed." });
+                }
+                return res.status(500).json({ success: false, data: "Migration failed: " + err.message });
+            }
+            res.status(200).json({ success: true, data: "Successfully added 'updated_at' column!" });
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, data: err.message });
+    }
+});
+
 module.exports = router;
