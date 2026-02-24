@@ -177,6 +177,7 @@ async function initDashboard() {
                 document.getElementById('sh-uptime').innerText = data.system_health.uptime;
                 document.getElementById('sh-dbsize').innerText = data.system_health.db_size + ' MB';
                 document.getElementById('sh-backup').innerText = data.system_health.last_backup;
+                document.getElementById('sh-maintenance').innerText = data.system_health.next_maintenance;
             }
             
             // Render Chart
@@ -201,30 +202,50 @@ async function initDashboard() {
     }
 }
 
-// Chart Renderer (Helper for Dashboard)
+window.parseJwt = function(token) {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+        return null;
+    }
+};
+
+// --- 2. REPLACE renderChart() in admin.js ---
 function renderChart(chartData) {
     const container = document.getElementById('chart-bars');
     if (!container) return;
     
     if (!chartData || chartData.length === 0) {
-        container.innerHTML = '<p style="text-align:center; width:100%; color:#999;">No data</p>';
+        container.innerHTML = '<p style="text-align:center; width:100%; color:#999; align-self:center; margin-top:80px;"><i class="bi bi-inbox" style="font-size:2rem; display:block; margin-bottom:10px;"></i>No data available yet</p>';
         return;
     }
     
     const maxVal = Math.max(...chartData.map(d => d.count)) || 1;
+    // FIX: Only show midVal if maxVal is greater than 1, otherwise leave it blank
+    const midVal = maxVal > 1 ? Math.round(maxVal / 2) : '';
 
-    container.innerHTML = chartData.map(d => {
+    const yAxis = `
+        <div style="display: flex; flex-direction: column; justify-content: space-between; height: 220px; padding-right: 15px; border-right: 2px solid #cbd5e1; color: #64748b; font-size: 0.75rem; font-weight: 700; text-align: right; margin-bottom: 27px;">
+            <span>${maxVal}</span>
+            <span>${midVal}</span>
+            <span>0</span>
+        </div>
+    `;
+
+    const bars = chartData.map(d => {
         const date = new Date(d.month + '-01'); 
         const label = date.toLocaleString('default', { month: 'short' });
-        const height = (d.count / maxVal) * 80;
+        const height = (d.count / maxVal) * 90; 
         return `
             <div class="bar-group">
                 <div class="bar-bg">
-                    <div class="bar" style="height: ${height}%;" title="${d.count} Applicants"></div>
+                    <div class="bar" style="height: ${height}%;" title="${d.count} Applications"></div>
                 </div>
                 <span class="bar-label">${label}</span>
             </div>`;
     }).join('');
+
+    container.innerHTML = yAxis + `<div style="display: flex; flex: 1; justify-content: space-around; align-items: flex-end;">${bars}</div>`;
 }
 
 function applyRBAC() {
@@ -255,6 +276,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Run Auth Check
     checkAuth();
     applyRBAC();
+
+    const token = getToken();
+    if (token) {
+        const user = window.parseJwt(token);
+        if (user) {
+            const userLabel = document.createElement('div');
+            userLabel.style = "padding: 12px 15px; margin: auto 15px 15px 15px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 0.8rem; color: #94a3b8; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; line-height: 1.4;";
+            
+            // Color code the role
+            let roleColor = '#3b82f6'; // Staff
+            if(user.role === 'Admin') roleColor = '#f59e0b';
+            if(user.role === 'Owner') roleColor = '#ef4444';
+
+            userLabel.innerHTML = `
+                <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Logged in as</span>
+                <strong style="color: white; font-size: 0.95rem;">${user.username}</strong>
+                <span style="color: ${roleColor}; font-weight: 700; margin-top: 2px;">
+                    <i class="bi bi-shield-lock-fill"></i> ${user.role}
+                </span>
+            `;
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn && logoutBtn.parentNode) {
+                // Push the logout button to the absolute bottom, put user label right above it
+                logoutBtn.style.marginTop = "0"; 
+                userLabel.style.marginTop = "auto"; 
+                logoutBtn.parentNode.insertBefore(userLabel, logoutBtn);
+            }
+        }
+    }
 
     // 2. Logout Handler
     const logoutBtn = document.getElementById('logout-btn');

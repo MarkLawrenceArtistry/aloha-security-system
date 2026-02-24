@@ -62,23 +62,30 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { username, email, role, password } = req.body;
+        const requestingUserId = req.user.id;
+        const requestingUserRole = req.user.role;
 
         // check if user exists
         const user = await get("SELECT id, role FROM users WHERE id = ?", [id]);
         if (!user) return res.status(404).json({ success: false, data: "User not found." });
 
-        // Security check: Prevent tampering with Owner role
-        if (user.role === 'Owner' && role !== 'Owner') {
-            return res.status(403).json({ success: false, data: "Cannot demote the Owner account." });
+        // SECURITY 1: Admin cannot edit Owner at all. Only the Owner can edit the Owner.
+        if (user.role === 'Owner' && requestingUserRole !== 'Owner') {
+            return res.status(403).json({ success: false, data: "Access Denied: You do not have permission to edit the Owner account." });
         }
+
+        // SECURITY 2: Admin cannot assign the Owner role to someone else
         if (user.role !== 'Owner' && role === 'Owner') {
             return res.status(403).json({ success: false, data: "Cannot assign Owner role to existing users." });
         }
 
-        // Safe role assignment
+        // SECURITY 3: Users cannot change their own role
+        if (parseInt(id) === parseInt(requestingUserId) && role !== user.role) {
+            return res.status(403).json({ success: false, data: "You cannot change your own role. Ask another Admin or the Owner." });
+        }
+
         const finalRole = user.role === 'Owner' ? 'Owner' : role;
 
-        // If password is provided, hash it. If not, keep existing password.
         if (password && password.trim() !== "") {
             const hashedPassword = await bcrypt.hash(password, 10);
             await run(

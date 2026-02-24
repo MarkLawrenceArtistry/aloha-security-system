@@ -48,49 +48,37 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // 1. API DATA: Network First -> Cache Fallback (Stale-While-Revalidate logic)
-    if (url.pathname.includes('/api/')) {
-        event.respondWith(
-            caches.open(DATA_CACHE_NAME).then(async (cache) => {
-                try {
-                    const networkResponse = await fetch(event.request);
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
-                } catch (error) {
-                    const cachedResponse = await cache.match(event.request);
-                    if (cachedResponse) return cachedResponse;
-                    throw error;
-                }
-            })
-        );
-        return;
-    }
-
-    // 2. EXTERNAL CDNs (Bootstrap Icons, Fonts): Cache First
+    // EXTERNAL CDNs (Bootstrap Icons, Fonts): Cache First
     if (url.origin !== self.location.origin) {
         event.respondWith(
             caches.match(event.request).then((response) => {
-                if (response) return response;
-                return fetch(event.request).then((networkResponse) => {
-                    // Cache the new external resource
+                return response || fetch(event.request).then((networkResponse) => {
                     return caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
                     });
-                }).catch(() => {
-                    // If offline and not in cache, we can't do anything for external CDN
                 });
-            })
+            }).catch(() => {})
         );
         return;
     }
 
-    // 3. STATIC FILES: Cache First -> Network
+    // INTERNAL FILES & API: Network First -> Cache Fallback
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        }).catch(() => {
-             // Optional: Return custom offline page here
-        })
+        fetch(event.request)
+            .then((networkResponse) => {
+                // If it's a good response, cache it for offline use
+                if (networkResponse && networkResponse.status === 200) {
+                    const cacheToUse = url.pathname.includes('/api/') ? DATA_CACHE_NAME : CACHE_NAME;
+                    const responseClone = networkResponse.clone();
+                    caches.open(cacheToUse).then((cache) => cache.put(event.request, responseClone));
+                }
+                return networkResponse;
+            })
+            .catch(async () => {
+                // Network failed (Offline) - fallback to Cache
+                const cachedResponse = await caches.match(event.request);
+                if (cachedResponse) return cachedResponse;
+            })
     );
 });

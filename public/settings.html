@@ -136,7 +136,7 @@
         // Check RBAC for Tab Visibility
         document.addEventListener('DOMContentLoaded', () => {
             const role = localStorage.getItem('admin_role');
-            if(role !== 'Admin') {
+            if(!(role == 'Admin' || role == 'Owner')) {
                 document.getElementById('system-tab-btn').style.display = 'none';
             }
         });

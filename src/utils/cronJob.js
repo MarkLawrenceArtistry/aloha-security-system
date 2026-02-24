@@ -54,6 +54,15 @@ const startCronJob = () => {
         scheduled: true,
         timezone: "Asia/Manila" // <--- THIS IS THE MAGIC FIX
     });
+
+    cron.schedule('0 0 * * *', () => {
+        console.log('Running cron: Deleting Audit Logs older than 1 year...');
+        // SQLite date('now', '-1 year') gets the exact date 1 year ago
+        database.run("DELETE FROM audit_logs WHERE timestamp <= date('now', '-1 year')", function(err) {
+            if (err) console.error("Cron Error (Audit Logs):", err);
+            else console.log(`Audit Log Cleanup: Deleted ${this.changes} old logs.`);
+        });
+    }, { scheduled: true, timezone: "Asia/Manila" });
 };
 
 module.exports = startCronJob;

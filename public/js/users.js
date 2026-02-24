@@ -7,9 +7,17 @@ function getToken() {
     return localStorage.getItem('admin_token');
 }
 
+// Quick JWT Decoder to get current logged in User ID
+function parseJwt(token) {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+        return null;
+    }
+}
+
 async function fetchUsers() {
     try {
-        // CHANGED: Use fetchData instead of fetch
         const result = await fetchData(API_BASE, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
@@ -26,11 +34,24 @@ async function fetchUsers() {
 }
 
 function renderTable(users) {
+    const token = getToken();
+    const currentUser = parseJwt(token);
+    const currentRole = currentUser ? currentUser.role : '';
+    const currentUserId = currentUser ? currentUser.id : null;
+
     const tbody = document.getElementById('users-body');
-    tbody.innerHTML = users.map(u => `
+    tbody.innerHTML = users.map(u => {
+        const isOwner = u.role === 'Owner';
+        const isSelf = u.id === currentUserId;
+        
+        // Rules
+        const canEdit = isOwner ? (currentRole === 'Owner') : true; // Only Owner edits Owner
+        const canDelete = !isOwner && !isSelf; // Cannot delete Owner, cannot delete Self
+
+        return `
         <tr>
             <td>#${u.id}</td>
-            <td><strong>${u.username}</strong></td>
+            <td><strong>${u.username} ${isSelf ? '<span style="font-size:0.7rem; color:#10b981; margin-left:5px;">(You)</span>' : ''}</strong></td>
             <td>${u.email}</td>
             <td>
                 <span class="badge" style="background:${u.role === 'Owner' ? '#fef2f2' : '#eee'}; color:${u.role === 'Owner' ? '#ef4444' : '#333'};">
@@ -39,17 +60,20 @@ function renderTable(users) {
             </td>
             <td>${new Date(u.created_at).toLocaleDateString()}</td>
             <td>
-                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}', '${u.role}')" class="btn-action" style="color:#2b6cb0; margin-right:10px;" title="Edit">
+                ${canEdit ? `
+                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}', '${u.role}', ${isSelf})" class="btn-action" style="color:#2b6cb0; margin-right:10px;" title="Edit">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                ${u.role !== 'Owner' ? `
+                ` : `<span class="badge" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; margin-right:10px;">Protected</span>`}
+                
+                ${canDelete ? `
                 <button onclick="deleteUser(${u.id})" class="btn-action" style="color:#c53030;" title="Delete">
                     <i class="bi bi-trash-fill"></i>
                 </button>
-                ` : `<span class="badge" style="background:#fef2f2; color:#ef4444; border:1px solid #fee2e2; margin-left:5px;">Protected</span>`}
+                ` : ''}
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 }
 
 // --- MODAL & FORM LOGIC ---
@@ -71,11 +95,8 @@ window.openModal = () => {
     document.getElementById('pass-hint').innerText = "Required for new users.";
 }
 
-window.closeModal = () => {
-    document.getElementById('user-modal').style.display = 'none';
-}
-
-window.editUser = (id, username, email, role) => {
+// Notice the new 'isSelf' parameter
+window.editUser = (id, username, email, role, isSelf) => {
     document.getElementById('user-modal').style.display = 'flex';
     document.getElementById('modal-title').innerText = 'Edit User';
     document.getElementById('user-id').value = id;
@@ -85,23 +106,30 @@ window.editUser = (id, username, email, role) => {
     const roleSelect = document.getElementById('user-role');
     
     if (role === 'Owner') {
-        // If editing the owner, temporarily add the Owner option so it displays, but disable changes
         if (![...roleSelect.options].some(opt => opt.value === 'Owner')) {
             roleSelect.add(new Option('Owner', 'Owner'));
         }
         roleSelect.value = 'Owner';
-        roleSelect.disabled = true; // Lock dropdown
+        roleSelect.disabled = true; // Lock dropdown completely
     } else {
-        // If normal user, ensure 'Owner' is removed and enable dropdown
         roleSelect.disabled = false;
         [...roleSelect.options].forEach(opt => { if(opt.value === 'Owner') opt.remove(); });
         roleSelect.value = role;
+
+        // If user is editing themselves, disable role changing
+        if (isSelf) {
+            roleSelect.disabled = true;
+        }
     }
     
     const passInput = document.getElementById('user-password');
     passInput.value = ''; 
     passInput.required = false;
     document.getElementById('pass-hint').innerText = "Leave blank to keep current password.";
+}
+
+window.closeModal = () => {
+    document.getElementById('user-modal').style.display = 'none';
 }
 
 window.deleteUser = async (id) => {

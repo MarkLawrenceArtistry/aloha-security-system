@@ -287,6 +287,15 @@ const getDashboardStats = async (req, res) => {
         const minutes = Math.floor((uptimeSeconds % 3600) / 60);
         const uptimeStr = `${hours}h ${minutes}m`;
 
+        // CALCULATE TIME UNTIL MIDNIGHT (Next Maintenance)
+        const now = new Date();
+        const midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0); // Sets time to next midnight
+        const msUntilMidnight = midnight - now;
+        const maintHours = Math.floor(msUntilMidnight / (1000 * 60 * 60));
+        const maintMins = Math.floor((msUntilMidnight % (1000 * 60 * 60)) / (1000 * 60));
+        const nextMaintenanceStr = `In ${maintHours}h ${maintMins}m`;
+
         res.status(200).json({
             success: true,
             data: {
@@ -298,7 +307,8 @@ const getDashboardStats = async (req, res) => {
                 system_health: {
                     uptime: uptimeStr,
                     db_size: dbSizeMB,
-                    last_backup: lastBackup
+                    last_backup: lastBackup,
+                    next_maintenance: nextMaintenanceStr // Add this!
                 },
                 chart: chartData, 
                 recent: recent
