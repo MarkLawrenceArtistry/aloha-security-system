@@ -81,4 +81,38 @@ const sendStatusEmail = async (applicant, newStatus, extraMessage = '') => {
     }
 };
 
-module.exports = { sendStatusEmail };
+const sendOtpEmail = async (userEmail, userName, otp) => {
+    if (!process.env.BREVO_API_KEY) {
+        throw new Error("Email service is not configured (Missing API Key).");
+    }
+
+    try {
+        const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+        apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+
+        const sendSmtpEmail = {
+            to: [{ email: userEmail, name: userName }],
+            sender: { email: 'noreply@alohasecurity.com', name: 'Aloha System' },
+            subject: "Your Password Reset Code - Aloha Security",
+            htmlContent: `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2>Password Reset Request</h2>
+                    <p>Hello ${userName},</p>
+                    <p>Someone requested a password reset for your account. Your 6-digit verification code is:</p>
+                    <div style="font-size: 24px; font-weight: bold; background: #f4f6f8; padding: 15px; text-align: center; letter-spacing: 5px; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>
+                </div>
+            `
+        };
+
+        await apiInstance.sendTransacEmail(sendSmtpEmail);
+    } catch (error) {
+        console.error("OTP Email Error:", error);
+        throw new Error("Failed to send OTP email.");
+    }
+};
+
+// Update module.exports at the bottom
+module.exports = { sendStatusEmail, sendOtpEmail };

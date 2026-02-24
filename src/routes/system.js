@@ -20,4 +20,45 @@ router.post('/restore', verifyToken, verifyAdmin, backupUpload.single('backup_fi
 router.get('/email-settings', verifyToken, verifyAdmin, settingsController.getEmailSettings);
 router.post('/email-settings', verifyToken, verifyAdmin, settingsController.updateEmailSettings);
 
+
+router.post('/trigger-cron', verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const database = require('../database').getDB();
+        const fs = require('fs');
+        const path = require('path');
+        const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public/uploads');
+
+        // 1. Delete Rejected Apps
+        const retentionPeriod = 72 * 60 * 60 * 1000; 
+        const cutoffDate = new Date(Date.now() - retentionPeriod).toISOString();
+        
+        database.all("SELECT id, resume_path, id_image_path FROM applicants WHERE status = 'Rejected' AND updated_at < ?", [cutoffDate], (err, rows) => {
+            if (rows) {
+                rows.forEach(applicant => {
+                    const deleteFile = (urlPath) => {
+                        if (!urlPath) return;
+                        const filename = urlPath.split('/').pop();
+                        const filePath = path.join(UPLOAD_PATH, filename);
+                        fs.unlink(filePath, (e) => {});
+                    };
+                    deleteFile(applicant.resume_path);
+                    deleteFile(applicant.id_image_path);
+                    database.run("DELETE FROM applicants WHERE id = ?", [applicant.id]);
+                });
+            }
+        });
+
+        // 2. Delete old Audit Logs
+        database.run("DELETE FROM audit_logs WHERE timestamp <= date('now', '-1 year')");
+
+        // 3. Log this action
+        const { logAction } = require('../utils/auditLogger');
+        await logAction(req, 'MANUAL_CRON', `Admin manually triggered system maintenance tasks.`);
+
+        res.status(200).json({ success: true, data: "Maintenance tasks executed successfully!" });
+    } catch (err) {
+        res.status(500).json({ success: false, data: err.message });
+    }
+});
+
 module.exports = router;

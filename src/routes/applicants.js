@@ -25,4 +25,9 @@ router.post('/auth/forgot-password-init', authController.getSecurityQuestion);
 router.post('/auth/reset-password', authController.resetPassword);
 router.put('/auth/update-profile', verifyToken, authController.updateProfile); // For Settings Page
 
+router.post('/auth/reset-master-key', authController.resetViaMasterKey);
+router.post('/auth/forgot-password-otp-send', authController.sendPasswordOtp);
+router.post('/auth/forgot-password-otp-verify', authController.resetViaOtp);
+
+
 module.exports = router;

@@ -84,79 +84,179 @@
         </div>
     </main>
 
-    <div id="forgot-modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 2000; align-items:center; justify-content:center;">
-        <div style="background:white; padding: 30px; border-radius: 12px; width: 400px;">
-            <h3>Reset Password</h3>
+    <div id="forgot-modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; align-items:center; justify-content:center;">
+        <div style="background:white; padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <h3 style="font-family: 'HelveticaCustom', sans-serif; font-weight: bold; margin-bottom: 20px;">Account Recovery</h3>
             
-            <!-- STEP 1: Email -->
-            <div id="step-1">
-                <p>Enter your email to find your security question.</p>
+            <!-- STEP 0: Choose Method -->
+            <div id="step-0">
+                <p class="text-muted small mb-3">Select a method to reset your password:</p>
+                <div class="d-grid gap-2">
+                    <button onclick="selectMethod('email')" class="btn btn-outline-dark text-start"><i class="bi bi-envelope-fill me-2 text-danger"></i> Send OTP to Email</button>
+                    <button onclick="selectMethod('security')" class="btn btn-outline-dark text-start"><i class="bi bi-question-circle-fill me-2 text-primary"></i> Security Question</button>
+                    <button onclick="selectMethod('master')" class="btn btn-outline-dark text-start"><i class="bi bi-key-fill me-2 text-warning"></i> Use Master Key</button>
+                </div>
+            </div>
+
+            <!-- STEP 1A: Email Input for OTP & Security -->
+            <div id="step-email-input" style="display:none;">
+                <p class="text-muted small" id="email-prompt-text">Enter your email address to continue.</p>
                 <input type="email" id="fp-email" class="form-control mb-3" placeholder="Email Address">
-                <button onclick="fetchQuestion()" class="btn btn-primary w-100">Next</button>
+                <button onclick="proceedEmailInput()" id="fp-email-btn" class="btn btn-dark w-100 mb-2">Continue</button>
+                <button onclick="resetModal()" class="btn btn-light w-100 text-muted">Back</button>
             </div>
 
-            <!-- STEP 2: Answer -->
-            <div id="step-2" style="display:none;">
-                <p class="fw-bold" id="fp-question"></p>
+            <!-- STEP 2A: Security Answer -->
+            <div id="step-security" style="display:none;">
+                <p class="fw-bold text-danger mb-2" id="fp-question"></p>
                 <input type="text" id="fp-answer" class="form-control mb-3" placeholder="Security Answer">
-                <input type="password" id="fp-new-pass" class="form-control mb-3" placeholder="New Password">
-                <button onclick="submitReset()" class="btn btn-success w-100">Reset Password</button>
+                <input type="password" id="fp-new-pass-sec" class="form-control mb-3" placeholder="New Password">
+                <button onclick="submitSecurityReset()" class="btn btn-dark w-100 mb-2">Reset Password</button>
+                <button onclick="resetModal()" class="btn btn-light w-100 text-muted">Back</button>
             </div>
 
-            <button onclick="document.getElementById('forgot-modal').style.display='none'" class="btn btn-link w-100 mt-2">Cancel</button>
+            <!-- STEP 2B: OTP Verification -->
+            <div id="step-otp" style="display:none;">
+                <p class="text-muted small mb-3">Enter the 6-digit code sent to your email.</p>
+                <input type="text" id="fp-otp" class="form-control mb-3 text-center fs-4 letter-spacing-2" placeholder="000000" maxlength="6">
+                <input type="password" id="fp-new-pass-otp" class="form-control mb-3" placeholder="New Password">
+                <button onclick="submitOtpReset()" class="btn btn-dark w-100 mb-2">Verify & Reset</button>
+                <button onclick="resetModal()" class="btn btn-light w-100 text-muted">Back</button>
+            </div>
+
+            <!-- STEP 2C: Master Key -->
+            <div id="step-master" style="display:none;">
+                <p class="text-muted small mb-3">Enter the System Master Key and the email of the account to reset.</p>
+                <input type="email" id="fp-master-email" class="form-control mb-3" placeholder="Account Email">
+                <input type="password" id="fp-master-key" class="form-control mb-3" placeholder="Master Key (from manual)">
+                <input type="password" id="fp-new-pass-master" class="form-control mb-3" placeholder="New Password">
+                <button onclick="submitMasterReset()" class="btn btn-dark w-100 mb-2"><i class="bi bi-unlock-fill"></i> Override Password</button>
+                <button onclick="resetModal()" class="btn btn-light w-100 text-muted">Back</button>
+            </div>
+
+            <button onclick="document.getElementById('forgot-modal').style.display='none'" class="btn btn-link text-danger w-100 mt-3 text-decoration-none" id="cancel-btn-main">Cancel</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/admin.js"></script>
     <script>
-        // NEW FORGOT PASSWORD LOGIC
+        let currentRecoveryMethod = '';
+
         function showForgotModal() {
             document.getElementById('forgot-modal').style.display = 'flex';
-            document.getElementById('step-1').style.display = 'block';
-            document.getElementById('step-2').style.display = 'none';
+            resetModal();
         }
 
-        async function fetchQuestion() {
+        function resetModal() {
+            document.getElementById('step-0').style.display = 'block';
+            document.getElementById('step-email-input').style.display = 'none';
+            document.getElementById('step-security').style.display = 'none';
+            document.getElementById('step-otp').style.display = 'none';
+            document.getElementById('step-master').style.display = 'none';
+            document.getElementById('cancel-btn-main').style.display = 'block';
+            
+            // Clear inputs
+            document.querySelectorAll('#forgot-modal input').forEach(inp => inp.value = '');
+        }
+
+        function selectMethod(method) {
+            currentRecoveryMethod = method;
+            document.getElementById('step-0').style.display = 'none';
+            document.getElementById('cancel-btn-main').style.display = 'none';
+
+            if (method === 'master') {
+                document.getElementById('step-master').style.display = 'block';
+            } else {
+                document.getElementById('step-email-input').style.display = 'block';
+                if(method === 'email') document.getElementById('email-prompt-text').innerText = "Enter your email to receive a 6-digit OTP code.";
+                if(method === 'security') document.getElementById('email-prompt-text').innerText = "Enter your email to retrieve your security question.";
+            }
+        }
+
+        async function proceedEmailInput() {
             const email = document.getElementById('fp-email').value;
-            if(!email) return alert("Enter email");
+            if(!email) return alert("Please enter an email.");
+            
+            const btn = document.getElementById('fp-email-btn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
 
-            try {
-                const res = await fetch('/api/auth/forgot-password-init', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email })
-                });
-                const json = await res.json();
-                if(json.success) {
-                    document.getElementById('fp-question').innerText = json.data.question;
-                    document.getElementById('step-1').style.display = 'none';
-                    document.getElementById('step-2').style.display = 'block';
-                } else {
-                    alert(json.data);
-                }
-            } catch(err) { alert("Error connecting"); }
+            if (currentRecoveryMethod === 'security') {
+                try {
+                    const res = await fetch('/api/auth/forgot-password-init', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
+                    });
+                    const json = await res.json();
+                    if(json.success) {
+                        document.getElementById('fp-question').innerText = json.data.question;
+                        document.getElementById('step-email-input').style.display = 'none';
+                        document.getElementById('step-security').style.display = 'block';
+                    } else { alert(json.data); }
+                } catch(err) { alert("Connection error."); }
+            } 
+            else if (currentRecoveryMethod === 'email') {
+                try {
+                    const res = await fetch('/api/auth/forgot-password-otp-send', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
+                    });
+                    const json = await res.json();
+                    if(json.success) {
+                        alert("If the email exists, an OTP has been sent.");
+                        document.getElementById('step-email-input').style.display = 'none';
+                        document.getElementById('step-otp').style.display = 'block';
+                    } else { alert(json.data); }
+                } catch(err) { alert("Connection error."); }
+            }
+
+            btn.innerText = "Continue";
+            btn.disabled = false;
         }
 
-        async function submitReset() {
+        // --- SUBMITTERS ---
+        async function submitSecurityReset() {
             const email = document.getElementById('fp-email').value;
             const answer = document.getElementById('fp-answer').value;
-            const newPassword = document.getElementById('fp-new-pass').value;
+            const newPassword = document.getElementById('fp-new-pass-sec').value;
+            if(!answer || !newPassword) return alert("Fill all fields.");
 
-            try {
-                const res = await fetch('/api/auth/reset-password', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email, answer, newPassword })
-                });
-                const json = await res.json();
-                if(json.success) {
-                    alert("Password reset! Please login.");
-                    location.reload();
-                } else {
-                    alert(json.data);
-                }
-            } catch(err) { alert("Error connecting"); }
+            const res = await fetch('/api/auth/reset-password', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, answer, newPassword })
+            });
+            const json = await res.json();
+            if(json.success) { alert("Password reset! Please login."); location.reload(); }
+            else { alert(json.data); }
+        }
+
+        async function submitOtpReset() {
+            const email = document.getElementById('fp-email').value;
+            const otp = document.getElementById('fp-otp').value;
+            const newPassword = document.getElementById('fp-new-pass-otp').value;
+            if(!otp || !newPassword) return alert("Fill all fields.");
+
+            const res = await fetch('/api/auth/forgot-password-otp-verify', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, otp, newPassword })
+            });
+            const json = await res.json();
+            if(json.success) { alert("Password reset! Please login."); location.reload(); }
+            else { alert(json.data); }
+        }
+
+        async function submitMasterReset() {
+            const email = document.getElementById('fp-master-email').value;
+            const masterKey = document.getElementById('fp-master-key').value;
+            const newPassword = document.getElementById('fp-new-pass-master').value;
+            if(!email || !masterKey || !newPassword) return alert("Fill all fields.");
+
+            const res = await fetch('/api/auth/reset-master-key', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, masterKey, newPassword })
+            });
+            const json = await res.json();
+            if(json.success) { alert("Override Successful! Password reset."); location.reload(); }
+            else { alert(json.data); }
         }
     </script>
 </body>

@@ -58,9 +58,14 @@ const initDB = () => {
                 role TEXT DEFAULT 'Admin',
                 security_question TEXT,
                 security_answer_hash TEXT,
+                reset_otp TEXT,
+                reset_otp_expiry TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
+
+        database.run(`ALTER TABLE users ADD COLUMN reset_otp TEXT`, (err) => {});
+        database.run(`ALTER TABLE users ADD COLUMN reset_otp_expiry TIMESTAMP`, (err) => {});
 
         // --- 2. Branches ---
         database.run(`
