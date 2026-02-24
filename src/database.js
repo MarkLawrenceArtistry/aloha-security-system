@@ -103,7 +103,7 @@ const initDB = () => {
 
         // --- MIGRATION FIX: FORCE ADD 'updated_at' COLUMN ---
         // This attempts to add the column. If it exists, it ignores the error.
-        database.run(`ALTER TABLE applicants ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`, (err) => {
+        database.run(`ALTER TABLE applicants ADD COLUMN updated_at TIMESTAMP DEFAULT '2024-01-01 00:00:00'`, (err) => {
             // Error "duplicate column name" is expected if the column already exists, so we ignore it.
             if (err && !err.message.includes('duplicate column name')) {
                 console.log("Migration Note (updated_at):", err.message);
