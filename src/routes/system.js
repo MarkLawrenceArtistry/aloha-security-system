@@ -80,4 +80,34 @@ router.get('/force-migration', verifyToken, verifyAdmin, async (req, res) => {
     }
 });
 
+router.get('/nuke-db', verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        // Close DB first
+        const { closeDB } = require('../database');
+        await closeDB();
+
+        const DB_PATH = process.env.VOLUME_PATH 
+            ? path.join(process.env.VOLUME_PATH, 'aloha_database.db') 
+            : path.join(__dirname, '../../aloha_database.db');
+
+        if (fs.existsSync(DB_PATH)) {
+            fs.unlinkSync(DB_PATH); // Delete the file
+            
+            // Re-initialize (Create fresh DB)
+            const { connectDB, initDB } = require('../database');
+            connectDB();
+            initDB();
+            
+            return res.status(200).json({ success: true, data: "Database deleted and recreated. All data has been wiped and schema is now fresh." });
+        } else {
+            return res.status(200).json({ success: true, data: "Database file didn't exist, created a new one." });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, data: err.message });
+    }
+});
+
 module.exports = router;
