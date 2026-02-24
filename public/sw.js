@@ -17,8 +17,8 @@ const ASSETS_TO_CACHE = [
     '/css/admin.css',
     '/css/login.css',
     '/js/admin.js',
-    '/resources/logo.png',
-    '/manifest.json' // If you have one
+    '/resources/logo.png'
+    // REMOVED: '/manifest.json' <-- Delete this line!
 ];
 
 self.addEventListener('install', (event) => {

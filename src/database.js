@@ -146,7 +146,7 @@ const initDB = () => {
                 database.run(`INSERT OR IGNORE INTO users 
                     (username, email, password_hash, role, security_question, security_answer_hash) 
                     VALUES (?, ?, ?, ?, ?, ?)`, 
-                    ["admin", "admin@aloha.com", passHash, "Admin", "What is the agency name?", answerHash]
+                    ["admin", "admin@aloha.com", passHash, "Owner", "What is the agency name?", answerHash]
                 );
             });
         });

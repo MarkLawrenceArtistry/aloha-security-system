@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
 
 const verifyAdmin = (req, res, next) => {
     // verifyToken must run before this to populate req.user
-    if (req.user && req.user.role === 'Admin') {
+    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Owner')) {
         next();
     } else {
         return res.status(403).json({ success: false, data: "Access Denied: Admin privileges required." });

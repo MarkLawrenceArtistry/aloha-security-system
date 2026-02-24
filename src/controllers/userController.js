@@ -25,6 +25,10 @@ const createUser = async (req, res) => {
             return res.status(400).json({ success: false, data: "Missing required fields." });
         }
 
+        if (role === 'Owner') {
+            return res.status(403).json({ success: false, data: "Cannot create additional Owner accounts." });
+        }
+
         // Check for duplicate
         const existing = await get("SELECT id FROM users WHERE email = ? OR username = ?", [email, username]);
         if (existing) {
@@ -60,20 +64,31 @@ const updateUser = async (req, res) => {
         const { username, email, role, password } = req.body;
 
         // check if user exists
-        const user = await get("SELECT id FROM users WHERE id = ?", [id]);
+        const user = await get("SELECT id, role FROM users WHERE id = ?", [id]);
         if (!user) return res.status(404).json({ success: false, data: "User not found." });
+
+        // Security check: Prevent tampering with Owner role
+        if (user.role === 'Owner' && role !== 'Owner') {
+            return res.status(403).json({ success: false, data: "Cannot demote the Owner account." });
+        }
+        if (user.role !== 'Owner' && role === 'Owner') {
+            return res.status(403).json({ success: false, data: "Cannot assign Owner role to existing users." });
+        }
+
+        // Safe role assignment
+        const finalRole = user.role === 'Owner' ? 'Owner' : role;
 
         // If password is provided, hash it. If not, keep existing password.
         if (password && password.trim() !== "") {
             const hashedPassword = await bcrypt.hash(password, 10);
             await run(
                 "UPDATE users SET username = ?, email = ?, role = ?, password_hash = ? WHERE id = ?",
-                [username, email, role, hashedPassword, id]
+                [username, email, finalRole, hashedPassword, id]
             );
         } else {
             await run(
                 "UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?",
-                [username, email, role, id]
+                [username, email, finalRole, id]
             );
         }
 
@@ -88,15 +103,18 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const requestingUserId = req.user.id; // From verifyToken middleware
+        const requestingUserId = req.user.id; 
 
-        // Prevent self-deletion
         if (parseInt(id) === parseInt(requestingUserId)) {
             return res.status(403).json({ success: false, data: "You cannot delete your own account." });
         }
 
-        const userToDelete = await get("SELECT username FROM users WHERE id = ?", [id]);
+        const userToDelete = await get("SELECT username, role FROM users WHERE id = ?", [id]);
         if (!userToDelete) return res.status(404).json({ success: false, data: "User not found." });
+
+        if (userToDelete.role === 'Owner') {
+            return res.status(403).json({ success: false, data: "The Owner account cannot be deleted." });
+        }
 
         await run("DELETE FROM users WHERE id = ?", [id]);
         await logAction(req, 'USER_DELETE', `Deleted user: ${userToDelete.username}`);

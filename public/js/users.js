@@ -32,15 +32,21 @@ function renderTable(users) {
             <td>#${u.id}</td>
             <td><strong>${u.username}</strong></td>
             <td>${u.email}</td>
-            <td><span class="badge" style="background:#eee; color:#333;">${u.role}</span></td>
+            <td>
+                <span class="badge" style="background:${u.role === 'Owner' ? '#fef2f2' : '#eee'}; color:${u.role === 'Owner' ? '#ef4444' : '#333'};">
+                    ${u.role}
+                </span>
+            </td>
             <td>${new Date(u.created_at).toLocaleDateString()}</td>
             <td>
-                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}', '${u.role}')" class="btn-action" style="color:#2b6cb0; margin-right:10px;">
+                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}', '${u.role}')" class="btn-action" style="color:#2b6cb0; margin-right:10px;" title="Edit">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <button onclick="deleteUser(${u.id})" class="btn-action" style="color:#c53030;">
+                ${u.role !== 'Owner' ? `
+                <button onclick="deleteUser(${u.id})" class="btn-action" style="color:#c53030;" title="Delete">
                     <i class="bi bi-trash-fill"></i>
                 </button>
+                ` : `<span class="badge" style="background:#fef2f2; color:#ef4444; border:1px solid #fee2e2; margin-left:5px;">Protected</span>`}
             </td>
         </tr>
     `).join('');
@@ -54,7 +60,12 @@ window.openModal = () => {
     document.getElementById('user-id').value = '';
     document.getElementById('modal-title').innerText = 'Add User';
     
-    // Force password to be required for new users
+    // Ensure "Owner" isn't an option for new users
+    const roleSelect = document.getElementById('user-role');
+    roleSelect.disabled = false;
+    [...roleSelect.options].forEach(opt => { if(opt.value === 'Owner') opt.remove(); });
+    roleSelect.value = 'Admin';
+    
     const passInput = document.getElementById('user-password');
     passInput.required = true; 
     document.getElementById('pass-hint').innerText = "Required for new users.";
@@ -70,11 +81,25 @@ window.editUser = (id, username, email, role) => {
     document.getElementById('user-id').value = id;
     document.getElementById('user-username').value = username;
     document.getElementById('user-email').value = email;
-    document.getElementById('user-role').value = role;
     
-    // Password is optional during edit
+    const roleSelect = document.getElementById('user-role');
+    
+    if (role === 'Owner') {
+        // If editing the owner, temporarily add the Owner option so it displays, but disable changes
+        if (![...roleSelect.options].some(opt => opt.value === 'Owner')) {
+            roleSelect.add(new Option('Owner', 'Owner'));
+        }
+        roleSelect.value = 'Owner';
+        roleSelect.disabled = true; // Lock dropdown
+    } else {
+        // If normal user, ensure 'Owner' is removed and enable dropdown
+        roleSelect.disabled = false;
+        [...roleSelect.options].forEach(opt => { if(opt.value === 'Owner') opt.remove(); });
+        roleSelect.value = role;
+    }
+    
     const passInput = document.getElementById('user-password');
-    passInput.value = ''; // Clear it
+    passInput.value = ''; 
     passInput.required = false;
     document.getElementById('pass-hint').innerText = "Leave blank to keep current password.";
 }

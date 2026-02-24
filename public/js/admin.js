@@ -22,6 +22,40 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+window.fetchData = async function(url, options = {}) {
+    const storageKey = 'cache_' + url; 
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Network response was not ok");
+        
+        const result = await response.json();
+
+        if (result.success) {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(result));
+            } catch (e) {
+                console.warn("LocalStorage full, could not cache data");
+            }
+        }
+        return result;
+
+    } catch (err) {
+        console.warn(`Network failed for ${url}, checking LocalStorage...`);
+        const cached = localStorage.getItem(storageKey);
+
+        if (cached) {
+            const pill = document.querySelector('.offline-pill');
+            if(pill) {
+                pill.innerHTML = '<i class="bi bi-database"></i> <span>Viewing offline data</span>';
+                pill.classList.add('show');
+            }
+            return JSON.parse(cached);
+        }
+        throw err;
+    }
+};
+
 // --- 2. UNIVERSAL MULTI-DELETE FUNCTION ---
 // This is now available to any page that includes admin.js
 function setupMultiDelete({ 
@@ -138,6 +172,12 @@ async function initDashboard() {
             document.getElementById('dash-total').innerText = data.counts.total;
             document.getElementById('dash-pending').innerText = data.counts.pending;
             document.getElementById('dash-deployed').innerText = data.counts.active_deployments;
+
+            if (data.system_health) {
+                document.getElementById('sh-uptime').innerText = data.system_health.uptime;
+                document.getElementById('sh-dbsize').innerText = data.system_health.db_size + ' MB';
+                document.getElementById('sh-backup').innerText = data.system_health.last_backup;
+            }
             
             // Render Chart
             renderChart(data.chart);
@@ -196,8 +236,7 @@ function applyRBAC() {
         'audit-log.html'
     ];
 
-    if (role !== 'Admin') {
-        // 1. Remove Sidebar Links
+    if (role !== 'Admin' && role !== 'Owner') {
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             const href = item.getAttribute('href');
@@ -206,7 +245,6 @@ function applyRBAC() {
             }
         });
 
-        // 2. Hide Delete Buttons on Applicant/Branch pages (Optional stricter UI)
         const deleteActions = document.getElementById('delete-actions');
         if(deleteActions) deleteActions.style.display = 'none !important';
     }
@@ -388,45 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 4. SMART FETCH (Network First -> LocalStorage Fallback)
     // ============================================================
-    window.fetchData = async function(url, options = {}) {
-        const storageKey = 'cache_' + url; // Unique key for every API call
-
-        try {
-            // A. Try Network
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error("Network response was not ok");
-            
-            const result = await response.json();
-
-            // B. If success, save to LocalStorage (Overwrite old data)
-            if (result.success) {
-                try {
-                    localStorage.setItem(storageKey, JSON.stringify(result));
-                } catch (e) {
-                    console.warn("LocalStorage full, could not cache data");
-                }
-            }
-            return result;
-
-        } catch (err) {
-            // C. If Network Fails (Offline), try LocalStorage
-            console.warn(`Network failed for ${url}, checking LocalStorage...`);
-            const cached = localStorage.getItem(storageKey);
-
-            if (cached) {
-                // Trigger visual indicator that we are viewing cached data
-                const pill = document.querySelector('.offline-pill');
-                if(pill) {
-                    pill.innerHTML = '<i class="bi bi-database"></i> <span>Viewing offline data</span>';
-                    pill.classList.add('show');
-                }
-                return JSON.parse(cached);
-            }
-
-            // D. If neither works, throw error
-            throw err;
-        }
-    };
+    
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
@@ -462,47 +462,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.onscroll = resetAfkTimer;
 
 
-    // ============================================================
-    // 2. SMART FETCH (Network First -> LocalStorage Fallback)
-    // ============================================================
-    window.fetchData = async function(url, options = {}) {
-        const storageKey = 'cache_' + url; // Unique key for every API call
-
-        try {
-            // A. Try Network
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error("Network response was not ok");
-            
-            const result = await response.json();
-
-            // B. If success, save to LocalStorage (Overwrite old data)
-            if (result.success) {
-                try {
-                    localStorage.setItem(storageKey, JSON.stringify(result));
-                    console.log(`Saved live data to ${storageKey}`);
-                } catch (e) {
-                    console.warn("LocalStorage full, could not cache data");
-                }
-            }
-            return result;
-
-        } catch (err) {
-            // C. If Network Fails (Offline), try LocalStorage
-            console.warn("Network failed, checking LocalStorage...");
-            const cached = localStorage.getItem(storageKey);
-
-            if (cached) {
-                // Trigger the Offline Toast specifically for Data
-                const offlinePill = document.querySelector('.offline-pill');
-                if(offlinePill) {
-                    offlinePill.innerHTML = '<i class="bi bi-database-check"></i> <span>Viewing offline data</span>';
-                    offlinePill.classList.add('show');
-                }
-                return JSON.parse(cached);
-            }
-
-            // D. If neither works, throw error
-            throw err;
-        }
-    };
+    
 });

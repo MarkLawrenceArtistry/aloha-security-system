@@ -246,12 +246,9 @@ const getDashboardStats = async (req, res) => {
         // 1. KPI Cards Data
         const totalReq = await get("SELECT COUNT(*) as count FROM applicants");
         const pendingReq = await get("SELECT COUNT(*) as count FROM applicants WHERE status = 'Pending'");
-        
-        // Active deployments (Joining deployments table)
         const deployedReq = await get("SELECT COUNT(*) as count FROM deployments WHERE status = 'Active'");
 
-        // 2. Chart Data (Last 6 Months) - SQLite Syntax
-        // Groups applicants by Month-Year
+        // 2. Chart Data (Last 6 Months)
         const chartQuery = `
             SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count 
             FROM applicants 
@@ -261,8 +258,34 @@ const getDashboardStats = async (req, res) => {
         `;
         const chartData = await all(chartQuery);
 
-        // 3. Recent Applicants (Limit 5)
+        // 3. Recent Applicants
         const recent = await all("SELECT * FROM applicants ORDER BY created_at DESC LIMIT 5");
+
+        // 4. SYSTEM HEALTH LOGIC (NEW)
+        const DB_PATH = process.env.VOLUME_PATH
+            ? path.join(process.env.VOLUME_PATH, 'aloha_database.db')
+            : path.join(__dirname, '../../aloha_database.db');
+
+        const AUTO_BACKUP_PATH = process.env.VOLUME_PATH
+            ? path.join(process.env.VOLUME_PATH, 'aloha_auto_backup.db')
+            : path.join(__dirname, '../../aloha_auto_backup.db');
+
+        let dbSizeMB = "0.00";
+        if (fs.existsSync(DB_PATH)) {
+            const stats = fs.statSync(DB_PATH);
+            dbSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
+        }
+
+        let lastBackup = "No automated backup yet";
+        if (fs.existsSync(AUTO_BACKUP_PATH)) {
+            const backupStats = fs.statSync(AUTO_BACKUP_PATH);
+            lastBackup = backupStats.mtime.toLocaleString();
+        }
+
+        const uptimeSeconds = process.uptime();
+        const hours = Math.floor(uptimeSeconds / 3600);
+        const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+        const uptimeStr = `${hours}h ${minutes}m`;
 
         res.status(200).json({
             success: true,
@@ -272,7 +295,12 @@ const getDashboardStats = async (req, res) => {
                     pending: pendingReq.count,
                     active_deployments: deployedReq.count
                 },
-                chart: chartData, // Real array of { month: '2026-01', count: 5 }
+                system_health: {
+                    uptime: uptimeStr,
+                    db_size: dbSizeMB,
+                    last_backup: lastBackup
+                },
+                chart: chartData, 
                 recent: recent
             }
         });
