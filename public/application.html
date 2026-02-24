@@ -483,6 +483,54 @@
             const formFields = form.querySelectorAll('input, select, textarea, .address-part');
             const DRAFT_KEY = 'aloha_application_draft';
 
+            const numberFields = ['contact_num', 'years_experience'];
+
+            numberFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        // Regex: Replace anything that is NOT 0-9 with empty string
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                        
+                        // Optional: Limit Mobile to 11 chars (Standard PH Format 09xxxxxxxxx)
+                        if(id === 'contact_num' && this.value.length > 11) {
+                            this.value = this.value.slice(0, 11);
+                        }
+                    });
+                }
+            });
+
+            // 2. NAME FIELDS - REJECT NUMBERS & SYMBOLS ("Real Name" Logic)
+            const nameFields = ['first_name', 'last_name'];
+
+            nameFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    // Logic: Allow a-z, A-Z, spaces, dots (.), hyphens (-), and Ññ
+                    // If user types a number or symbol, remove it immediately
+                    input.addEventListener('input', function(e) {
+                        // The regex /[^a-zA-Z\s\.\-\u00f1\u00d1]/g selects anything NOT a letter/space/dot/dash
+                        if (/[^a-zA-Z\s\.\-\u00f1\u00d1]/.test(this.value)) {
+                            // Strip invalid char
+                            this.value = this.value.replace(/[^a-zA-Z\s\.\-\u00f1\u00d1]/g, '');
+                            
+                            // Optional: Visual feedback (Flash red border)
+                            this.style.borderColor = 'red';
+                            setTimeout(() => this.style.borderColor = '', 500);
+                        }
+                    });
+
+                    // Capitalize first letter of words automatically (UX Improvement)
+                    input.addEventListener('blur', function() {
+                        this.value = this.value
+                            .toLowerCase()
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                    });
+                }
+            });
+
             const saveDraft = () => {
                 const formData = new FormData(form);
                 const formObject = Object.fromEntries(formData.entries());
