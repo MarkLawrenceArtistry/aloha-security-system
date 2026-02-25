@@ -3,25 +3,37 @@
 // ================================================
 const { run } = require('./helper');
 
-/**
- * Records an administrative action in the audit_logs table.
- * @param {object} req - The Express request object (to get user and IP).
- * @param {string} action - A short code for the action (e.g., 'STATUS_UPDATE').
- * @param {string} details - A descriptive string of what happened.
- */
 const logAction = async (req, action, details) => {
     try {
-        // The user object is attached to the request by our verifyToken middleware
         const userId = req.user ? req.user.id : null; 
         const ipAddress = req.ip || req.connection.remoteAddress;
 
+        // --- TIMEZONE FIX: Force Philippine Time (UTC+8) ---
+        // 1. Get current UTC time
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        
+        // 2. Add 8 Hours for Philippines
+        const phOffset = 8; 
+        const phTime = new Date(utc + (3600000 * phOffset));
+
+        // 3. Format to SQL String: YYYY-MM-DD HH:MM:SS
+        const year = phTime.getFullYear();
+        const month = String(phTime.getMonth() + 1).padStart(2, '0');
+        const day = String(phTime.getDate()).padStart(2, '0');
+        const hours = String(phTime.getHours()).padStart(2, '0');
+        const minutes = String(phTime.getMinutes()).padStart(2, '0');
+        const seconds = String(phTime.getSeconds()).padStart(2, '0');
+        
+        const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+        // 4. Insert explicitly with the calculated timestamp
         await run(
-            'INSERT INTO audit_logs (user_id, action, details, ip_address) VALUES (?, ?, ?, ?)',
-            [userId, action, details, ipAddress]
+            'INSERT INTO audit_logs (user_id, action, details, ip_address, timestamp) VALUES (?, ?, ?, ?, ?)',
+            [userId, action, details, ipAddress, timestamp]
         );
     } catch (err) {
         // We log the error but don't want to fail the user's main request
-        // just because the audit log failed.
         console.error('CRITICAL: Failed to write to audit log:', err);
     }
 };
