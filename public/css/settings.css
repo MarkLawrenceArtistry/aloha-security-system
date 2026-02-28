@@ -1,0 +1,404 @@
+   /* =========================================================
+           SETTINGS PAGE - CLEAN BRAND-ACCURATE UI
+           ========================================================= */
+        
+        /* Scoped Typography */
+        .main-content {
+            font-family: 'Helvetica Text', 'Inter', sans-serif;
+            background-color: #f4f6f8;
+            padding: 30px;
+        }
+        .main-content h1, .main-content h2, .main-content h3, .main-content h4 {
+            font-family: 'Helvetica Display', 'Inter', sans-serif;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .stagger-1 { animation: slideUpFade 0.5s ease-out 0.1s forwards; opacity: 0; }
+        .stagger-2 { animation: slideUpFade 0.5s ease-out 0.2s forwards; opacity: 0; }
+
+        /* --- PAGE HEADER --- */
+        .page-header-modern {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            border-left: 6px solid #e53828;
+        }
+        .header-icon {
+            width: 55px; height: 55px;
+            background: #fef2f2; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: #e53828;
+        }
+        .page-header-modern h1 { color: #0f172a; margin: 0 0 5px 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+        .page-header-modern p { color: #64748b; margin: 0; font-size: 0.95rem; }
+
+        /* --- SETTINGS CONTAINER --- */
+        .settings-container {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        /* --- TABS STYLING --- */
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 0 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tab-btn {
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #64748b;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn i {
+            font-size: 1.1rem;
+        }
+        .tab-btn:hover {
+            color: #334155;
+        }
+        .tab-btn.active {
+            border-color: #e53828;
+            color: #e53828;
+            background: rgba(229, 56, 40, 0.02);
+        }
+
+        /* --- TAB CONTENT --- */
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        .tab-content.active {
+            display: block;
+            animation: slideUpFade 0.3s ease-out;
+        }
+
+        /* --- FORM STYLES --- */
+        .settings-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: #f8fafc;
+            transition: all 0.2s;
+            outline: none;
+            font-family: 'Helvetica Text', sans-serif;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #e53828;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(229, 56, 40, 0.1);
+        }
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i {
+            color: #e53828;
+            background: #fef2f2;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* --- BUTTON STYLES --- */
+        .btn-primary {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-secondary {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-warning {
+            background: #8b5cf6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-warning:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        /* --- BACKUP CARDS --- */
+        .backup-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .backup-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .backup-card h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .backup-card p {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        .maintenance-card {
+            border-left: 4px solid #8b5cf6;
+            background: #faf5ff;
+        }
+        .backup-card-download {
+            border-left: 4px solid #3b82f6;
+        }
+        .backup-card-restore {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        /* --- FILE INPUT STYLING --- */
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .file-input:hover {
+            border-color: #94a3b8;
+        }
+
+        /* --- HELPER TEXT --- */
+        .text-muted {
+            color: #64748b;
+        }
+        .small {
+            font-size: 0.85rem;
+        }
+        .warning-text {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* --- LOGOUT MODAL --- */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .custom-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .custom-modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .custom-modal-overlay.active .custom-modal-box {
+            transform: translateY(0) scale(1);
+        }
+        
+        .modal-icon-warning {
+            width: 60px;
+            height: 60px;
+            background: #fef2f2;
+            color: #e53828;
+            font-size: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn-modal-cancel {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-modal-cancel:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .btn-modal-confirm {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: #e53828;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-modal-confirm:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(229, 56, 40, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 15px; }
+            .page-header-modern { flex-direction: column; text-align: center; padding: 20px; }
+            .settings-tabs { flex-direction: column; gap: 0; padding: 0; }
+            .tab-btn { width: 100%; justify-content: center; }
+            .settings-card { max-width: 100%; }
+        }

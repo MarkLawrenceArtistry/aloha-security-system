@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Active Roster - Aloha Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/roster.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -32,18 +32,24 @@
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Active Roster</h1>
-            <p style="color:#666;">Pool of hired guards ready for deployment or currently active.</p>
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-person-badge-fill"></i></div>
+            <div>
+                <h1>Active Roster</h1>
+                <p>Pool of hired personnel cleared and ready for active deployment.</p>
+            </div>
         </div>
 
-        <div class="table-container deployment">
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <input type="text" id="roster-search" class="search-input" placeholder="Search guard name...">
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper-modern stagger-2">
+            <div class="toolbar-modern">
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="roster-search" class="search-input-modern" placeholder="Search guard name...">
                 </div>
-                <div class="toolbar-right">
-                    <a href="deploy-form.html" class="btn-toolbar btn-add">
+                <div>
+                    <a href="deploy-form.html" class="btn-toolbar-add">
                         <i class="bi bi-send-check"></i> Assign Duty
                     </a>
                 </div>
@@ -55,6 +61,22 @@
         </div>
     </main>
 
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title">Sign Out?</h3>
+            <p class="custom-modal-text">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backend Logic Scripts (Unchanged Functionality) -->
     <script src="js/admin.js"></script>
     <script>
         let rosterData = [];
@@ -71,15 +93,48 @@
                 );
                 renderRoster(filtered, query);
             });
+
+            // --- Intercept Logout Safely ---
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            cancelBtn.addEventListener('click', () => {
+                logoutModal.classList.remove('active');
+            });
+
+            confirmBtn.addEventListener('click', () => {
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display: inline-block;"></i> Signing Out...';
+                confirmBtn.style.opacity = '0.8';
+                confirmBtn.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) logoutModal.classList.remove('active');
+            });
         });
 
         async function fetchRoster() {
             const token = localStorage.getItem('admin_token');
             const grid = document.getElementById('roster-grid');
-            grid.innerHTML = '<div style="padding: 20px;">Loading personnel...</div>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b;"><i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display:inline-block; margin-right:8px;"></i> Loading personnel...</div>';
 
             try {
-                // CHANGED: Use fetchData
+                // CHANGED: Use fetchData (assumes it is in your js/admin.js)
                 const json = await fetchData('/api/applicants?status=Hired&limit=500', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -90,7 +145,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                grid.innerHTML = '<div style="padding: 20px; color: red;">Failed to load data.</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #ef4444;">Failed to load roster data.</div>';
             }
         }
 
@@ -105,20 +160,21 @@
             
             if(data.length === 0) {
                 grid.innerHTML = `
-                    <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b; background: white; border-radius: 16px; border: 1px dashed #cbd5e1;">
-                        <i class="bi bi-person-badge" style="font-size: 2rem; display: block; margin-bottom: 12px;"></i>
-                        No hired guards found in the roster.
+                    <div style="grid-column: 1/-1; padding: 60px 20px; text-align: center; color: #94a3b8;">
+                        <i class="bi bi-person-badge" style="font-size: 3rem; display: block; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <span style="font-size: 1.1rem; font-weight: 600; color: #64748b;">No personnel found.</span>
                     </div>`;
                 return;
             }
 
-            grid.innerHTML = data.map(app => {
+            grid.innerHTML = data.map((app, index) => {
                 const hiredDate = new Date(app.updated_at).toLocaleDateString();
+                const animDelay = `animation-delay: ${index * 0.05}s;`;
                 
                 return `
-                    <div class="deployment-card">
+                    <div class="deployment-card" style="${animDelay}">
                         <div class="tag-container">
-                            <div class="card-tag secured" style="position:static;">
+                            <div class="card-tag secured">
                                 <i class="bi bi-shield-check"></i> Cleared for Duty
                             </div>
                         </div>
@@ -129,25 +185,25 @@
                             </div>
                             <div class="guard-info">
                                 <h3>${highlightText(app.first_name + ' ' + app.last_name, query)}</h3>
-                                <p style="margin:0; font-weight: 600;"><i class="bi bi-person-badge"></i> ${app.position_applied}</p>
+                                <p><i class="bi bi-person-badge"></i> ${app.position_applied}</p>
                             </div>
                         </div>
 
-                        <div class="deployment-timeline" style="margin-top: 15px;">
+                        <div class="deployment-timeline">
                             <div class="timeline-header">
-                                <span>Experience</span>
+                                <span>Experience Level</span>
                                 <span>${app.years_experience} Years</span>
                             </div>
-                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
-                                <i class="bi bi-calendar-check"></i> Hired On: ${hiredDate}
+                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 8px;">
+                                <i class="bi bi-calendar-check" style="color: #94a3b8; margin-right: 4px;"></i> Hired On: ${hiredDate}
                             </div>
                         </div>
 
                         <div class="card-footer-actions">
                             <span class="deployment-id">ID #${String(app.id).padStart(4, '0')}</span>
-                            <div style="display:flex; gap: 8px;">
-                                <a href="applicant-details.html?id=${app.id}" class="btn-outline-custom" style="padding: 6px 12px; font-size: 0.75rem;">View</a>
-                                <button onclick="rejectGuard(${app.id})" class="btn-outline-custom" style="padding: 6px 12px; color:#ef4444; border-color:#fee2e2; background:#fef2f2; font-size:0.75rem;">Revoke</button>
+                            <div style="display:flex; gap: 10px;">
+                                <a href="applicant-details.html?id=${app.id}" class="btn-outline-custom" style="padding: 6px 14px; font-size: 0.8rem;">View</a>
+                                <button onclick="rejectGuard(${app.id})" class="btn-outline-custom btn-revoke" style="padding: 6px 14px; font-size: 0.8rem;">Revoke</button>
                             </div>
                         </div>
                     </div>
@@ -156,6 +212,7 @@
         }
 
         async function rejectGuard(id) {
+            // Keep native confirm to not break original logic flow
             if(!confirm("Are you sure? This will remove the guard from the active roster and mark them as 'Rejected'.")) return;
             
             const token = localStorage.getItem('admin_token');

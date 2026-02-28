@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Management - Aloha Security</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/branches.css">
 </head>
 <body>
     <div id="toast-container" class="toast-container"></div>
@@ -33,11 +33,17 @@
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Branches</h1>
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-building-fill"></i></div>
+            <div>
+                <h1>Branch Management</h1>
+                <p>Configure facility locations and set operational security parameters.</p>
+            </div>
         </div>
 
-        <div class="stats-grid">
+        <!-- KPI Stats -->
+        <div class="stats-grid stagger-2">
             <div class="stat-card">
                 <div class="stat-number" id="total-branches">-</div>
                 <div class="stat-label">Total Branches</div>
@@ -48,7 +54,10 @@
             </div>
         </div>
 
-        <div class="branches-view-container">
+        <!-- Content Wrapper -->
+        <div class="content-wrapper-modern stagger-3">
+            
+            <!-- Filter Chips -->
             <div id="filter-chips" class="filter-container">
                 <div class="filter-chip active" data-filter="all">
                     <i class="bi bi-grid-fill"></i> All <span class="count-badge" id="count-all">0</span>
@@ -64,9 +73,11 @@
                 </div>
             </div>
 
-            <div class="toolbar">
+            <!-- Toolbar -->
+            <div class="toolbar-modern">
                 <div class="toolbar-left">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search branches...">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="search-input" class="search-input-modern" placeholder="Search facilities or locations...">
                 </div>
 
                 <div class="toolbar-right">
@@ -79,40 +90,42 @@
                         <i class="bi bi-trash"></i> Delete Selected
                     </button>
                     
-                    <button onclick="openModal()" class="btn-toolbar btn-add">
+                    <button onclick="openModal()" class="btn-toolbar-add">
                         <i class="bi bi-plus-lg"></i> Add New
                     </button>
                 </div>
             </div>
 
+            <!-- Tactical Grid -->
             <div id="facility-grid" class="facility-grid">
                 <!-- Cards injected here via JS -->
-                <div class="loading-state">Loading facilities...</div>
+                <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b;"><i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display:inline-block; margin-right:8px;"></i> Loading facilities...</div>
             </div>
 
-            <!-- Keep hidden table body for multi-delete script compatibility if needed -->
+            <!-- Hidden table to keep multi-delete script compatibility intact -->
             <table style="display:none;"><tbody id="branches-body"></tbody></table>
 
+            <!-- Pagination -->
             <div class="pagination-container">
-                <span id="page-info" class="text-muted small">Loading...</span>
-                <div class="d-flex gap-2">
-                    <button id="prev-btn" class="btn-outline-custom" disabled>&lt;</button>
-                    <button id="next-btn" class="btn-outline-custom">&gt;</button>
+                <span id="page-info">Loading...</span>
+                <div style="display:flex; gap:10px;">
+                    <button id="prev-btn" class="btn-outline-custom" disabled><i class="bi bi-chevron-left"></i> Prev</button>
+                    <button id="next-btn" class="btn-outline-custom">Next <i class="bi bi-chevron-right"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- 3. Premium Tabbed Modal -->
+    <!-- PREMIUM TABBED MODAL -->
     <div id="branch-modal" class="modal-system" style="display:none;">
         <div class="modal-overlay" onclick="closeModal()"></div>
         <div class="modal-content-wrapper">
             <div class="modal-header-premium">
-                <div class="header-main">
+                <div>
                     <h2 id="modal-title">Add New Branch</h2>
                     <p class="header-sub">Configure facility security operational parameters.</p>
                 </div>
-                <button type="button" class="btn-close-modal" onclick="closeModal()"><i class="bi bi-x"></i></button>
+                <button type="button" class="btn-close-modal" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
             </div>
 
             <div class="modal-tabs">
@@ -144,13 +157,12 @@
                     <div id="tab-personnel" class="tab-pane">
                         <div class="form-group-premium">
                             <label><i class="bi bi-people"></i> Required Guard Count</label>
-                            <div class="input-with-hint">
-                                <input type="number" id="branch-guards" min="1" value="1" required>
-                                <span class="input-hint">Minimum personnel needed for 24/7 security.</span>
-                            </div>
+                            <input type="number" id="branch-guards" min="1" value="1" required>
+                            <span style="font-size: 0.75rem; color: #64748b; margin-top: -4px;">Minimum personnel needed for 24/7 security.</span>
                         </div>
                         <div class="info-alert">
-                            <i class="bi bi-info-circle"></i> Deployment alerts will be sent if the count falls below this threshold.
+                            <i class="bi bi-info-circle-fill"></i> 
+                            <span>Deployment alerts will be sent if the active guard count falls below this threshold.</span>
                         </div>
                     </div>
                 </div>
@@ -158,18 +170,67 @@
                 <div class="modal-footer-premium">
                     <button type="button" class="btn-cancel-premium" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-save-premium">
-                        <i class="bi bi-check-circle"></i> Save Framework
+                        <i class="bi bi-check-circle-fill"></i> Save Framework
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box-logout">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title" style="font-family: 'Helvetica Display', sans-serif;">Sign Out?</h3>
+            <p style="font-size: 0.95rem; color: #64748b; margin-bottom: 30px;">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-cancel-premium" style="flex: 1;">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-reject" style="flex: 1; justify-content: center;">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
     <script src="js/admin.js"></script>
     <script src="js/branches.js"></script>
+    
+    <!-- UI Interception & Override Scripts -->
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            cancelBtn.addEventListener('click', () => logoutModal.classList.remove('active'));
+
+            confirmBtn.addEventListener('click', () => {
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Processing...';
+                confirmBtn.style.opacity = '0.8';
+                confirmBtn.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) logoutModal.classList.remove('active');
+            });
+        });
+
         // --- UNIVERSAL MULTI-DELETE OVERRIDE ---
-        // We override the global function to use our Premium Toast system
         const originalSetupMultiDelete = window.setupMultiDelete;
         window.setupMultiDelete = function(config) {
             const tbody = document.getElementById(config.tableBodyId);
@@ -202,12 +263,8 @@
                 const success = results.filter(r => r.success).length;
                 const failed = results.length - success;
 
-                if (success > 0) {
-                    showToast('Deleted', `${success} facility records removed successfully`);
-                }
-                if (failed > 0) {
-                    showToast('Conflict', `${failed} records could not be deleted (Guards deployed)`, 'warning');
-                }
+                if (success > 0) showToast('Deleted', `${success} facility records removed successfully`);
+                if (failed > 0) showToast('Conflict', `${failed} records could not be deleted (Guards deployed)`, 'warning');
 
                 if (checkAll) checkAll.checked = false;
                 if (container) container.style.display = 'none';
@@ -215,22 +272,16 @@
                 if (config.onSuccess) config.onSuccess();
             });
 
-            // Call original to set up standard checkbox listeners (harmless to double-bind updateVisibility)
             if (originalSetupMultiDelete) originalSetupMultiDelete(config);
         };
 
-        // --- FACILITY CARDS OVERRIDE ---
         // --- TOAST SYSTEM ---
         function showToast(title, message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `premium-toast ${type}`;
             
-            const icons = {
-                success: 'bi-check-circle-fill',
-                error: 'bi-exclamation-octagon-fill',
-                warning: 'bi-exclamation-triangle-fill'
-            };
+            const icons = { success: 'bi-check-circle-fill', error: 'bi-exclamation-octagon-fill', warning: 'bi-exclamation-triangle-fill' };
 
             toast.innerHTML = `
                 <div class="toast-icon"><i class="bi ${icons[type]}"></i></div>
@@ -243,7 +294,6 @@
 
             container.appendChild(toast);
 
-            // Progress bar animation
             const progressFill = toast.querySelector('.toast-progress-fill');
             progressFill.style.transition = 'width 3s linear';
             requestAnimationFrame(() => progressFill.style.width = '0%');
@@ -270,15 +320,14 @@
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             currentFilter = chip.getAttribute('data-filter');
-            fetchBranches(); // Re-fetch or re-render
+            fetchBranches(); 
         });
 
         // --- FACILITY CARDS OVERRIDE ---
         const originalRenderTable = window.renderTable;
         window.renderTable = async function(branches) {
-            // Fetch real deployment data to calculate accurate status and get personnel names
             let deploymentCounts = {};
-            let personnelMap = {}; // Group personnel names by branch
+            let personnelMap = {}; 
             
             try {
                 const depRes = await fetch('/api/deployments?limit=1000', {
@@ -289,48 +338,36 @@
                     depData.data.deployments.forEach(d => {
                         if (d.status === 'Active') {
                             deploymentCounts[d.branch_name] = (deploymentCounts[d.branch_name] || 0) + 1;
-                            
                             if (!personnelMap[d.branch_name]) personnelMap[d.branch_name] = [];
                             personnelMap[d.branch_name].push(`${d.first_name} ${d.last_name}`);
                         }
                     });
                 }
-            } catch (err) {
-                console.error("Failed to fetch deployment stats:", err);
-            }
+            } catch (err) { console.error(err); }
 
             if (originalRenderTable) originalRenderTable(branches);
 
             const grid = document.getElementById('facility-grid');
             if (!grid) return;
 
-            // Pre-calculate status for filtering and counts
             const branchesWithStatus = branches.map(b => {
                 const assigned = deploymentCounts[b.name] || 0;
                 const percent = (assigned / b.required_guards) * 100;
-                return {
-                    ...b,
-                    assigned,
-                    percent,
-                    isFullySecured: percent >= 100,
-                    isCritical: percent < 50
-                };
+                return { ...b, assigned, percent, isFullySecured: percent >= 100, isCritical: percent < 50 };
             });
 
-            // Update Counts on Chips (Based on full data)
             document.getElementById('count-all').innerText = branchesWithStatus.length;
             document.getElementById('count-secured').innerText = branchesWithStatus.filter(b => b.isFullySecured).length;
             document.getElementById('count-personnel').innerText = branchesWithStatus.filter(b => !b.isFullySecured).length;
             document.getElementById('count-critical').innerText = branchesWithStatus.filter(b => b.isCritical).length;
 
-            // Apply Status Filter
             let filtered = branchesWithStatus;
             if (currentFilter === 'secured') filtered = filtered.filter(b => b.isFullySecured);
             else if (currentFilter === 'personnel') filtered = filtered.filter(b => !b.isFullySecured);
             else if (currentFilter === 'critical') filtered = filtered.filter(b => b.isCritical);
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="no-data">No facilities found for this filter.</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b;"><i class="bi bi-inbox" style="font-size: 2rem; display:block; margin-bottom:10px; opacity:0.5;"></i> No facilities found for this filter.</div>';
                 return;
             }
 
@@ -339,103 +376,69 @@
             grid.innerHTML = filtered.map(b => {
                 const assigned = b.assigned;
                 const percent = Math.min(b.percent, 100);
-                const isFullySecured = b.isFullySecured;
                 const guardsList = personnelMap[b.name] || [];
 
                 return `
                     <div class="facility-card" data-id="${b.id}" onclick="toggleCardSelection(this, event)">
                         <div class="selection-overlay">
                             <input type="checkbox" class="card-checkbox" value="${b.id}" onclick="event.stopPropagation()">
-                            <i class="bi bi-check-circle-fill"></i>
                         </div>
-                        <div class="tag-container">
-                            ${isFullySecured ? `
-                                <div class="card-tag secured">
-                                    <i class="bi bi-shield-fill-check"></i> Fully Secured
-                                    <div class="tag-tooltip">Facility has reached optimal staffing levels. No immediate action required.</div>
-                                </div>
+                        <div class="tag-container" style="position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                            ${b.isFullySecured ? `
+                                <div class="card-tag secured" style="background:#ecfdf5; color:#10b981; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-shield-fill-check"></i> Secured</div>
                             ` : `
-                                <div class="card-tag warning">
-                                    <i class="bi bi-exclamation-triangle-fill"></i> Needs Personnel
-                                    <div class="tag-tooltip">Facility is understaffed. New guard deployments are recommended.</div>
-                                </div>
-                                ${b.percent < 50 ? `
-                                    <div class="card-tag critical">
-                                        <i class="bi bi-lightning-fill"></i> Critical State
-                                        <div class="tag-tooltip">High Priority: Facility is operating at less than 50% capacity. Deployment required immediately.</div>
-                                    </div>
-                                ` : ''}
+                                <div class="card-tag warning" style="background:#fffbeb; color:#f59e0b; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-exclamation-triangle-fill"></i> Needs Staff</div>
+                                ${b.isCritical ? `<div class="card-tag critical" style="background:#fef2f2; color:#ef4444; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-lightning-fill"></i> Critical</div>` : ''}
                             `}
                         </div>
                         
-                        <div class="facility-icon">
-                            <i class="bi bi-building"></i>
-                        </div>
-
                         <div class="facility-header">
+                            <div class="facility-icon"><i class="bi bi-building"></i></div>
                             <h3 class="facility-name">${highlightText(b.name, searchQuery)}</h3>
                             <p class="facility-location"><i class="bi bi-geo-alt"></i> ${b.location}</p>
                         </div>
 
-                        <div class="capacity-info">
-                            <div class="capacity-labels">
-                                <span>Deployment Status</span>
+                        <div class="capacity-info" style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #f1f5f9; margin-top: auto;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; color:#475569; margin-bottom:8px;">
+                                <span>Deployment</span>
                                 <span>${assigned}/${b.required_guards} Guards</span>
                             </div>
-                            <div class="capacity-track">
-                                <div class="capacity-fill grow-animate" data-percent="${percent}" style="width: 0%;"></div>
+                            <div style="height:6px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+                                <div class="grow-animate" data-percent="${percent}" style="height:100%; background:#10b981; width:0%; transition: width 1s ease-out;"></div>
                             </div>
                             
-                            <div class="personnel-tooltip">
-                                <div class="tooltip-header">
-                                    <i class="bi bi-shield-shaded"></i> Active Personnel
-                                </div>
-                                <ul class="personnel-list">
-                                    ${guardsList.length > 0 
-                                        ? guardsList.map(name => `<li class="personnel-item"><i class="bi bi-person-fill"></i> ${name}</li>`).join('') 
-                                        : '<li class="personnel-item" style="opacity: 0.5;">No guards deployed</li>'}
-                                </ul>
-                            </div>
-
-                            ${!isFullySecured ? `
-                                <div style="margin-top: 10px; text-align: right;">
-                                    <a href="deploy-form.html" class="deploy-shortcut" onclick="event.stopPropagation()" style="font-size: 0.75rem; color: #10b981; font-weight: 700; text-decoration: none;">
-                                        <i class="bi bi-person-plus"></i> Deploy Guard
+                            ${!b.isFullySecured ? `
+                                <div style="margin-top: 12px; text-align: center;">
+                                    <a href="deploy-form.html" onclick="event.stopPropagation()" style="font-size: 0.8rem; color: #e53828; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                                        <i class="bi bi-person-plus-fill"></i> Deploy Staff
                                     </a>
                                 </div>
                             ` : ''}
                         </div>
 
-                        <div class="facility-actions">
-                            <button onclick="event.stopPropagation(); editBranch(${b.id}, '${b.name}', '${b.location}', ${b.required_guards})" class="btn-card-edit">
-                                <i class="bi bi-pencil-square"></i> Edit Details
+                        <div style="margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+                            <button onclick="event.stopPropagation(); editBranch(${b.id}, '${b.name}', '${b.location}', ${b.required_guards})" style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;">
+                                <i class="bi bi-pencil-square"></i> Edit Facility
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            // Trigger grow animation
             requestAnimationFrame(() => {
-                document.querySelectorAll('.grow-animate').forEach(el => {
-                    el.style.width = el.getAttribute('data-percent') + '%';
-                });
+                document.querySelectorAll('.grow-animate').forEach(el => el.style.width = el.getAttribute('data-percent') + '%');
             });
         };
 
         function toggleCardSelection(card, event) {
-            // Don't toggle if clicking a button
-            if (event.target.closest('button')) return;
-            
+            if (event.target.closest('button') || event.target.closest('a')) return;
             const checkbox = card.querySelector('.card-checkbox');
             checkbox.checked = !checkbox.checked;
             card.classList.toggle('is-selected', checkbox.checked);
 
-            // Sync with the hidden actual checkboxes for multi-delete script
             const hiddenCheckbox = document.querySelector(`#branches-body input[value="${checkbox.value}"]`);
             if (hiddenCheckbox) {
                 hiddenCheckbox.checked = checkbox.checked;
-                // Manually trigger change event so the multi-delete script sees it
                 hiddenCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
@@ -444,12 +447,10 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.querySelector(`.tab-btn[onclick*="${tabId}"]`).classList.add('active');
         }
 
-        // We also override openModal and editBranch to ensure they reset tabs
         const originalOpenModal = window.openModal;
         window.openModal = function() {
             if (originalOpenModal) originalOpenModal();
@@ -470,7 +471,6 @@
             switchTab('location');
         };
 
-        // Override handleFormSubmit to use Toasts
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
             const id = document.getElementById('branch-id').value;
@@ -484,54 +484,18 @@
             try {
                 const res = await fetch(url, {
                     method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
                     body: JSON.stringify({ name, location, required_guards: guards })
                 });
-                
                 if (res.ok) {
-                    closeModal();
-                    fetchBranches();
-                    showToast('Success', id ? 'Branch details updated' : 'New facility created');
+                    closeModal(); fetchBranches();
+                    showToast('Success', id ? 'Facility updated' : 'Facility created');
                 } else {
                     const error = await res.json();
                     showToast('Error', error.data || 'Operation failed', 'error');
                 }
-            } catch (err) {
-                console.error(err);
-                showToast('Error', 'Connection failed', 'error');
-            }
+            } catch (err) { showToast('Error', 'Connection failed', 'error'); }
         };
-
-        // Override deleteBranch to use Toasts
-        window.deleteBranch = async function(id) {
-            // We use standard confirm for safety, but toast for the result
-            if (!confirm('Are you sure you want to delete this branch?')) return;
-            
-            try {
-                const res = await fetch(`/api/branches/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const result = await res.json();
-                
-                if (res.ok) {
-                    fetchBranches();
-                    showToast('Deleted', 'Facility has been removed');
-                } else {
-                    showToast('Conflict', result.data || 'Cannot delete branch', 'warning');
-                }
-            } catch (err) {
-                showToast('Error', 'Failed to delete', 'error');
-            }
-        };
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('admin_token');
-            window.location.href = 'login.html';
-        });
     </script>
 </body>
 </html>

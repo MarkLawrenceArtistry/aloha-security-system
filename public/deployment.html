@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deployment - Aloha Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/deployment.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -32,11 +32,17 @@
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Deployment Management</h1>
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+                <h1>Deployment Management</h1>
+                <p>Track active personnel, manage assignments, and monitor facility coverage.</p>
+            </div>
         </div>
 
-        <div class="stats-grid">
+        <!-- KPI Stats -->
+        <div class="stats-grid stagger-2">
             <div class="stat-card">
                 <div class="stat-number" id="stat-total">-</div>
                 <div class="stat-label">Total Deployments</div>
@@ -51,8 +57,9 @@
             </div>
         </div>
 
-        <!-- NEW TABLE CONTAINER STRUCTURE -->
-        <div class="table-container deployment">
+        <!-- Content Wrapper -->
+        <div class="content-wrapper-modern stagger-3">
+            
             <!-- Filter Chips -->
             <div class="filter-container" id="filter-chips">
                 <div class="filter-chip active" data-filter="all">
@@ -66,44 +73,60 @@
                 </div>
             </div>
 
-            <!-- Toolbar: Search Left, Button Right -->
-            <div class="toolbar">
+            <!-- Toolbar -->
+            <div class="toolbar-modern">
                 <div class="toolbar-left">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search guard or branch...">
+                    <div class="search-wrapper">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="search-input" class="search-input-modern" placeholder="Search guard or branch...">
+                    </div>
                     <select id="sort-select" class="sort-select" title="Sort deployment records">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>
                     </select>
                 </div>
-                <div class="toolbar-right" style="display:flex; gap:10px;">
-                    <!-- NEW PDF BUTTON -->
-                    <button onclick="downloadPdfReport()" class="btn-outline-custom" style="height:42px;">
+                <div class="toolbar-right">
+                    <button onclick="downloadPdfReport()" class="btn-print">
                         <i class="bi bi-printer-fill"></i> Print Report
                     </button>
-                    
-                    <a href="deploy-form.html" class="btn-toolbar btn-add">
+                    <a href="deploy-form.html" class="btn-toolbar-add">
                         <i class="bi bi-plus-lg"></i> Deploy Guard
                     </a>
                 </div>
             </div>
 
-            <!-- Tactical Grid replaces Table -->
+            <!-- Tactical Grid (Replaces Table) -->
             <div class="facility-grid" id="deploy-grid">
-                <!-- Cards will be rendered here -->
+                <!-- Cards will be rendered here via JS -->
             </div>
 
-            <!-- Pagination Footer -->
+            <!-- Pagination -->
             <div class="pagination-container">
-                <span id="page-info" class="text-muted small">Loading...</span>
-                <div class="d-flex gap-2">
-                    <button id="prev-btn" class="btn-outline-custom" disabled>&lt;</button>
-                    <button id="next-btn" class="btn-outline-custom">&gt;</button>
+                <span id="page-info">Loading...</span>
+                <div style="display:flex; gap:10px;">
+                    <button id="prev-btn" class="btn-outline-custom" disabled><i class="bi bi-chevron-left"></i> Prev</button>
+                    <button id="next-btn" class="btn-outline-custom">Next <i class="bi bi-chevron-right"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Core System Scripts -->
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title">Sign Out?</h3>
+            <p class="custom-modal-text">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
     <script src="js/admin.js"></script>
     <script>
         const API_BASE = '/api/deployments';
@@ -113,7 +136,36 @@
         let allBranchesMap = {}; 
         const itemsPerPage = 6; 
 
-        // Override fetchDeployments to handle full data for client-side filtering
+        // --- LOGOUT INTERCEPTION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+            cancelBtn.addEventListener('click', () => logoutModal.classList.remove('active'));
+            confirmBtn.addEventListener('click', () => {
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Processing...';
+                confirmBtn.style.opacity = '0.8';
+                confirmBtn.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) logoutModal.classList.remove('active');
+            });
+        });
+
         window.fetchDeployments = async function() {
             const searchField = document.getElementById('search-input');
             const sortField = document.getElementById('sort-select');
@@ -121,7 +173,7 @@
             const sort = sortField ? sortField.value : 'desc';
             
             try {
-                // 1. Fetch Branches for Mini-Map data (Isolated to not block deployments)
+                // Fetch Branches for Mini-Map data
                 try {
                     const branchRes = await fetch('/api/branches?limit=1000', {
                         headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -135,7 +187,7 @@
                     }
                 } catch (bErr) { console.error("Branch fetch failed:", bErr); }
 
-                // 2. Fetch Deployments
+                // Fetch Deployments
                 const res = await fetch(`${API_BASE}?page=1&limit=1000&search=${search}&sort=${sort}`, {
                     headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
@@ -144,7 +196,6 @@
                 if (result.success) {
                     allDeployments = result.data.deployments || [];
                     
-                    // Calculate active guard counts per branch manually for tooltips
                     Object.values(allBranchesMap).forEach(b => b.active_count = 0);
                     allDeployments.forEach(d => {
                         if (d.status === 'Active') {
@@ -159,7 +210,7 @@
             } catch (err) {
                 console.error("Main fetch failed:", err);
                 const grid = document.getElementById('deploy-grid');
-                if(grid) grid.innerHTML = '<div class="text-center p-5 text-danger">Failed to load data. Please refresh.</div>';
+                if(grid) grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #ef4444;">Failed to load data. Please refresh.</div>';
             }
         };
 
@@ -172,36 +223,28 @@
                 return statusMatch;
             });
 
-            // Update Pagination display
             const totalPages = Math.ceil(filteredDeployments.length / itemsPerPage);
             if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
             
-            updatePagination({
-                current_page: currentPage,
-                total_pages: totalPages || 1
-            });
+            updatePagination({ current_page: currentPage, total_pages: totalPages || 1 });
 
-            // Render current page
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedItems = filteredDeployments.slice(start, start + itemsPerPage);
             renderTable(paginatedItems);
         }
 
-        // Override updatePagination to handle client-side paging
         window.updatePagination = function(pagination) {
             document.getElementById('page-info').innerText = `Page ${pagination.current_page} of ${pagination.total_pages}`;
             document.getElementById('prev-btn').disabled = pagination.current_page === 1;
             document.getElementById('next-btn').disabled = pagination.current_page >= pagination.total_pages;
         };
 
-        // Enhanced Text Highlighting
         function highlightText(text, query) {
             if (!query) return text;
             const regex = new RegExp(`(${query})`, 'gi');
             return text.replace(regex, '<span class="highlight">$1</span>');
         }
 
-        // Override renderTable for Tactical Grid
         window.renderTable = function(data) {
             const grid = document.getElementById('deploy-grid');
             const searchField = document.getElementById('search-input');
@@ -209,15 +252,15 @@
 
             if (data.length === 0) {
                 grid.innerHTML = `
-                    <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b; background: white; border-radius: 16px; border: 1px dashed #cbd5e1;">
-                        <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 12px;"></i>
-                        No deployments found matching your criteria.
+                    <div style="grid-column: 1/-1; padding: 50px; text-align: center; color: #94a3b8;">
+                        <i class="bi bi-inbox" style="font-size: 3rem; display: block; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <span style="font-size: 1.1rem; font-weight: 600; color: #64748b;">No deployments found.</span>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = data.map(d => {
+            grid.innerHTML = data.map((d, index) => {
                 const depDate = new Date(d.date_deployed);
                 const now = new Date();
                 const diffMs = now - depDate;
@@ -241,11 +284,12 @@
                 }
 
                 const isNew = d.status === 'Active' && diffMs < (24 * 60 * 60 * 1000);
+                const animDelay = `animation-delay: ${index * 0.05}s;`;
 
                 return `
-                <div class="deployment-card ${isNew ? 'new-entry' : ''}">
+                <div class="deployment-card ${isNew ? 'new-entry' : ''}" style="${animDelay}">
                     <div class="tag-container">
-                        <div class="card-tag ${d.status === 'Active' ? 'secured' : 'warning'}" style="position:static;">
+                        <div class="card-tag ${d.status === 'Active' ? 'secured' : 'warning'}">
                             <i class="bi ${d.status === 'Active' ? 'bi-person-check-fill' : 'bi-person-x-fill'}"></i>
                             ${d.status}
                             <div class="tag-tooltip">
@@ -263,37 +307,32 @@
                         <div class="guard-info">
                             <h3>${highlightText(d.first_name + ' ' + d.last_name, searchQuery)}</h3>
                             <div class="branch-link-wrapper">
-                                <p style="margin:0; cursor: help;"><i class="bi bi-building"></i> ${highlightText(d.branch_name, searchQuery)}</p>
+                                <p><i class="bi bi-building"></i> ${highlightText(d.branch_name, searchQuery)}</p>
                                 ${(() => {
                                     if (!allBranchesMap || Object.keys(allBranchesMap).length === 0) return '';
                                     const branchMatchName = (bName, dName) => {
                                         const b = bName.trim().toLowerCase();
                                         const d = dName.trim().toLowerCase();
-                                        // Fuzzy matching: check if d is a substring of b, or b is a substring of d
                                         return b.includes(d) || d.includes(b);
                                     };
-                                    const branch = Object.values(allBranchesMap).find(b => 
-                                        branchMatchName(b.name, d.branch_name)
-                                    );
+                                    const branch = Object.values(allBranchesMap).find(b => branchMatchName(b.name, d.branch_name));
                                     if (!branch) return '';
                                     return `
                                     <div class="mini-map-tooltip">
-                                        <div class="mini-map-header">
-                                            <div class="mini-map-title">
-                                                <i class="bi bi-geo-alt-fill"></i> Facility Intel
-                                            </div>
+                                        <div class="mini-map-title">
+                                            <i class="bi bi-geo-alt-fill"></i> Facility Intel
                                         </div>
-                                        <div class="mini-map-body">
-                                            <p><i class="bi bi-map"></i> ${branch.location}</p>
-                                            <div class="mini-map-stats">
-                                                <div class="mini-stat">
-                                                    <span class="mini-stat-val">${branch.active_count || 0}</span>
-                                                    <span class="mini-stat-lbl">Active</span>
-                                                </div>
-                                                <div class="mini-stat">
-                                                    <span class="mini-stat-val">${branch.required_guards}</span>
-                                                    <span class="mini-stat-lbl">Limit</span>
-                                                </div>
+                                        <div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 12px; line-height: 1.4;">
+                                            <i class="bi bi-map" style="color: #94a3b8; margin-right: 4px;"></i> ${branch.location}
+                                        </div>
+                                        <div style="display:flex; gap:10px;">
+                                            <div style="flex:1; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; text-align:center;">
+                                                <span class="mini-stat-val">${branch.active_count || 0}</span><br>
+                                                <span class="mini-stat-lbl">Active</span>
+                                            </div>
+                                            <div style="flex:1; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; text-align:center;">
+                                                <span class="mini-stat-val">${branch.required_guards}</span><br>
+                                                <span class="mini-stat-lbl">Limit</span>
                                             </div>
                                         </div>
                                     </div>
@@ -314,32 +353,28 @@
                     </div>
 
                     <div class="card-footer-actions">
-                        <span class="deployment-id">EXP #${d.id}</span>
+                        <span class="deployment-id">EXP #${String(d.id).padStart(4, '0')}</span>
                         ${d.status === 'Active' 
-                            ? `<button onclick="endDeployment(${d.id})" class="btn-outline-custom" style="padding: 6px 14px; color:#ef4444; border-color:#fee2e2; background:#fef2f2; font-size:0.75rem; border-radius:8px;">End Duty</button>` 
-                            : '<span class="text-muted small">Status Logged</span>'}
+                            ? `<button onclick="endDeployment(${d.id})" class="btn-outline-custom" style="padding: 6px 14px; color:#ef4444; border-color:#fee2e2; background:#fef2f2; font-size:0.75rem;">End Duty</button>` 
+                            : '<span style="font-size:0.75rem; color:#94a3b8; font-weight:700;">STATUS LOGGED</span>'}
                     </div>
                 </div>
                 `;
             }).join('');
         };
 
-        // Override updateStats for counts
         window.updateStats = function(stats) {
             document.getElementById('stat-total').innerText = stats.total_deployments;
             document.getElementById('stat-active').innerText = stats.total_active;
             document.getElementById('stat-month').innerText = stats.this_month;
-            
             document.getElementById('count-all').innerText = stats.total_deployments;
             document.getElementById('count-Active').innerText = stats.total_active;
             document.getElementById('count-Ended').innerText = stats.total_deployments - stats.total_active;
         };
 
-        // Filter Chips Listener
         document.getElementById('filter-chips').addEventListener('click', (e) => {
             const chip = e.target.closest('.filter-chip');
             if (!chip) return;
-
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             currentFilter = chip.getAttribute('data-filter');
@@ -347,56 +382,33 @@
             applyFilters();
         });
 
-        // Pagination Listeners (re-bind since we handle them locally now)
         document.getElementById('prev-btn').addEventListener('click', (e) => {
             e.stopImmediatePropagation();
-            if(currentPage > 1) {
-                currentPage--;
-                applyFilters();
-            }
+            if(currentPage > 1) { currentPage--; applyFilters(); }
         });
         document.getElementById('next-btn').addEventListener('click', (e) => {
             e.stopImmediatePropagation();
             const totalPages = Math.ceil(filteredDeployments.length / itemsPerPage);
-            if(currentPage < totalPages) {
-                currentPage++;
-                applyFilters();
-            }
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('admin_token');
-            window.location.href = 'login.html';
+            if(currentPage < totalPages) { currentPage++; applyFilters(); }
         });
 
         async function endDeployment(id) {
             if(!confirm("Are you sure you want to end this guard's deployment?")) return;
-
             try {
                 const res = await fetch(`${API_BASE}/${id}`, {
                     method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}` 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
                     body: JSON.stringify({ status: 'Ended' })
                 });
                 const result = await res.json();
                 if(result.success) {
-                    if (typeof showToast === 'function') {
-                        showToast('Duty Ended', 'Guard record has been updated.');
-                    }
+                    if (typeof showToast === 'function') showToast('Duty Ended', 'Guard record has been updated.');
                     fetchDeployments();
                 }
-            } catch(err) {
-                console.error(err);
-            }
+            } catch(err) { console.error(err); }
         }
 
-        // Explicit Initializations
         if (typeof currentPage === 'undefined') window.currentPage = 1;
-        
-        // Ensure initial fetch runs reliably
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             fetchDeployments();
         } else {
@@ -406,23 +418,17 @@
         async function downloadPdfReport() {
             const btn = document.querySelector('button[onclick="downloadPdfReport()"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Generating...';
             btn.disabled = true;
 
             try {
                 const res = await fetch('/api/deployments/report/pdf', {
-                    method: 'GET',
-                    headers: { 
-                        'Authorization': `Bearer ${getToken()}` 
-                    }
+                    method: 'GET', headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
 
                 if (res.ok) {
-                    // Convert response to blob
                     const blob = await res.blob();
                     const url = window.URL.createObjectURL(blob);
-                    
-                    // Create invisible link and click it
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = `aloha_deployment_report_${new Date().toISOString().slice(0,10)}.pdf`;

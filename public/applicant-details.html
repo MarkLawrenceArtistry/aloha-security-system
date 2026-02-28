@@ -2,186 +2,222 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Applicant Details - Aloha Security</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/applicant-details.css">
 </head>
-<body class="focus-layout">
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <img src="resources/logo.png" alt="Aloha Logo" class="sidebar-logo"> ALOHA <span>ADMIN</span>
+        </div>
+        
+        <div class="sidebar-category">Main Menu</div>
+        <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="audit-log.html" class="nav-item"><i class="bi bi-clipboard-data-fill"></i> Audit Logs</a>
+        
+        <div class="sidebar-category">Operations</div>
+        <a href="applicants.html" class="nav-item active"><i class="bi bi-people-fill"></i> Applicants</a>
+        <a href="roster.html" class="nav-item"><i class="bi bi-person-badge-fill"></i> Active Roster</a>
+        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+        <a href="deployment.html" class="nav-item"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
+        
+        <div class="sidebar-category">System</div>
+        <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
+        <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+        
+        <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </nav>
+
     <main class="main-content">
         <div class="focus-container">
-        <!-- 1. Profile Hero Section -->
-        <div class="profile-hero">
-            <div class="hero-content">
-                <div class="hero-avatar">
-                    <div class="avatar-ring"></div>
-                    <i class="bi bi-person-fill"></i>
+            <!-- Breadcrumb Navigation -->
+            <div class="breadcrumb-nav">
+                <div class="breadcrumb-icon">
+                    <i class="bi bi-folder2-open"></i>
                 </div>
-                <div class="hero-details">
-                    <h1 id="app-name">Loading...</h1>
-                    <div class="hero-badges">
-                        <span id="app-position" class="hero-pos-badge">...</span>
-                        <div class="hero-contact-quick">
-                            <span><i class="bi bi-envelope"></i> <small id="display-email">...</small></span>
-                            <span><i class="bi bi-telephone"></i> <small id="display-phone">...</small></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-actions-group">
-                <span id="app-status" class="badge">...</span>
-                <a href="applicants.html" class="btn-hero-back">
-                    <i class="bi bi-arrow-left"></i> Back to List
+                <a href="applicants.html" class="breadcrumb-item">
+                    <i class="bi bi-people-fill"></i> Applicants
                 </a>
+                <span class="breadcrumb-separator"><i class="bi bi-chevron-right"></i></span>
+                <span class="breadcrumb-item active">
+                    <i class="bi bi-person-badge"></i> <span id="breadcrumb-name">Applicant Details</span>
+                </span>
             </div>
+
+            <!-- 1. Profile Hero Section -->
+            <div class="profile-hero">
+                <div class="hero-content">
+                    <div class="hero-avatar">
+                        <div class="avatar-ring"></div>
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="hero-details">
+                        <h1 id="app-name">Loading...</h1>
+                        <div class="hero-badges">
+                            <span id="app-position" class="hero-pos-badge">...</span>
+                            <div class="hero-contact-quick">
+                                <span><i class="bi bi-envelope"></i> <small id="display-email">...</small></span>
+                                <span><i class="bi bi-telephone"></i> <small id="display-phone">...</small></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-actions-group">
+                    <span id="app-status" class="badge">...</span>
+                    <a href="applicants.html" class="btn-hero-back">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. Hiring Progress Stepper -->
+          <div class="stepper-wrapper">
+    <div class="stepper-container">
+        <div class="stepper-line">
+            <div class="stepper-line-progress" id="stepper-progress" style="width: 100%;"></div>
         </div>
-
-        <!-- 2. Hiring Progress Stepper -->
-        <div class="stepper-wrapper">
-            <div class="stepper-container">
-                <div class="stepper-line">
-                    <div class="stepper-line-progress" id="stepper-progress"></div>
-                </div>
-                
-                <div class="step-node" id="step-0">
-                    <div class="step-icon"><i class="bi bi-file-earmark-text"></i></div>
-                    <span class="step-label">Applied</span>
-                </div>
-                
-                <div class="step-node" id="step-1">
-                    <div class="step-icon"><i class="bi bi-search"></i></div>
-                    <span class="step-label">Screening</span>
-                </div>
-                
-                <div class="step-node" id="step-2">
-                    <div class="step-icon"><i class="bi bi-chat-dots"></i></div>
-                    <span class="step-label">Interview</span>
-                </div>
-                
-                <div class="step-node" id="step-3">
-                    <div class="step-icon"><i class="bi bi-shield-lock"></i></div>
-                    <span class="step-label">Vetting</span>
-                </div>
-                
-                <div class="step-node" id="step-4">
-                    <div class="step-icon"><i class="bi bi-check-all"></i></div>
-                    <span class="step-label">Decision</span>
-                </div>
-            </div>
+        
+        <div class="step-node" id="step-0">
+            <div class="step-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <span class="step-label">Applied</span>
         </div>
-
-        <div class="profile-grid">
-            
-            <!-- LEFT COLUMN: Info -->
-            <div class="left-col">
-                
-                <!-- Personal Info Card -->
-                <div class="info-card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-person-circle"></i> Personal Information</h3>
-                    </div>
-                    <!-- JS injects grid here -->
-                    <div id="personal-info" class="info-row"></div>
-                </div>
-
-                <!-- Experience Card -->
-                <div class="info-card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-briefcase-fill"></i> Experience & Background</h3>
-                    </div>
-                    <!-- JS injects grid here -->
-                    <div id="job-info" class="info-row"></div>
-                </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: Actions & Docs -->
-            <div class="right-col">
-                
-                <!-- Actions Card -->
-                <div class="info-card">
-                    <div class="card-header">
-                        <h3>Action Required</h3>
-                    </div>
-                    <div class="decision-grid">
-                        <div class="decision-card hire-card" id="btn-hire">
-                            <div class="card-icon"><i class="bi bi-person-check-fill"></i></div>
-                            <div class="card-content">
-                                <h4>Hire Applicant</h4>
-                                <p>Approve applicant for deployment.</p>
-                            </div>
-                            <div class="shimmer"></div>
-                        </div>
-
-                        <div class="decision-card interview-card" id="btn-interview">
-                            <div class="card-icon"><i class="bi bi-calendar-event-fill"></i></div>
-                            <div class="card-content">
-                                <h4>Set Interview</h4>
-                                <p>Schedule a face-to-face meeting.</p>
-                            </div>
-                        </div>
-
-                        <div class="decision-card reject-card" id="btn-reject">
-                            <div class="card-icon"><i class="bi bi-person-x-fill"></i></div>
-                            <div class="card-content">
-                                <h4>Reject</h4>
-                                <p>Discontinue the application process.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Documents Card -->
-                <div class="info-card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-file-earmark-text"></i> Attachments</h3>
-                    </div>
-                    
-                    <div class="document-grid">
-                        <!-- Resume Card -->
-                        <div class="doc-item">
-                            <div class="doc-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
-                            <div class="doc-info">
-                                <span class="doc-name">Resume_CV.pdf</span>
-                                <span class="doc-meta">PDF • 1.2 MB</span>
-                            </div>
-                            <div class="doc-actions">
-                                <button class="btn-quickview" onclick="openQuickView('resume-link', 'pdf')" title="Quick View Resume" aria-label="Quick View Resume">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <a id="resume-link" href="#" target="_blank" class="btn-download" title="Download Resume" aria-label="Download Resume">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                            </div>
-                            
-                        </div>
-
-                        <!-- ID Card -->
-                        <div class="doc-item">
-                            <div class="doc-preview">
-                                <img id="id-img" src="" alt="ID Preview">
-                                <div class="preview-overlay" onclick="openQuickView('id-img', 'image')">
-                                    <i class="bi bi-zoom-in"></i>
-                                </div>
-                            </div>
-                            <div class="doc-info">
-                                <span class="doc-name">Government_ID.jpg</span>
-                                <span class="doc-meta">Image • 2.4 MB</span>
-                            </div>
-                            <div class="doc-actions">
-                                <a href="#" id="id-download" class="btn-download" title="Download ID" aria-label="Download ID"><i class="bi bi-download"></i></a>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+        
+        <div class="step-node" id="step-1">
+            <div class="step-icon"><i class="bi bi-search"></i></div>
+            <span class="step-label">Screening</span>
+        </div>
+        
+        <div class="step-node" id="step-2">
+            <div class="step-icon"><i class="bi bi-chat-dots"></i></div>
+            <span class="step-label">Interview</span>
+        </div>
+        
+        <div class="step-node" id="step-3">
+            <div class="step-icon"><i class="bi bi-shield-lock"></i></div>
+            <span class="step-label">Vetting</span>
+        </div>
+        
+        <div class="step-node completed" id="step-4">
+            <div class="step-icon"><i class="bi bi-check-lg"></i></div>
+            <span class="step-label" style="color: #10b981 !important; font-weight: 800;">DECISION</span>
         </div>
     </div>
+</div>
+
+            <div class="profile-grid">
+                
+                <!-- LEFT COLUMN: Info -->
+                <div class="left-col">
+                    
+                    <!-- Personal Info Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3><i class="bi bi-person-circle"></i> Personal Information</h3>
+                        </div>
+                        <!-- JS injects grid here -->
+                        <div id="personal-info" class="info-row"></div>
+                    </div>
+
+                    <!-- Experience Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3><i class="bi bi-briefcase-fill"></i> Experience & Background</h3>
+                        </div>
+                        <!-- JS injects grid here -->
+                        <div id="job-info" class="info-row"></div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: Actions & Docs -->
+                <div class="right-col">
+                    
+                    <!-- Actions Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3>Action Required</h3>
+                        </div>
+                        <div class="decision-grid">
+                            <div class="decision-card hire-card" id="btn-hire">
+                                <div class="card-icon"><i class="bi bi-person-check-fill"></i></div>
+                                <div class="card-content">
+                                    <h4>Hire Applicant</h4>
+                                    <p>Approve applicant for deployment.</p>
+                                </div>
+                                <div class="shimmer"></div>
+                            </div>
+
+                            <div class="decision-card interview-card" id="btn-interview">
+                                <div class="card-icon"><i class="bi bi-calendar-event-fill"></i></div>
+                                <div class="card-content">
+                                    <h4>Set Interview</h4>
+                                    <p>Schedule a face-to-face meeting.</p>
+                                </div>
+                            </div>
+
+                            <div class="decision-card reject-card" id="btn-reject">
+                                <div class="card-icon"><i class="bi bi-person-x-fill"></i></div>
+                                <div class="card-content">
+                                    <h4>Reject</h4>
+                                    <p>Discontinue the application process.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3><i class="bi bi-file-earmark-text"></i> Attachments</h3>
+                        </div>
+                        
+                        <div class="document-grid">
+                            <!-- Resume Card -->
+                            <div class="doc-item">
+                                <div class="doc-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                                <div class="doc-info">
+                                    <span class="doc-name">Resume_CV.pdf</span>
+                                    <span class="doc-meta">PDF • 1.2 MB</span>
+                                </div>
+                                <div class="doc-actions">
+                                    <button class="btn-quickview" onclick="openQuickView('resume-link', 'pdf')" title="Quick View Resume">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <a id="resume-link" href="#" target="_blank" class="btn-download" title="Download Resume">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                </div>
+                                
+                            </div>
+
+                            <!-- ID Card -->
+                            <div class="doc-item">
+                                <div class="doc-preview">
+                                    <img id="id-img" src="" alt="ID Preview">
+                                    <div class="preview-overlay" onclick="openQuickView('id-img', 'image')">
+                                        <i class="bi bi-zoom-in"></i>
+                                    </div>
+                                </div>
+                                <div class="doc-info">
+                                    <span class="doc-name">Government_ID.jpg</span>
+                                    <span class="doc-meta">Image • 2.4 MB</span>
+                                </div>
+                                <div class="doc-actions">
+                                    <a href="#" id="id-download" class="btn-download" title="Download ID"><i class="bi bi-download"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Quick View Modal -->
@@ -190,7 +226,7 @@
         <div class="qv-content">
             <div class="qv-header">
                 <h4 id="qv-title">Document Preview</h4>
-                <button class="qv-close" onclick="closeQuickView()" title="Close Preview" aria-label="Close Preview"><i class="bi bi-x-lg"></i></button>
+                <button class="qv-close" onclick="closeQuickView()"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="qv-body" id="qv-body">
                 <!-- Content injected by JS -->
@@ -198,7 +234,22 @@
         </div>
     </div>
 
-    <!-- Inline Logic for Modal (Since js/ files are restricted) -->
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title">Sign Out?</h3>
+            <p class="custom-modal-text">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Logic for Modal -->
     <script>
         function openQuickView(elementId, type) {
             const modal = document.getElementById('quickview-modal');
@@ -234,11 +285,20 @@
             document.getElementById('quickview-modal').classList.remove('active');
         }
 
+        // Update breadcrumb with applicant name
+        function updateBreadcrumb(name) {
+            const breadcrumbName = document.getElementById('breadcrumb-name');
+            if (breadcrumbName && name && name !== 'Loading...') {
+                breadcrumbName.textContent = name;
+            }
+        }
+
         // Bridge to sync data to the new UI components
         const syncData = () => {
             const emailSpan = document.querySelector('#personal-info .info-group:nth-child(1) .info-value');
             const phoneSpan = document.querySelector('#personal-info .info-group:nth-child(2) .info-value');
             const statusBadge = document.getElementById('app-status');
+            const nameElement = document.getElementById('app-name');
             
             if (emailSpan && emailSpan.innerText !== '...') {
                 document.getElementById('display-email').innerText = emailSpan.innerText;
@@ -246,19 +306,48 @@
             if (phoneSpan && phoneSpan.innerText !== '...') {
                 document.getElementById('display-phone').innerText = phoneSpan.innerText;
             }
+            if (nameElement && nameElement.innerText !== 'Loading...') {
+                updateBreadcrumb(nameElement.innerText);
+            }
             if (statusBadge && statusBadge.innerText !== '...') {
                 updateStepper(statusBadge.innerText);
+                // Update status badge color
+                updateStatusBadgeColor(statusBadge.innerText);
             }
         };
 
+        function updateStatusBadgeColor(status) {
+            const badge = document.getElementById('app-status');
+            if (!badge) return;
+            
+            // Remove all status classes
+            badge.classList.remove('status-pending', 'status-interview', 'status-vetting', 'status-hired', 'status-rejected');
+            
+            // Add appropriate class based on status
+            const s = status.trim().toUpperCase();
+            if (s === 'PENDING') {
+                badge.classList.add('status-pending');
+            } else if (s === 'FOR INTERVIEW' || s === 'INTERVIEW') {
+                badge.classList.add('status-interview');
+            } else if (s === 'VETTING' || s === 'SCREENING') {
+                badge.classList.add('status-vetting');
+            } else if (s === 'HIRED') {
+                badge.classList.add('status-hired');
+            } else if (s === 'REJECTED') {
+                badge.classList.add('status-rejected');
+            }
+        }
+
         const observer = new MutationObserver(syncData);
 
-        // Observe both info area and status badge for changes
+        // Observe elements for changes
         const infoArea = document.getElementById('personal-info');
         const statusBadge = document.getElementById('app-status');
+        const nameElement = document.getElementById('app-name');
         
         if (infoArea) observer.observe(infoArea, { childList: true, characterData: true, subtree: true });
         if (statusBadge) observer.observe(statusBadge, { childList: true, characterData: true, subtree: true });
+        if (nameElement) observer.observe(nameElement, { childList: true, characterData: true, subtree: true });
 
         // Fallback: Check every 500ms for 3 seconds to ensure sync
         let checks = 0;
@@ -311,8 +400,48 @@
             if (progressLine) progressLine.style.width = `${progress}%`;
         }
 
-        const target = document.getElementById('personal-info');
-        if (target) observer.observe(target, { childList: true });
+        // Logout Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    logoutModal.classList.remove('active');
+                });
+            }
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Signing Out...';
+                    confirmBtn.style.opacity = '0.8';
+                    confirmBtn.style.pointerEvents = 'none';
+                    
+                    setTimeout(() => {
+                        localStorage.removeItem('admin_token');
+                        window.location.href = 'login.html';
+                    }, 500);
+                });
+            }
+
+            if (logoutModal) {
+                logoutModal.addEventListener('click', (e) => {
+                    if (e.target === logoutModal) logoutModal.classList.remove('active');
+                });
+            }
+        });
     </script>
 
     <script src="js/admin.js"></script>
