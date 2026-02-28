@@ -1,369 +1,153 @@
-<!-- ================================================ -->
-<!-- FILE: public/deploy-form.html                    -->
-<!-- ================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Deployment - Aloha Security</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
-    <style>
-        .form-card { 
-            background: rgba(255, 255, 255, 0.85); 
-            -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            max-width: 600px; 
-            margin: 0 auto; 
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(0, 0, 0, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        }
-        .form-group { margin-bottom: 24px; position: relative; }
-        .form-group label { display: block; margin-bottom: 10px; font-weight: 700; color: #1e293b; font-size: 0.9rem; }
-        
-        /* Premium Input Wrapper with Icon */
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            color: #94a3b8;
-            font-size: 1.1rem;
-            transition: color 0.2s ease;
-            z-index: 2;
-        }
-        .input-wrapper:focus-within i {
-            color: #10b981;
-        }
-        
-        /* Premium Inputs */
-        .form-select, .form-input { 
-            width: 100%; 
-            padding: 14px 14px 14px 44px; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 12px; 
-            font-size: 1rem; 
-            background: #fff;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            outline: none;
-        }
-        .form-select:focus, .form-input:focus {
-            border-color: #10b981;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-        }
-        .form-select:hover, .form-input:hover {
-            border-color: #cbd5e1;
-        }
-        
-        /* Custom Select Styling */
-        .form-select {
-            -webkit-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 44px;
-            cursor: pointer;
-        }
-        
-        /* Search Results Dropdown - Glassmorphism */
-        .search-results {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            max-height: 220px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .search-result-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.15s ease;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-        .search-result-item:hover {
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent);
-        }
-        .search-result-item i {
-            color: #10b981;
-        }
-        .search-no-results {
-            padding: 16px;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-        .search-no-results i {
-            font-size: 1.5rem;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            font-weight: 600;
-            margin-left: auto;
-        }
-        
-        /* Premium Button Styling */
-        .btn-deploy {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-        }
-        .btn-deploy:hover:not(:disabled) {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 12px 24px -8px rgba(16, 185, 129, 0.4);
-        }
-        .btn-deploy:active:not(:disabled) {
-            transform: translateY(0) scale(1);
-        }
-        .btn-deploy:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .btn-deploy .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Facility Intel Preview */
-        .facility-preview {
-            margin-top: 12px;
-            padding: 16px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04));
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 12px;
-            display: none;
-        }
-        .facility-preview.active {
-            display: block;
-            animation: fadeSlideIn 0.3s ease;
-        }
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .facility-preview-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            font-weight: 700;
-            color: #10b981;
-            font-size: 0.85rem;
-        }
-        .facility-preview-body {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px;
-            align-items: center;
-        }
-        .facility-address {
-            font-size: 0.85rem;
-            color: #475569;
-        }
-        .facility-status {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .facility-status.secured {
-            background: rgba(16, 185, 129, 0.15);
-            color: #059669;
-        }
-        .facility-status.needs-personnel {
-            background: rgba(245, 158, 11, 0.15);
-            color: #d97706;
-        }
-        .facility-staffing {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 8px;
-        }
-        
-        /* Toast Notification */
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 9999;
-        }
-        .toast {
-            background: rgba(255, 255, 255, 0.95);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 320px;
-            animation: toastSlideIn 0.4s ease;
-            margin-bottom: 12px;
-        }
-        @keyframes toastSlideIn {
-            from { opacity: 0; transform: translateX(100%); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .toast.fade-out {
-            animation: toastSlideOut 0.3s ease forwards;
-        }
-        @keyframes toastSlideOut {
-            to { opacity: 0; transform: translateX(100%); }
-        }
-        .toast-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .toast-icon.success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        .toast-icon.error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        .toast-content {
-            flex: 1;
-        }
-        .toast-title {
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 0.95rem;
-        }
-        .toast-message {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 2px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/deploy-form.css">
 </head>
 <body>
     <nav class="sidebar">
         <div class="sidebar-brand">
             <img src="resources/logo.png" alt="Aloha Logo" class="sidebar-logo"> ALOHA <span>ADMIN</span>
         </div>
-        <div class="sidebar-category">Navigation</div>
-        <a href="deployment.html" class="nav-item active"><i class="bi bi-arrow-left"></i> Back to List</a>
+        
+        <div class="sidebar-category">Main Menu</div>
+        <a href="admin-dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="audit-log.html" class="nav-item"><i class="bi bi-clipboard-data-fill"></i> Audit Logs</a>
+        
+        <div class="sidebar-category">Operations</div>
+        <a href="applicants.html" class="nav-item"><i class="bi bi-people-fill"></i> Applicants</a>
+        <a href="roster.html" class="nav-item"><i class="bi bi-person-badge-fill"></i> Active Roster</a>
+        <a href="branches.html" class="nav-item"><i class="bi bi-building-fill"></i> Branches</a>
+        <a href="deployment.html" class="nav-item active"><i class="bi bi-geo-alt-fill"></i> Deployment</a>
+        
+        <div class="sidebar-category">System</div>
+        <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
+        <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+        
+        <!-- USER SECTION AT BOTTOM (above logout) -->
+        <div class="sidebar-user" id="sidebar-user">
+            <div class="sidebar-user-icon">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="sidebar-user-info">
+                <span class="sidebar-user-name" id="logged-in-user">Loading...</span>
+                <span class="sidebar-user-role" id="logged-in-role">...</span>
+            </div>
+        </div>
+        
+        <button class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
     </nav>
 
-    <main class="main-content branches-view-container">
-        <div class="page-header justify-content-center" style="flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                    <i class="bi bi-geo-alt-fill" style="font-size: 1.5rem; color: white;"></i>
-                </div>
-                <h1 style="margin: 0;">Deploy Security Personnel</h1>
+    <main class="main-content">
+        <!-- BREADCRUMB NAVIGATION -->
+        <div class="breadcrumb-nav">
+            <div class="breadcrumb-icon">
+                <i class="bi bi-send-check"></i>
             </div>
-            <p style="margin: 0; color: #64748b; font-size: 0.9rem;">Assign a hired guard to a facility for active duty.</p>
+            <a href="deployment.html" class="breadcrumb-item">
+                <i class="bi bi-geo-alt-fill"></i> Deployment
+            </a>
+            <span class="breadcrumb-separator"><i class="bi bi-chevron-right"></i></span>
+            <span class="breadcrumb-item active">
+                <i class="bi bi-plus-circle"></i> New Deployment
+            </span>
         </div>
 
-        <div class="form-card" style="position: relative; z-index: 1;">
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-send-check-fill"></i></div>
+            <div>
+                <h1>Deploy Personnel</h1>
+                <p>Assign cleared and hired guards to active facility locations.</p>
+            </div>
+        </div>
+
+        <div class="form-card stagger-2">
             <form id="deploy-form">
                 <!-- PREMIUM APPLICANT SELECTOR -->
                 <div class="form-group">
-                    <label><i class="bi bi-search" style="margin-right: 6px;"></i>Search Applicant (Hired Status)</label>
+                    <label><i class="bi bi-person-badge"></i> Search Cleared Applicant</label>
                     <div class="input-wrapper">
-                        <i class="bi bi-person-badge"></i>
+                        <i class="bi bi-search"></i>
                         <input type="text" id="applicant-search" class="form-input" placeholder="Start typing a name..." autocomplete="off">
                     </div>
                     <input type="hidden" id="applicant-id" required>
                     <div id="applicant-results" class="search-results" style="display: none;"></div>
-                    <div style="margin-top: 8px; font-size: 0.8rem; color: #64748b;">
-                        <i class="bi bi-info-circle" style="margin-right: 4px;"></i>Only applicants marked as "Hired" will appear.
+                    <div style="margin-top: 8px; font-size: 0.75rem; color: #94a3b8; font-weight: 600;">
+                        <i class="bi bi-info-circle-fill" style="margin-right: 4px; color:#cbd5e1;"></i>Only applicants marked as "Hired" will appear in this list.
                     </div>
                 </div>
 
                 <!-- PREMIUM BRANCH SELECTOR -->
-                <div class="form-group">
-                    <label><i class="bi bi-geo-alt" style="margin-right: 6px;"></i>Select Branch Location</label>
+                <div class="form-group" style="margin-top: 35px;">
+                    <label><i class="bi bi-building-fill-add"></i> Select Branch Location</label>
                     <div class="input-wrapper">
-                        <i class="bi bi-building"></i>
+                        <i class="bi bi-geo-alt"></i>
                         <select id="branch-select" class="form-select" required title="Select a branch location for deployment">
                             <option value="" disabled selected>Loading branches...</option>
                         </select>
                     </div>
+
+                    <!-- Facility Intel Preview -->
+                    <div id="facility-preview" class="facility-preview">
+                        <div class="facility-preview-header">
+                            <i class="bi bi-shield-check"></i> Facility Intelligence
+                        </div>
+                        <div class="facility-preview-body">
+                            <div class="facility-address">
+                                <i class="bi bi-map"></i> <span id="preview-address">--</span>
+                            </div>
+                            <div class="facility-status" id="preview-status">--</div>
+                        </div>
+                        <div class="facility-staffing" id="preview-staffing">
+                            <i class="bi bi-people-fill text-muted"></i> -- Guards Active
+                        </div>
+                    </div>
                 </div>
 
-                <div style="margin-top: 30px; display: grid; gap: 10px;">
+                <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <a href="deployment.html" class="btn-cancel">Cancel</a>
                     <button type="submit" id="deploy-btn" class="btn-deploy">
-                        <i class="bi bi-send-check"></i>
-                        <span>Confirm Deployment</span>
+                        <i class="bi bi-check2-circle" style="font-size: 1.2rem;"></i> Confirm Deployment
                     </button>
-                    <a href="deployment.html" class="btn btn-outline-custom text-center justify-content-center" style="width:100%;">Cancel</a>
                 </div>
             </form>
-        </div>
-
-        <!-- Facility Intel Preview -->
-        <div id="facility-preview" class="facility-preview">
-            <div class="facility-preview-header">
-                <i class="bi bi-shield-check"></i> Facility Intel
-            </div>
-            <div class="facility-preview-body">
-                <div class="facility-address" id="preview-address">--</div>
-                <div class="facility-status" id="preview-status">--</div>
-            </div>
-            <div class="facility-staffing" id="preview-staffing">-- Guards Active</div>
         </div>
     </main>
 
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
+    <script>
+        // Load logged in user info
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(localStorage.getItem('currentUser')) || {
+                username: 'admin',
+                role: 'Owner'
+            };
+            
+            const userNameEl = document.getElementById('logged-in-user');
+            const userRoleEl = document.getElementById('logged-in-role');
+            
+            if (userNameEl) userNameEl.textContent = userData.username || 'User';
+            if (userRoleEl) userRoleEl.textContent = userData.role || 'Staff';
+            
+            // Update icon based on role
+            const userIcon = document.querySelector('#sidebar-user .sidebar-user-icon i');
+            if (userIcon) {
+                if (userData.role === 'Owner' || userData.role === 'Admin') {
+                    userIcon.className = 'bi bi-shield-lock-fill';
+                } else {
+                    userIcon.className = 'bi bi-person-fill';
+                }
+            }
+        });
+    </script>
     <script src="js/deploy-form.js"></script>
 </body>
 </html>

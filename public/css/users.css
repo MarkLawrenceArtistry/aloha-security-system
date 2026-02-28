@@ -1,0 +1,194 @@
+        .main-content, .custom-modal-overlay {
+            font-family: 'Helvetica Text', 'Inter', sans-serif;
+            background-color: #f4f6f8;
+        }
+        .main-content h1, .main-content h2, .main-content h3, .main-content h4, 
+        #modal-title, .toolbar-title {
+            font-family: 'Helvetica Display', 'Inter', sans-serif;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .stagger-1 { animation: slideUpFade 0.5s ease-out 0.1s forwards; opacity: 0; }
+        .stagger-2 { animation: slideUpFade 0.5s ease-out 0.2s forwards; opacity: 0; }
+
+        /* --- PAGE HEADER --- */
+        .page-header-modern {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            border-left: 6px solid #e53828; /* Aloha Red */
+        }
+        .header-icon {
+            width: 55px; height: 55px;
+            background: #fef2f2; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: #e53828;
+        }
+        .page-header-modern h1 { color: #0f172a; margin: 0 0 5px 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+        .page-header-modern p { color: #64748b; margin: 0; font-size: 0.95rem; }
+
+        /* --- CONTENT WRAPPER & TOOLBAR --- */
+        .content-wrapper-modern {
+            border-radius: 16px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.03); 
+            border: 1px solid #e2e8f0; background: #ffffff; overflow: hidden;
+        }
+        
+        .toolbar-modern {
+            padding: 20px 25px; background: #ffffff; border-bottom: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        }
+        .toolbar-title {
+            font-size: 1.2rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 10px;
+        }
+        .toolbar-title i { color: #e53828; padding: 8px; background: #fef2f2; border-radius: 8px; font-size: 1.1rem; }
+
+        .btn-toolbar-add {
+            background: #10b981; color: white; padding: 0 20px; height: 45px;
+            border-radius: 10px; font-weight: 700; font-size: 0.95rem; border: none;
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-toolbar-add:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+
+        /* --- TABLE STYLES --- */
+        .table { margin: 0; width: 100%; border-collapse: collapse; background: #ffffff; }
+        .table th { 
+            background: #f8fafc; color: #475569; font-size: 0.75rem; 
+            padding: 16px 25px; text-transform: uppercase; font-weight: 800; border-bottom: 1px solid #e2e8f0; letter-spacing: 0.5px; text-align: left;
+        }
+        .table td { 
+            padding: 18px 25px; color: #334155; font-size: 0.9rem; font-weight: 500; 
+            border-bottom: 1px solid #f1f5f9; background: #ffffff; vertical-align: middle;
+        }
+        
+        .table tbody tr { transition: all 0.2s ease; position: relative; }
+        .table tbody tr:hover { 
+            background: #f8fafc; transform: scale(1.002); 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); z-index: 10;
+        }
+        
+        /* Left accent bar on hover */
+        .table tbody td:first-child { position: relative; }
+        .table tbody td:first-child::before {
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px;
+            background: #e53828; transform: scaleY(0); transition: 0.2s ease;
+        }
+        .table tbody tr:hover td:first-child::before { transform: scaleY(1); }
+
+        /* Ensure dynamically rendered buttons from users.js look good */
+        .table tbody button {
+            padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        }
+
+        /* --- MODERN USER MODAL OVERRIDE --- */
+        .custom-modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(5px); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        /* Uses wildcard to match whatever users.js applies (e.g. display: flex or block) */
+        .custom-modal-overlay[style*="display: block"],
+        .custom-modal-overlay[style*="display: flex"],
+        .custom-modal-overlay[style*="display:flex"] {
+            opacity: 1 !important; visibility: visible !important;
+        }
+
+        .modal-content-wrapper {
+            background: #ffffff !important; width: 100%; max-width: 450px !important;
+            border-radius: 20px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; padding: 0 !important;
+        }
+        
+        .custom-modal-overlay[style*="display: block"] .modal-content-wrapper,
+        .custom-modal-overlay[style*="display: flex"] .modal-content-wrapper,
+        .custom-modal-overlay[style*="display:flex"] .modal-content-wrapper {
+            transform: translateY(0);
+        }
+
+        .modal-header-premium {
+            padding: 25px 30px; border-bottom: 1px solid #f1f5f9; background: #ffffff;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header-premium h2 { margin: 0; font-size: 1.4rem; font-weight: 800; color: #0f172a; }
+        .btn-close-modal {
+            background: #f1f5f9; border: none; width: 35px; height: 35px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: 0.2s;
+        }
+        .btn-close-modal:hover { background: #fef2f2; color: #e53828; }
+
+        .modal-body-premium { padding: 25px 30px; }
+        
+        .form-group-premium { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .form-group-premium label { font-size: 0.8rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group-premium input, .form-group-premium select {
+            width: 100% !important; padding: 12px 15px !important; border: 1px solid #cbd5e1 !important; 
+            border-radius: 10px !important; font-size: 0.95rem !important; background: #f8fafc !important; 
+            transition: all 0.2s !important; outline: none; font-family: 'Helvetica Text', sans-serif;
+            color: #0f172a;
+        }
+        .form-group-premium input:focus, .form-group-premium select:focus {
+            border-color: #e53828 !important; background: #ffffff !important; box-shadow: 0 0 0 3px rgba(229, 56, 40, 0.1) !important;
+        }
+
+        .modal-footer-premium {
+            padding: 20px 30px; background: #f8fafc; border-top: 1px solid #f1f5f9;
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+        .btn-cancel-premium {
+            background: #ffffff !important; border: 1px solid #cbd5e1 !important; padding: 10px 20px !important; 
+            border-radius: 8px !important; font-size: 0.9rem !important; font-weight: 700 !important; 
+            color: #475569 !important; cursor: pointer !important; transition: 0.2s !important;
+        }
+        .btn-cancel-premium:hover { background: #f1f5f9 !important; color: #0f172a !important; }
+        
+        .btn-save-premium {
+            background: #10b981 !important; border: none !important; padding: 10px 25px !important; 
+            border-radius: 8px !important; font-size: 0.9rem !important; font-weight: 700 !important; 
+            color: white !important; cursor: pointer !important; transition: 0.2s !important;
+        }
+        .btn-save-premium:hover { background: #059669 !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2) !important; }
+
+        /* --- LOGOUT MODAL --- */
+        .custom-logout-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .custom-logout-overlay.active { opacity: 1; visibility: visible; }
+        
+        .custom-logout-box {
+            background: #ffffff; width: 100%; max-width: 400px; border-radius: 20px;
+            padding: 40px 30px; text-align: center; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px) scale(0.95); transition: all 0.3s ease;
+        }
+        .custom-logout-overlay.active .custom-logout-box { transform: translateY(0) scale(1); }
+        
+        .modal-icon-warning {
+            width: 60px; height: 60px; background: #fef2f2; color: #e53828; font-size: 2rem;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header-modern { flex-direction: column; text-align: center; padding: 20px; }
+            .toolbar-modern { flex-direction: column; align-items: stretch; }
+            .btn-toolbar-add { justify-content: center; }
+        }

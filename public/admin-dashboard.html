@@ -4,98 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Aloha Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
-    <style>
-        /* --- PREMIUM CSS BAR CHART --- */
-        .chart-container { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 30px; 
-            border: 1px solid #e2e8f0; 
-            height: 380px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-        .chart-title { 
-            font-weight: 800; 
-            margin-bottom: 25px; 
-            font-size: 1.15rem; 
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .chart-title i { color: #e53828; padding: 8px; background: #fef2f2; border-radius: 8px; font-size: 1rem;}
-        
-        .bars-wrapper { 
-            display: flex; 
-            align-items: flex-end; 
-            justify-content: space-around; 
-            height: 100%; 
-            border-bottom: 2px solid #cbd5e1; 
-            padding-bottom: 10px; 
-            position: relative;
-        }
-        
-        /* Subtle Grid Lines */
-        .bars-wrapper::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(to bottom, transparent, transparent calc(20% - 1px), #f1f5f9 calc(20%), transparent calc(20% + 1px));
-            z-index: 0;
-        }
-
-        .bar-group { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; width: 45px; z-index: 1; }
-        
-        .bar-bg { 
-            width: 100%; 
-            background: rgba(241, 245, 249, 0.4); 
-            border-radius: 6px 6px 0 0; 
-            height: 220px; /* Fixed height for scale */
-            position: relative; 
-            display: flex; 
-            align-items: flex-end; 
-            border: 1px dashed #cbd5e1;
-            border-bottom: none;
-        }
-        
-        .bar { 
-            width: 100%; 
-            background: linear-gradient(180deg, #e53828 0%, #b91c1c 100%); 
-            border-radius: 4px 4px 0 0; 
-            position: relative; 
-            transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            min-height: 5px; 
-            box-shadow: 0 -4px 12px rgba(229, 56, 40, 0.25);
-        }
-        .bar:hover { filter: brightness(1.15); cursor: pointer; }
-        .bar-label { margin-top: 12px; font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-        
-        /* Tooltip hack */
-        .bar::after {
-            content: attr(title);
-            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 4px 8px; border-radius: 4px;
-            font-size: 0.75rem; font-weight: 700; opacity: 0; transition: 0.2s; pointer-events: none;
-            white-space: nowrap;
-        }
-        .bar:hover::after { opacity: 1; top: -35px; }
-
-        /* Custom Table Header for Dashboard */
-        .dash-table-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid #f1f5f9;
-            background: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .dash-table-header h4 { margin: 0; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
-    </style>
+    <link rel="stylesheet" href="css/admin-dashboard.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -116,62 +28,63 @@
         <div class="sidebar-category">System</div>
         <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
         <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+        
+        <!-- ID preserved for backend logic interception -->
         <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Dashboard Overview</h1>
+        
+        <!-- Premium Hero Section -->
+        <div class="dashboard-hero stagger-1">
+            <div class="hero-content">
+                <div class="hero-title">
+                    <h1>Dashboard Analytics</h1>
+                    <p>Here is the latest intelligence on agency operations.</p>
+                </div>
+                <div class="date-badge">
+                    <i class="bi bi-calendar3"></i> <span id="current-date-display">Today</span>
+                </div>
+            </div>
+
+            <!-- Health Dock -->
+            <div class="system-health-dock">
+                <div class="health-pill">
+                    <i class="bi bi-activity" style="color: #60a5fa;"></i>
+                    <div class="health-info">
+                        <span class="label">Server Uptime</span>
+                        <span id="sh-uptime" class="val">--h --m</span>
+                    </div>
+                </div>
+                
+                <div class="health-pill">
+                    <i class="bi bi-database" style="color: #34d399;"></i>
+                    <div class="health-info">
+                        <span class="label">Database Size</span>
+                        <span id="sh-dbsize" class="val">-- MB</span>
+                    </div>
+                </div>
+                
+                <div class="health-pill">
+                    <i class="bi bi-cloud-arrow-up" style="color: #a78bfa;"></i>
+                    <div class="health-info">
+                        <span class="label">Last Backup</span>
+                        <span id="sh-backup" class="val">--</span>
+                    </div>
+                </div>
+
+                <div class="health-pill maintenance-pill">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <div class="health-info">
+                        <span class="label" style="color: #fca5a5;">Next Maintenance <span class="maintenance-pulse"></span></span>
+                        <span id="sh-maintenance" class="val" style="color: #ffffff;">--</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="system-health-bar" style="background: white; border-radius: 12px; padding: 20px 25px; margin-bottom: 30px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 30px; align-items: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);">
-            <div style="display:flex; align-items:center; gap:15px; flex: 1; min-width: 200px;">
-                <div style="background: #ecfdf5; padding: 12px; border-radius: 12px; color: #10b981; display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-activity" style="font-size:1.6rem;"></i>
-                </div>
-                <div>
-                    <div style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Server Uptime</div>
-                    <div id="sh-uptime" style="font-weight:800; color:#0f172a; font-size:1.15rem; margin-top:2px;">--h --m</div>
-                </div>
-            </div>
-            
-            <div style="width:1px; height:40px; background:#e2e8f0;" class="d-none d-md-block"></div>
-            
-            <div style="display:flex; align-items:center; gap:15px; flex: 1; min-width: 200px;">
-                <div style="background: #eff6ff; padding: 12px; border-radius: 12px; color: #3b82f6; display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-database" style="font-size:1.6rem;"></i>
-                </div>
-                <div>
-                    <div style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Database Size</div>
-                    <div id="sh-dbsize" style="font-weight:800; color:#0f172a; font-size:1.15rem; margin-top:2px;">-- MB</div>
-                </div>
-            </div>
-
-            <div style="width:1px; height:40px; background:#e2e8f0;" class="d-none d-md-block"></div>
-            
-            <div style="display:flex; align-items:center; gap:15px; flex: 1; min-width: 200px;">
-                <div style="background: #fffbeb; padding: 12px; border-radius: 12px; color: #f59e0b; display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-clock-history" style="font-size:1.6rem;"></i>
-                </div>
-                <div>
-                    <div style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Last Auto-Backup</div>
-                    <div id="sh-backup" style="font-weight:800; color:#0f172a; font-size:1.15rem; margin-top:2px;">--</div>
-                </div>
-            </div>
-
-            <div style="display:flex; align-items:center; gap:15px; flex: 1; min-width: 150px;" title="Time until next Backup & Log Deletion run">
-                <div style="background: #fef2f2; padding: 12px; border-radius: 12px; color: #ef4444; display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-arrow-repeat" style="font-size:1.6rem;"></i>
-                </div>
-                <div>
-                    <div style="font-size:0.7rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Next Maintenance</div>
-                    <div id="sh-maintenance" style="font-weight:800; color:#0f172a; font-size:1rem; margin-top:2px;">--</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- REFINED KPI CARDS -->
-        <div class="stats-grid">
+        <!-- KPI Cards -->
+        <div class="stats-grid stagger-2">
             <div class="stat-card">
                 <i class="bi bi-people-fill bg-icon"></i>
                 <div class="stat-number" id="dash-total">-</div>
@@ -189,18 +102,22 @@
             </div>
         </div>
 
-        <!-- REFINED CHART -->
-        <div class="chart-container">
-            <div class="chart-title"><i class="bi bi-bar-chart-fill"></i> Application Volume (Last 6 Months)</div>
+        <!-- Chart -->
+        <div class="chart-container stagger-3">
+            <div class="chart-title">
+                <div class="icon-box"><i class="bi bi-bar-chart-fill"></i></div>
+                Application Volume (6 Months)
+            </div>
             <div class="bars-wrapper" id="chart-bars">
-                <!-- Bars injected via JS -->
+                <!-- Bars injected via backend JS -->
             </div>
         </div>
 
-        <!-- REFINED TABLE -->
-        <div class="table-container">
+        <!-- Table -->
+        <div class="table-container stagger-4">
             <div class="dash-table-header">
-                <i class="bi bi-clock-history text-danger"></i> <h4>Recent Applications</h4>
+                <div class="icon-box"><i class="bi bi-clock-history"></i></div>
+                <h4>Recent Applications</h4>
             </div>
             <div class="table-responsive">
                 <table class="table">
@@ -213,12 +130,81 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="recent-body"></tbody>
+                    <tbody id="recent-body">
+                        <!-- Table Data injected via backend JS -->
+                    </tbody>
                 </table>
             </div>
         </div>
     </main>
 
+    <!-- LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title">Sign Out?</h3>
+            <p class="custom-modal-text">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Cancel</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backend Script (Unmodified) -->
     <script src="js/admin.js"></script>
+
+    <!-- UI/UX Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set dynamic date in Hero Header
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateEl = document.getElementById('current-date-display');
+            if(dateEl) dateEl.innerText = new Date().toLocaleDateString('en-US', dateOptions);
+
+            // 1. Intercept Logout Safely
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                // Clone node to strip preexisting listeners from js/admin.js
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            // Cancel button
+            cancelBtn.addEventListener('click', () => {
+                logoutModal.classList.remove('active');
+            });
+
+            // Confirm button (Executes original logout logic with animation)
+            confirmBtn.addEventListener('click', () => {
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display: inline-block;"></i> Signing Out...';
+                confirmBtn.style.opacity = '0.8';
+                confirmBtn.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html';
+                }, 600);
+            });
+
+            // Close on outside click
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) {
+                    logoutModal.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Aloha Security</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
-    <style>
-        /* Tabs Styling */
-        .settings-tabs { display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 30px; }
-        .tab-btn { padding: 10px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #666; }
-        .tab-btn.active { border-color: #e53828; color: #e53828; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .backup-card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; }
-    </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -42,126 +32,262 @@
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Settings</h1>
-        </div>
-
-        <div class="settings-tabs">
-            <button class="tab-btn active" onclick="switchTab('profile')">My Profile</button>
-            <button class="tab-btn" onclick="switchTab('system')" id="system-tab-btn">System Maintenance</button>
-            <button class="tab-btn" onclick="switchTab('email')">Email Notifications</button>
-        </div>
-
-        <!-- TAB 1: PROFILE -->
-        <div id="tab-profile" class="tab-content active" style="max-width: 600px;">
-            <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid #ddd;">
-                <form id="settings-form">
-                    <h4 class="mb-3">Security Settings</h4>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Current Password</label>
-                        <input type="password" id="curr-pass" required class="search-input" style="width:100%;">
-                    </div>
-                    <div style="margin-bottom: 30px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">New Password</label>
-                        <input type="password" id="new-pass" placeholder="Optional" class="search-input" style="width:100%;">
-                    </div>
-
-                    <h4 class="mb-3">Recovery Question</h4>
-                    <div style="margin-bottom: 15px;">
-                        <select id="sec-q" class="search-input" style="width:100%; height: 45px;">
-                            <option value="">Select a question...</option>
-                            <option value="What is the name of your first pet?">What is the name of your first pet?</option>
-                            <option value="What city were you born in?">What city were you born in?</option>
-                            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                            <option value="What is the agency name?">What is the agency name?</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" id="sec-a" placeholder="Answer" class="search-input" style="width:100%;">
-                    </div>
-
-                    <button type="submit" class="btn-hire" style="border:none;">Save Changes</button>
-                </form>
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-gear-fill"></i></div>
+            <div>
+                <h1>System Settings</h1>
+                <p>Configure your security system parameters and account preferences.</p>
             </div>
         </div>
 
-        <!-- TAB 2: SYSTEM (Backup/Restore) -->
-        <div id="tab-system" class="tab-content" style="max-width: 600px;">
-            <div class="backup-card" style="border-color: #9f7aea; background: #faf5ff;">
-                <h4 style="color: #6b46c1;"><i class="bi bi-cpu-fill"></i> Run Maintenance Routines</h4>
-                <p class="text-muted small">Manually trigger the Cron Jobs (Deletes rejected apps > 72hrs, and audit logs > 1yr) without waiting for midnight.</p>
-                <button onclick="triggerMaintenance()" class="btn-hire" style="background:#805ad5;">Execute Maintenance Now</button>
+        <!-- Settings Container -->
+        <div class="settings-container stagger-2">
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="tab-btn active" onclick="switchTab('profile', this)">
+                    <i class="bi bi-person-circle"></i> My Profile
+                </button>
+                <button class="tab-btn" onclick="switchTab('system', this)" id="system-tab-btn">
+                    <i class="bi bi-cpu"></i> System Maintenance
+                </button>
+                <button class="tab-btn" onclick="switchTab('email', this)">
+                    <i class="bi bi-envelope"></i> Email Notifications
+                </button>
             </div>
 
-            <!-- Backup Section -->
-            <div class="backup-card">
-                <h4><i class="bi bi-cloud-download-fill"></i> Backup Data</h4>
-                <p class="text-muted small">Download a ZIP file containing the Database and all Uploaded Documents.</p>
-                <button onclick="downloadBackup()" class="btn-hire" style="background:#2b6cb0;">Download Backup</button>
-            </div>
-
-            <!-- Restore Section -->
-            <div class="backup-card" style="border-color: #fbd38d; background: #fffaf0;">
-                <h4 style="color: #c05621;"><i class="bi bi-cloud-upload-fill"></i> Restore Data</h4>
-                <p class="text-muted small">
-                    <strong>WARNING:</strong> This will overwrite the current database and files. 
-                    Ensure no one else is using the system.
-                </p>
-                
-                <form id="restore-form">
-                    <input type="file" id="backup-file" accept=".zip" required style="margin-bottom: 15px;">
-                    <button type="submit" class="btn-reject" style="font-size: 0.9rem;">Upload & Restore</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Add this new Tab Content div -->
-        <div id="tab-email" class="tab-content" style="max-width: 600px;">
-            <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid #ddd;">
-                <h4 class="mb-3">Brevo Sender Configuration</h4>
-                <p class="text-muted small mb-4">Ensure your API Key is set in the .env file. Use this form to set the visible sender.</p>
-                
-                <form id="email-settings-form">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Sender Name</label>
-                        <input type="text" id="sender-name" class="search-input" style="width:100%;" placeholder="e.g. Aloha HR">
+            <!-- TAB 1: PROFILE -->
+            <div id="tab-profile" class="tab-content active">
+                <div class="settings-card">
+                    <div class="section-title">
+                        <i class="bi bi-shield-lock"></i> Security Settings
                     </div>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:600;">Sender Email</label>
-                        <input type="email" id="sender-email" class="search-input" style="width:100%;" placeholder="e.g. hr@alohasecurity.com">
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="curr-pass" required placeholder="Enter your current password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="new-pass" placeholder="Leave blank to keep current">
+                        </div>
+
+                        <div class="section-title" style="margin-top: 30px;">
+                            <i class="bi bi-question-circle"></i> Recovery Question
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Select Security Question</label>
+                            <select id="sec-q">
+                                <option value="">Choose a question...</option>
+                                <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+                                <option value="What city were you born in?">What city were you born in?</option>
+                                <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                <option value="What elementary school did you attend?">What elementary school did you attend?</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Answer</label>
+                            <input type="text" id="sec-a" placeholder="Your answer">
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <i class="bi bi-check-circle-fill"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 2: SYSTEM MAINTENANCE -->
+            <div id="tab-system" class="tab-content">
+                <div style="max-width: 600px;">
+                    <!-- Maintenance Card -->
+                    <div class="backup-card maintenance-card">
+                        <h4 style="color: #8b5cf6;">
+                            <i class="bi bi-cpu-fill" style="color: #8b5cf6;"></i> Run Maintenance Routines
+                        </h4>
+                        <p>Manually trigger cleanup tasks: Deletes rejected applications older than 72 hours and audit logs older than 1 year.</p>
+                        <button onclick="triggerMaintenance()" class="btn-warning">
+                            <i class="bi bi-play-fill"></i> Execute Maintenance Now
+                        </button>
                     </div>
-                    <button type="submit" class="btn-hire" style="border:none;">Save Configuration</button>
-                </form>
+
+                    <!-- Backup Card -->
+                    <div class="backup-card backup-card-download">
+                        <h4 style="color: #3b82f6;">
+                            <i class="bi bi-cloud-download-fill" style="color: #3b82f6;"></i> Backup Data
+                        </h4>
+                        <p>Download a complete system backup including database and all uploaded documents.</p>
+                        <button onclick="downloadBackup()" class="btn-secondary">
+                            <i class="bi bi-download"></i> Download Backup
+                        </button>
+                    </div>
+
+                    <!-- Restore Card -->
+                    <div class="backup-card backup-card-restore">
+                        <h4 style="color: #f59e0b;">
+                            <i class="bi bi-cloud-upload-fill" style="color: #f59e0b;"></i> Restore Data
+                        </h4>
+                        <p class="warning-text"><i class="bi bi-exclamation-triangle-fill"></i> WARNING: This will overwrite current database and files. Ensure no one else is using the system.</p>
+                        
+                        <form id="restore-form">
+                            <input type="file" id="backup-file" accept=".zip" class="file-input">
+                            <button type="submit" class="btn-danger">
+                                <i class="bi bi-upload"></i> Upload & Restore
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: EMAIL NOTIFICATIONS -->
+            <div id="tab-email" class="tab-content">
+                <div class="settings-card">
+                    <div class="section-title">
+                        <i class="bi bi-envelope-paper"></i> Brevo Sender Configuration
+                    </div>
+                    <p class="small text-muted" style="margin-bottom: 25px;">Configure the sender details for all system emails. API key must be set in .env file.</p>
+                    
+                    <form id="email-settings-form">
+                        <div class="form-group">
+                            <label>Sender Name</label>
+                            <input type="text" id="sender-name" placeholder="e.g. Aloha Security HR">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Sender Email</label>
+                            <input type="email" id="sender-email" placeholder="e.g. hr@alohasecurity.com">
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="bi bi-save"></i> Save Configuration
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 style="font-family: 'Helvetica Display', sans-serif; font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Sign Out?</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 30px;">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/admin.js"></script>
     <script>
-        // Check RBAC for Tab Visibility
+        // =========================================================
+        // SETTINGS PAGE LOGIC
+        // =========================================================
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Check RBAC for System Tab visibility
             const role = localStorage.getItem('admin_role');
-            if(!(role == 'Admin' || role == 'Owner')) {
-                document.getElementById('system-tab-btn').style.display = 'none';
+            const systemTab = document.getElementById('system-tab-btn');
+            if (systemTab && role !== 'Admin' && role !== 'Owner') {
+                systemTab.style.display = 'none';
+            }
+
+            // Load email settings
+            loadEmailSettings();
+
+            // =========================================================
+            // LOGOUT INTERCEPTION
+            // =========================================================
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    logoutModal.classList.remove('active');
+                });
+            }
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Signing Out...';
+                    confirmBtn.style.opacity = '0.8';
+                    confirmBtn.style.pointerEvents = 'none';
+                    
+                    setTimeout(() => {
+                        localStorage.removeItem('admin_token');
+                        window.location.href = 'login.html';
+                    }, 500);
+                });
+            }
+
+            if (logoutModal) {
+                logoutModal.addEventListener('click', (e) => {
+                    if (e.target === logoutModal) logoutModal.classList.remove('active');
+                });
             }
         });
 
-        // Tab Switcher
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        // =========================================================
+        // TAB SWITCHING
+        // =========================================================
+        function switchTab(tabName, element) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
             
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected tab content
             document.getElementById(`tab-${tabName}`).classList.add('active');
-            event.target.classList.add('active');
+            
+            // Add active class to clicked tab
+            element.classList.add('active');
         }
 
-        // 1. Profile Update Logic
+        // =========================================================
+        // PROFILE UPDATE
+        // =========================================================
         document.getElementById('settings-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const curr = document.getElementById('curr-pass').value;
-            const newP = document.getElementById('new-pass').value;
-            const q = document.getElementById('sec-q').value;
-            const a = document.getElementById('sec-a').value;
+            
+            const currPass = document.getElementById('curr-pass').value;
+            const newPass = document.getElementById('new-pass').value;
+            const secQ = document.getElementById('sec-q').value;
+            const secA = document.getElementById('sec-a').value;
+
+            // Validate current password is provided
+            if (!currPass) {
+                alert('Current password is required');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Saving...';
+            submitBtn.disabled = true;
 
             try {
                 const res = await fetch('/api/auth/update-profile', {
@@ -171,34 +297,47 @@
                         'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
                     },
                     body: JSON.stringify({ 
-                        currentPassword: curr,
-                        newPassword: newP,
-                        newQuestion: q,
-                        newAnswer: a
+                        currentPassword: currPass,
+                        newPassword: newPass || null,
+                        newQuestion: secQ || null,
+                        newAnswer: secA || null
                     })
                 });
+                
                 const json = await res.json();
-                if(json.success) {
+                
+                if (json.success) {
                     alert('Profile updated successfully!');
                     document.getElementById('settings-form').reset();
                 } else {
-                    alert('Error: ' + json.data);
+                    alert('Error: ' + (json.data || 'Update failed'));
                 }
-            } catch(err) { alert('Connection error'); }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                console.error(err);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
-        // 2. Download Backup Logic
+        // =========================================================
+        // DOWNLOAD BACKUP
+        // =========================================================
         async function downloadBackup() {
             const token = localStorage.getItem('admin_token');
-            // Can't use fetch for file download easily, use window.open with token?
-            // Since API is protected, we need to pass token. 
-            // Standard approach: fetch -> blob -> objectUrl -> a.click
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Preparing...';
+            btn.disabled = true;
+
             try {
                 const res = await fetch('/api/system/backup', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
-                if(res.status === 200) {
+                if (res.status === 200) {
                     const blob = await res.blob();
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -206,25 +345,43 @@
                     a.download = `aloha_backup_${new Date().toISOString().slice(0,10)}.zip`;
                     document.body.appendChild(a);
                     a.click();
+                    window.URL.revokeObjectURL(url);
                     a.remove();
                 } else {
-                    alert("Backup failed. Only Admins can perform this action.");
+                    const error = await res.json();
+                    alert(error.data || 'Backup failed. Only Admins can perform this action.');
                 }
-            } catch(err) { console.error(err); alert("Download error"); }
+            } catch (err) {
+                alert('Download failed. Please try again.');
+                console.error(err);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
-        // 3. Restore Logic
+        // =========================================================
+        // RESTORE BACKUP
+        // =========================================================
         document.getElementById('restore-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!confirm("DANGER: This will delete current data and replace it with the backup. Continue?")) return;
+            
+            if (!confirm('⚠️ DANGER: This will completely replace your current database and files with the backup. This action cannot be undone. Continue?')) {
+                return;
+            }
 
             const fileInput = document.getElementById('backup-file');
+            if (!fileInput.files[0]) {
+                alert('Please select a backup file to restore.');
+                return;
+            }
+
             const formData = new FormData();
             formData.append('backup_file', fileInput.files[0]);
 
             const btn = e.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "Restoring... (Do not close)";
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Restoring...';
             btn.disabled = true;
 
             try {
@@ -233,68 +390,121 @@
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` },
                     body: formData
                 });
+                
                 const json = await res.json();
 
-                if(json.success) {
-                    alert("Restore Successful! The page will now reload.");
-                    location.reload();
+                if (json.success) {
+                    alert('✅ Restore successful! The system will now reload.');
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    alert("Restore Failed: " + json.data);
+                    alert('Restore failed: ' + (json.data || 'Unknown error'));
                 }
-            } catch(err) {
-                alert("Restore failed. Server might be restarting.");
+            } catch (err) {
+                alert('Restore failed. Server might be restarting.');
                 console.error(err);
             } finally {
-                btn.innerText = originalText;
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         });
 
+        // =========================================================
+        // LOAD EMAIL SETTINGS
+        // =========================================================
         async function loadEmailSettings() {
-            const res = await fetch('/api/system/email-settings', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
-            });
-            const json = await res.json();
-            if(json.success) {
-                document.getElementById('sender-name').value = json.data.sender_name;
-                document.getElementById('sender-email').value = json.data.sender_email;
+            try {
+                const res = await fetch('/api/system/email-settings', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+                });
+                
+                const json = await res.json();
+                if (json.success && json.data) {
+                    document.getElementById('sender-name').value = json.data.sender_name || '';
+                    document.getElementById('sender-email').value = json.data.sender_email || '';
+                }
+            } catch (err) {
+                console.error('Failed to load email settings:', err);
             }
         }
-        
-        // Call it
-        loadEmailSettings();
 
+        // =========================================================
+        // SAVE EMAIL SETTINGS
+        // =========================================================
+        document.getElementById('email-settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const senderName = document.getElementById('sender-name').value;
+            const senderEmail = document.getElementById('sender-email').value;
 
+            if (!senderName || !senderEmail) {
+                alert('Both sender name and email are required');
+                return;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/system/email-settings', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${localStorage.getItem('admin_token')}` 
+                    },
+                    body: JSON.stringify({ 
+                        sender_name: senderName, 
+                        sender_email: senderEmail 
+                    })
+                });
+                
+                if (res.ok) {
+                    alert('Email settings saved successfully!');
+                } else {
+                    const error = await res.json();
+                    alert('Error: ' + (error.data || 'Failed to save'));
+                }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                console.error(err);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // =========================================================
+        // TRIGGER MAINTENANCE
+        // =========================================================
         async function triggerMaintenance() {
-            if(!confirm("Run background cleanup tasks now?")) return;
+            if (!confirm('Run system maintenance tasks now? This will delete old records.')) return;
+            
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Running...';
+            btn.disabled = true;
+
             try {
                 const res = await fetch('/api/system/trigger-cron', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
                 });
+                
                 const json = await res.json();
-                if(json.success) alert(json.data);
-                else alert("Error: " + json.data);
-            } catch(err) { alert('Connection error'); }
+                if (json.success) {
+                    alert(json.data || 'Maintenance completed successfully');
+                } else {
+                    alert('Error: ' + (json.data || 'Maintenance failed'));
+                }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                console.error(err);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
-
-        // Handle Form Submit
-        document.getElementById('email-settings-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const sender_name = document.getElementById('sender-name').value;
-            const sender_email = document.getElementById('sender-email').value;
-
-            const res = await fetch('/api/system/email-settings', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${localStorage.getItem('admin_token')}` 
-                },
-                body: JSON.stringify({ sender_name, sender_email })
-            });
-            
-            if(res.ok) alert("Email settings saved!");
-        });
     </script>
 </body>
 </html>

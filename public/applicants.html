@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Applicants - Aloha Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/applicants.css">
 </head>
 <body>
     <nav class="sidebar">
@@ -32,15 +32,22 @@
     </nav>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Applicants</h1>
+        
+        <!-- Premium Header -->
+        <div class="page-header-modern stagger-1">
+            <div class="header-icon"><i class="bi bi-person-lines-fill"></i></div>
+            <div>
+                <h1>Applicant Tracking</h1>
+                <p>Manage recruitment pipelines, reviews, and candidate processing.</p>
+            </div>
         </div>
 
-        <div class="stats-grid">
+        <!-- KPI Stats Grid -->
+        <div class="stats-grid stagger-2">
             <div class="stat-card">
                 <i class="bi bi-people-fill bg-icon"></i>
                 <div class="stat-number" id="kpi-total">-</div>
-                <div class="stat-label">Total</div>
+                <div class="stat-label">Total Applicants</div>
             </div>
             <div class="stat-card">
                 <i class="bi bi-gender-male bg-icon"></i>
@@ -59,9 +66,11 @@
             </div>
         </div>
 
-        <!-- NEW TABLE CONTAINER STRUCTURE -->
-        <div class="table-container">
-            <div class="toolbar">
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper-modern stagger-3">
+            
+            <!-- Toolbar -->
+            <div class="toolbar-modern">
                 <div class="toolbar-left">
                     <input type="text" id="search-input" class="search-input" placeholder="Search name or position...">
                     <select id="sort-select" class="sort-select" title="Sort applicants by date">
@@ -72,24 +81,25 @@
                 
                 <!-- BUTTON GROUP FOR DELETION -->
                 <div id="delete-actions" style="display: none; gap: 10px;">
-                    <button id="btn-delete-standard" class="btn-reject" style="padding: 8px 12px; font-size: 0.85rem;">
-                        <i class="bi bi-person-x-fill"></i> Delete Applicant
+                    <button id="btn-delete-standard" class="btn-reject" style="padding: 10px 16px; font-size: 0.85rem; background: #e53828;">
+                        <i class="bi bi-person-x-fill"></i> Delete Selected
                     </button>
-                    <button id="btn-delete-force" class="btn-reject" style="padding: 8px 12px; font-size: 0.85rem; background: #742a2a; border-color: #742a2a; color: white;">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Delete w/ Deployments
+                    <button id="btn-delete-force" class="btn-reject" style="padding: 10px 16px; font-size: 0.85rem; background: #7f1d1d; color: white;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Force Delete (Deployed)
                     </button>
                 </div>
             </div>
 
+            <!-- Filter Chips -->
             <div class="filter-container" id="filter-chips">
                 <div class="filter-chip active" data-filter="">
-                    <i class="bi bi-grid-fill"></i> All
+                    <i class="bi bi-grid-fill"></i> All Applicants
                 </div>
                 <div class="filter-chip" data-filter="Pending">
                     <i class="bi bi-hourglass-split"></i> Pending
                 </div>
                 <div class="filter-chip" data-filter="For Interview">
-                    <i class="bi bi-calendar-event"></i> Interview
+                    <i class="bi bi-calendar-event"></i> For Interview
                 </div>
                 <div class="filter-chip" data-filter="Hired">
                     <i class="bi bi-check-circle-fill"></i> Hired
@@ -99,36 +109,88 @@
                 </div>
             </div>
 
-            <!-- SELECT ALL BAR (For Multi-Delete) -->
-            <div style="padding: 10px 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;">
-                <label for="check-all" style="font-size: 0.85rem; font-weight: 700; color: #64748b; cursor: pointer;">Select All Applicants on Page</label>
+            <!-- SELECT ALL BAR -->
+            <div class="select-all-bar">
+                <input type="checkbox" id="check-all">
+                <label for="check-all">Select All Candidates on Page</label>
             </div>
 
-            <!-- THE TACTICAL GRID -->
+            <!-- THE TACTICAL GRID (Populated by JS) -->
             <div class="facility-grid" id="applicants-grid">
-                <!-- Cards injected here -->
+                <!-- Cards injected here via JS -->
             </div>
 
-            <!-- Hidden table to keep your multi-delete logic working without breaking -->
+            <!-- Hidden table to keep multi-delete logic working without breaking -->
             <table style="display:none;"><tbody id="applicants-body"></tbody></table>
 
+            <!-- Pagination -->
             <div class="pagination-container">
-                <span id="page-info" class="text-muted small">Loading...</span>
-                <div class="d-flex gap-2">
-                    <button id="prev-btn" class="btn-outline-custom" disabled>&lt;</button>
-                    <button id="next-btn" class="btn-outline-custom" disabled>&gt;</button>
+                <span id="page-info">Loading...</span>
+                <div style="display:flex; gap:10px;">
+                    <button id="prev-btn" class="btn-outline-custom" disabled><i class="bi bi-chevron-left"></i> Prev</button>
+                    <button id="next-btn" class="btn-outline-custom" disabled>Next <i class="bi bi-chevron-right"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="custom-logout-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning">
+                <i class="bi bi-power"></i>
+            </div>
+            <h3 class="custom-modal-title">Sign Out?</h3>
+            <p class="custom-modal-text">You are about to securely log out of the Aloha Security administrative terminal.</p>
+            <div class="custom-modal-actions">
+                <button id="cancel-logout" class="btn-modal-cancel">Stay Logged In</button>
+                <button id="confirm-logout" class="btn-modal-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backend Logic Scripts -->
     <script src="js/admin.js"></script>
     <script src="js/applicants.js"></script>
+    
+    <!-- UI/UX Intercept Script -->
     <script>
-        document.getElementById('logout-btn').addEventListener('click', () => {
-             localStorage.removeItem('admin_token');
-             window.location.href = 'login.html';
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Intercept Logout Safely ---
+            const logoutSidebarBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('custom-logout-modal');
+            const confirmBtn = document.getElementById('confirm-logout');
+            const cancelBtn = document.getElementById('cancel-logout');
+
+            if (logoutSidebarBtn) {
+                // Clone node to strip preexisting listeners from js/admin.js or original HTML
+                const newLogoutBtn = logoutSidebarBtn.cloneNode(true);
+                logoutSidebarBtn.parentNode.replaceChild(newLogoutBtn, logoutSidebarBtn);
+
+                newLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            }
+
+            cancelBtn.addEventListener('click', () => {
+                logoutModal.classList.remove('active');
+            });
+
+            confirmBtn.addEventListener('click', () => {
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display: inline-block;"></i> Signing Out...';
+                confirmBtn.style.opacity = '0.8';
+                confirmBtn.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) logoutModal.classList.remove('active');
+            });
         });
     </script>
 </body>
