@@ -5,11 +5,12 @@ const authController = require('../controllers/authController');
 const upload = require('../middleware/upload');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
 const { applicationLimiter, loginLimiter, otpLimiter } = require('../middleware/rateLimiter');
+const fileGate = require('../middleware/fileGate'); 
 
 const uploadFields = upload.fields([{ name: 'resume', maxCount: 1 }, { name: 'id_image', maxCount: 1 }]);
 
 // Public Routes
-router.post('/apply', applicationLimiter, uploadFields, applicantController.apply);
+router.post('/apply', applicationLimiter, uploadFields, fileGate, applicantController.apply);
 router.get('/status', applicantController.checkStatus);
 router.post('/auth/login', loginLimiter, authController.login);
 router.get('/dashboard-stats', verifyToken, applicantController.getDashboardStats);
@@ -18,7 +19,7 @@ router.get('/dashboard-stats', verifyToken, applicantController.getDashboardStat
 router.get('/applicants', verifyToken, applicantController.getAllApplicants);
 router.put('/applicants/:id/status', verifyToken, applicantController.updateStatus);
 router.delete('/applicants/:id', verifyToken, verifyAdmin, applicantController.deleteApplicant);
-router.post('/applicants/direct-hire', verifyToken, verifyAdmin, uploadFields, applicantController.directHire);
+router.post('/applicants/direct-hire', verifyToken, verifyAdmin, uploadFields, fileGate, applicantController.directHire);
 
 router.get('/applicants/:id/pdf', verifyToken, verifyAdmin, applicantController.exportApplicantPdf);
 

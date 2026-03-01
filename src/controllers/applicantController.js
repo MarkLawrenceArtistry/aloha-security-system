@@ -74,19 +74,39 @@ const apply = async (req, res) => {
             return res.status(409).json({success:false, data:"An application with this email address already exists."});
         }
 
+        const resumeHash = req.files['resume'][0].fileHash;
+        const idHash = req.files['id_image'][0].fileHash;
+
+        const existingFile = await get(
+            "SELECT id FROM applicants WHERE resume_hash = ? OR id_image_hash = ?", 
+            [resumeHash, idHash]
+        );
+
+        if (existingFile) {
+            // Delete the files from disk since we are rejecting them
+            fs.unlinkSync(req.files['resume'][0].path);
+            fs.unlinkSync(req.files['id_image'][0].path);
+            return res.status(409).json({
+                success:false, 
+                data: "SECURITY ALERT: These exact documents have already been submitted to our system. Duplicate applications are not allowed."
+            });
+        }
+
         // 4. Insert to DB
         const result = await run(`
             INSERT INTO applicants (
                 first_name, last_name, email, contact_num, 
                 birthdate, gender, address, position_applied, 
                 years_experience, previous_employer, 
-                resume_path, id_image_path, ip_address 
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                resume_path, id_image_path, ip_address,
+                resume_hash, id_image_hash
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
             first_name, last_name, email, contact_num, 
             birthdate, gender, address, position_applied, 
             years_experience, previous_employer, 
-            resumePath, idImagePath, ip_address // <--- Pass the IP variable here
+            resumePath, idImagePath, ip_address,
+            resumeHash, idHash // <--- Add the hashes here
         ]);
 
         if (req.io) {
@@ -474,17 +494,27 @@ const directHire = async (req, res) => {
         // Files are optional for Admin Direct Imports
         let resumePath = null;
         let idImagePath = null;
-        if (req.files && req.files['resume']) resumePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['resume'][0].filename}`;
-        if (req.files && req.files['id_image']) idImagePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['id_image'][0].filename}`;
+        let resumeHash = null;
+        let idHash = null;
+
+        if (req.files && req.files['resume']) {
+            resumePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['resume'][0].filename}`;
+            resumeHash = req.files['resume'][0].fileHash;
+        }
+        if (req.files && req.files['id_image']) {
+            idImagePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['id_image'][0].filename}`;
+            idHash = req.files['id_image'][0].fileHash;
+        }
 
         const result = await run(`
             INSERT INTO applicants (
                 first_name, last_name, email, contact_num, birthdate, gender, address, position_applied, 
-                years_experience, previous_employer, status, resume_path, id_image_path, ip_address 
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Hired', ?, ?, 'Admin_Import')
+                years_experience, previous_employer, status, resume_path, id_image_path, ip_address,
+                resume_hash, id_image_hash
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Hired', ?, ?, 'Admin_Import', ?, ?)
         `, [
             first_name, last_name, email, contact_num, birthdate, gender, address, position_applied, 
-            years_experience || 0, previous_employer || 'N/A', resumePath, idImagePath
+            years_experience || 0, previous_employer || 'N/A', resumePath, idImagePath, resumeHash, idHash
         ]);
 
         await logAction(req, 'DIRECT_HIRE', `Admin imported existing guard: ${first_name} ${last_name}`);

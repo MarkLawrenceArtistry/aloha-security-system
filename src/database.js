@@ -117,6 +117,9 @@ const initDB = () => {
             }
         });
 
+        database.run(`ALTER TABLE applicants ADD COLUMN resume_hash TEXT`, (err) => {});
+        database.run(`ALTER TABLE applicants ADD COLUMN id_image_hash TEXT`, (err) => {});
+
         
         // --- 4. Deployments ---
         database.run(`
