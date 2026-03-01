@@ -41,7 +41,8 @@ async function searchApplicants(searchTerm) {
 
     const token = getToken();
     try {
-        const res = await fetch(`${API_BASE}/applicants?status=Hired&search=${encodeURIComponent(searchTerm)}&limit=10`, {
+        // FIX: Added &available_only=true to the URL
+        const res = await fetch(`${API_BASE}/applicants?status=Hired&available_only=true&search=${encodeURIComponent(searchTerm)}&limit=10`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await res.json();

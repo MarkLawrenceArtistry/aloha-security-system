@@ -186,13 +186,19 @@ const getAllApplicants = async (req, res) => {
         let params = [];
         let countParams = [];
 
-        // --- 1. STATUS & ROLE FILTERING ---
+        const { available_only } = req.query; // Add this destructure at the top of the function
+
         if (status === 'Archived') {
             if (req.user.role === 'Staff') return res.status(403).json({ success: false, data: "Admins only." });
             whereClauses.push(`status = 'Archived'`);
         } 
         else if (status === 'Hired') {
-            whereClauses.push(`status = 'Hired'`); // Used by Roster page
+            whereClauses.push(`status = 'Hired'`);
+            
+            // NEW FIX: If requested by the deployment form, exclude guards currently on duty
+            if (available_only === 'true') {
+                whereClauses.push(`id NOT IN (SELECT applicant_id FROM deployments WHERE status = 'Active')`);
+            }
         }
         else if (status) {
             whereClauses.push(`status = ?`); // Pending, Rejected, For Interview
@@ -205,11 +211,22 @@ const getAllApplicants = async (req, res) => {
         }
 
         // --- 2. SEARCH FILTERING ---
-        if (search && search.includes('@')) {
-             const searchHash = hashData(search);
-             whereClauses.push(`email_hash = ?`);
-             params.push(searchHash);
-             countParams.push(searchHash);
+        if (search) {
+            const searchTerm = `%${search}%`;
+            
+            // If they typed an '@', assume they are searching for an exact email
+            if (search.includes('@')) {
+                const { hashData } = require('../utils/crypto');
+                const searchHash = hashData(search);
+                whereClauses.push(`email_hash = ?`);
+                params.push(searchHash);
+                countParams.push(searchHash);
+            } else {
+                // Otherwise, search Name and Position (which are unencrypted for this exact reason)
+                whereClauses.push(`(first_name LIKE ? OR last_name LIKE ? OR position_applied LIKE ?)`);
+                params.push(searchTerm, searchTerm, searchTerm);
+                countParams.push(searchTerm, searchTerm, searchTerm);
+            }
         }
 
         // Apply WHERE to queries

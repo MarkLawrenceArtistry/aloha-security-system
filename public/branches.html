@@ -358,17 +358,25 @@
             const branchesWithStatus = branches.map(b => {
                 const assigned = deploymentCounts[b.name] || 0;
                 const percent = (assigned / b.required_guards) * 100;
-                return { ...b, assigned, percent, isFullySecured: percent >= 100, isCritical: percent < 50 };
+                return { 
+                    ...b, 
+                    assigned, 
+                    percent, 
+                    isFullySecured: assigned === b.required_guards, 
+                    isOverstaffed: assigned > b.required_guards, // NEW
+                    isCritical: percent < 50 
+                };
             });
 
+            // Update Counts (Treat Overstaffed as Secured for the counters)
             document.getElementById('count-all').innerText = branchesWithStatus.length;
-            document.getElementById('count-secured').innerText = branchesWithStatus.filter(b => b.isFullySecured).length;
-            document.getElementById('count-personnel').innerText = branchesWithStatus.filter(b => !b.isFullySecured).length;
+            document.getElementById('count-secured').innerText = branchesWithStatus.filter(b => b.isFullySecured || b.isOverstaffed).length;
+            document.getElementById('count-personnel').innerText = branchesWithStatus.filter(b => !b.isFullySecured && !b.isOverstaffed).length;
             document.getElementById('count-critical').innerText = branchesWithStatus.filter(b => b.isCritical).length;
 
             let filtered = branchesWithStatus;
-            if (currentFilter === 'secured') filtered = filtered.filter(b => b.isFullySecured);
-            else if (currentFilter === 'personnel') filtered = filtered.filter(b => !b.isFullySecured);
+            if (currentFilter === 'secured') filtered = filtered.filter(b => b.isFullySecured || b.isOverstaffed);
+            else if (currentFilter === 'personnel') filtered = filtered.filter(b => !b.isFullySecured && !b.isOverstaffed);
             else if (currentFilter === 'critical') filtered = filtered.filter(b => b.isCritical);
 
             if (filtered.length === 0) {
@@ -391,7 +399,9 @@
                             <input type="checkbox" class="card-checkbox" value="${b.id}" onclick="event.stopPropagation()">
                         </div>
                         <div class="tag-container" style="position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
-                            ${b.isFullySecured ? `
+                            ${b.isOverstaffed ? `
+                                <div class="card-tag" style="background:#eff6ff; color:#3b82f6; border: 1px solid #dbeafe; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-shield-fill-plus"></i> Overstaffed</div>
+                            ` : b.isFullySecured ? `
                                 <div class="card-tag secured" style="background:#ecfdf5; color:#10b981; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-shield-fill-check"></i> Secured</div>
                             ` : `
                                 <div class="card-tag warning" style="background:#fffbeb; color:#f59e0b; padding: 4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; text-transform:uppercase;"><i class="bi bi-exclamation-triangle-fill"></i> Needs Staff</div>

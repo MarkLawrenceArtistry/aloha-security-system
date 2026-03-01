@@ -14,19 +14,29 @@ const deployGuard = async (req, res) => {
             return res.status(400).json({ success: false, data: "Applicant and Branch are required." });
         }
 
+        // 1. Check if guard is ALREADY deployed
         const activeDeployment = await get(
             "SELECT id FROM deployments WHERE applicant_id = ? AND status = 'Active'",
             [applicant_id]
         );
 
         if (activeDeployment) {
-            return res.status(409).json({ success: false, data: "Guard is already deployed." });
+            return res.status(409).json({ success: false, data: "This guard is already on active duty elsewhere." });
         }
 
-        // --- FETCH DATA FOR LOGS & EMAILS ---
-        // Added 'email' for the applicant, and 'location', 'contact_person' for the branch
+        // 2. CHECK BRANCH THRESHOLD (Prevent Overstaffing)
+        const branch = await get("SELECT name, location, contact_person, required_guards FROM branches WHERE id = ?", [branch_id]);
+        const activeAtBranch = await get("SELECT COUNT(*) as count FROM deployments WHERE branch_id = ? AND status = 'Active'", [branch_id]);
+
+        if (activeAtBranch.count >= branch.required_guards) {
+            return res.status(400).json({ 
+                success: false, 
+                data: `Deployment Blocked: ${branch.name} is already at full capacity (${activeAtBranch.count}/${branch.required_guards} guards).` 
+            });
+        }
+
+        // 3. Proceed with Deployment
         const applicant = await get("SELECT first_name, last_name, email FROM applicants WHERE id = ?", [applicant_id]);
-        const branch = await get("SELECT name, location, contact_person FROM branches WHERE id = ?", [branch_id]);
 
         const result = await run(
             "INSERT INTO deployments (applicant_id, branch_id) VALUES (?, ?)",
@@ -36,18 +46,12 @@ const deployGuard = async (req, res) => {
         await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [applicant_id]);
 
         if (applicant && branch) {
-            // 1. Audit Log
             const details = `Admin User ID #${req.user.id} deployed ${applicant.first_name} ${applicant.last_name} to branch "${branch.name}".`;
             await logAction(req, 'DEPLOYMENT_CREATE', details);
-
-            // 2. Fire off the email asynchronously (don't await, so it doesn't slow down the UI response)
             sendDeploymentEmail(applicant, branch);
         }
 
-        res.status(201).json({ 
-            success: true, 
-            data: { id: result.lastID, message: "Guard deployed successfully" } 
-        });
+        res.status(201).json({ success: true, data: { id: result.lastID, message: "Guard deployed successfully" } });
     } catch (err) {
         res.status(500).json({ success: false, data: err.message });
     }
@@ -55,13 +59,27 @@ const deployGuard = async (req, res) => {
 
 const getDeployments = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = '', sort = 'desc' } = req.query;
+        const { page = 1, limit = 10, search = '', sort = 'desc', status = 'all' } = req.query;
         const offset = (page - 1) * limit;
-        const searchTerm = `%${search}%`;
+        
+        // FIX: Clean the search term and split it to allow searching "First Last" safely
+        const searchTerm = `%${search.trim()}%`;
 
         const totalResult = await get("SELECT COUNT(*) as count FROM deployments");
         const activeResult = await get("SELECT COUNT(*) as count FROM deployments WHERE status = 'Active'");
         const monthResult = await get("SELECT COUNT(*) as count FROM deployments WHERE strftime('%Y-%m', date_deployed) = strftime('%Y-%m', 'now')");
+
+        // FIX: Bulletproof SQL search logic combining first and last name
+        let baseWhere = `(a.first_name LIKE ? OR a.last_name LIKE ? OR (a.first_name || ' ' || a.last_name) LIKE ? OR b.name LIKE ?)`;
+        let params = [searchTerm, searchTerm, searchTerm, searchTerm];
+        let countParams = [searchTerm, searchTerm, searchTerm, searchTerm];
+
+        // Apply Status Filter (All, Active, Ended)
+        if (status !== 'all') {
+            baseWhere += ` AND d.status = ?`;
+            params.push(status);
+            countParams.push(status);
+        }
 
         let query = `
             SELECT d.id, d.status, d.date_deployed, 
@@ -70,35 +88,28 @@ const getDeployments = async (req, res) => {
             FROM deployments d
             JOIN applicants a ON d.applicant_id = a.id
             JOIN branches b ON d.branch_id = b.id
-            WHERE (a.first_name LIKE ? OR a.last_name LIKE ? OR b.name LIKE ?)
+            WHERE ${baseWhere}
+            ORDER BY d.date_deployed ${sort === 'asc' ? 'ASC' : 'DESC'} 
+            LIMIT ? OFFSET ?
         `;
         
-        query += ` ORDER BY d.date_deployed ${sort === 'asc' ? 'ASC' : 'DESC'} LIMIT ? OFFSET ?`;
+        params.push(limit, offset);
 
-        const deployments = await all(query, [searchTerm, searchTerm, searchTerm, limit, offset]);
-
+        const deployments = await all(query, params);
         const searchCountResult = await get(`
             SELECT COUNT(*) as count 
             FROM deployments d
             JOIN applicants a ON d.applicant_id = a.id
             JOIN branches b ON d.branch_id = b.id
-            WHERE (a.first_name LIKE ? OR a.last_name LIKE ? OR b.name LIKE ?)
-        `, [searchTerm, searchTerm, searchTerm]);
+            WHERE ${baseWhere}
+        `, countParams);
 
         res.status(200).json({
             success: true,
             data: {
                 deployments,
-                pagination: {
-                    current_page: parseInt(page),
-                    total_pages: Math.ceil(searchCountResult.count / limit),
-                    total_records: searchCountResult.count
-                },
-                stats: {
-                    total_deployments: totalResult.count,
-                    total_active: activeResult.count,
-                    this_month: monthResult.count
-                }
+                pagination: { current_page: parseInt(page), total_pages: Math.ceil(searchCountResult.count / limit), total_records: searchCountResult.count },
+                stats: { total_deployments: totalResult.count, total_active: activeResult.count, this_month: monthResult.count }
             }
         });
     } catch (err) {

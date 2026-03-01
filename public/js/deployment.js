@@ -1,6 +1,8 @@
 const API_BASE = '/api/deployments';
 let currentPage = 1;
 const limit = 10;
+let currentFilter = 'all'; 
+let allBranchesMap = {}; 
 
 function getToken() {
     return localStorage.getItem('admin_token');
@@ -10,7 +12,6 @@ async function fetchDeployments() {
     const search = document.getElementById('search-input').value;
     const sort = document.getElementById('sort-select').value;
     
-    // FETCH BRANCHES FOR MINI-MAP (Cache this too!)
     try {
         const branchRes = await fetchData('/api/branches?limit=1000', {
             headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -23,34 +24,47 @@ async function fetchDeployments() {
         }
     } catch (bErr) { console.warn("Could not load branches for map"); }
 
-    // FETCH DEPLOYMENTS
     try {
-        const url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${search}&sort=${sort}`;
+        // FIX: Pass the 'status' (currentFilter) to the backend API!
+        const url = `${API_BASE}?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}&sort=${sort}&status=${currentFilter}`;
         
-        // USE THE NEW HELPER
         const result = await fetchData(url, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
         
         if (result.success) {
-            allDeployments = result.data.deployments || [];
+            const deps = result.data.deployments || [];
             
-            // Recalculate maps logic since we have data
+            // Recalculate branch mapping logic
             Object.values(allBranchesMap).forEach(b => b.active_count = 0);
-            allDeployments.forEach(d => {
+            deps.forEach(d => {
                 if (d.status === 'Active') {
                     const branch = Object.values(allBranchesMap).find(b => b.name === d.branch_name);
                     if (branch) branch.active_count++;
                 }
             });
 
-            applyFilters();
+            // NO MORE applyFilters(). Just render directly from backend!
+            renderTable(deps);
             updateStats(result.data.stats);
+            updatePagination(result.data.pagination);
         }
     } catch (err) {
         console.error(err);
     }
 }
+
+// Update filter chip click listener to trigger fetch
+document.getElementById('filter-chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    
+    currentFilter = chip.getAttribute('data-filter');
+    currentPage = 1;
+    fetchDeployments(); // Ask backend for the filtered list
+});
 
 function renderTable(data) {
     const tbody = document.getElementById('deploy-body');
@@ -104,11 +118,34 @@ async function endDeployment(id) {
     }
 }
 
+let searchTimeout;
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchDeployments();
     
-    document.getElementById('search-input').addEventListener('input', () => { currentPage = 1; fetchDeployments(); });
-    document.getElementById('sort-select').addEventListener('change', fetchDeployments);
-    document.getElementById('prev-btn').addEventListener('click', () => { if(currentPage > 1) { currentPage--; fetchDeployments(); } });
-    document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchDeployments(); });
+    // 1. Debounced Search Input
+    document.getElementById('search-input').addEventListener('input', (e) => { 
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentPage = 1; 
+            fetchDeployments(); 
+        }, 300); // Waits 300ms after you stop typing before fetching
+    });
+
+    // 2. Sort Select
+    document.getElementById('sort-select').addEventListener('change', () => {
+        currentPage = 1;
+        fetchDeployments();
+    });
+
+    // 3. Pagination
+    document.getElementById('prev-btn').addEventListener('click', (e) => { 
+        e.stopImmediatePropagation();
+        if(currentPage > 1) { currentPage--; fetchDeployments(); } 
+    });
+    
+    document.getElementById('next-btn').addEventListener('click', (e) => { 
+        e.stopImmediatePropagation();
+        currentPage++; fetchDeployments(); 
+    });
 });

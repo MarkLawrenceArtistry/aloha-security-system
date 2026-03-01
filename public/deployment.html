@@ -221,7 +221,14 @@
 
             filteredDeployments = allDeployments.filter(d => {
                 const statusMatch = currentFilter === 'all' || d.status === currentFilter;
-                return statusMatch;
+                
+                // Add text matching for Name and Branch
+                const textMatch = !searchQuery || 
+                                  d.first_name.toLowerCase().includes(searchQuery) || 
+                                  d.last_name.toLowerCase().includes(searchQuery) || 
+                                  d.branch_name.toLowerCase().includes(searchQuery);
+                                  
+                return statusMatch && textMatch;
             });
 
             const totalPages = Math.ceil(filteredDeployments.length / itemsPerPage);
