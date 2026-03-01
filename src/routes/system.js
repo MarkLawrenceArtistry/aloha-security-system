@@ -6,6 +6,7 @@ const router = express.Router();
 const backupController = require('../controllers/backupController');
 const settingsController = require('../controllers/settingsController');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
+const reportController = require('../controllers/reportController');
 
 // IMPORT THE NEW MIDDLEWARE
 const backupUpload = require('../middleware/backupUpload'); 
@@ -109,5 +110,7 @@ router.get('/nuke-db', verifyToken, verifyAdmin, async (req, res) => {
         res.status(500).json({ success: false, data: err.message });
     }
 });
+
+router.get('/master-report', verifyToken, verifyAdmin, reportController.generateMasterReport)
 
 module.exports = router;

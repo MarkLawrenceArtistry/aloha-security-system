@@ -42,8 +42,16 @@
                     <h1>Dashboard Analytics</h1>
                     <p>Here is the latest intelligence on agency operations.</p>
                 </div>
-                <div class="date-badge">
-                    <i class="bi bi-calendar3"></i> <span id="current-date-display">Today</span>
+                
+                <!-- UPDATE THIS DIV TO GROUP THE DATE AND BUTTON -->
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <div class="date-badge">
+                        <i class="bi bi-calendar3"></i> <span id="current-date-display">Today</span>
+                    </div>
+                    
+                    <button onclick="downloadMasterReport()" class="btn-master-report" id="btn-master-report">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Download Report
+                    </button>
                 </div>
             </div>
 
@@ -213,6 +221,45 @@
                 }
             });
         });
+
+
+        async function downloadMasterReport() {
+            const btn = document.getElementById('btn-master-report');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear;"></i> Generating...';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+
+            try {
+                const res = await fetch('/api/system/master-report', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+                });
+
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Aloha_Master_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    const error = await res.json();
+                    alert(error.data || "Failed to generate report. Admin access required.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Connection error occurred while downloading the report.");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+            }
+        }
     </script>
 </body>
 </html>
