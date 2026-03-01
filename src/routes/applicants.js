@@ -23,6 +23,7 @@ router.delete('/applicants/:id', verifyToken, applicantController.deleteApplican
 
 router.post('/auth/forgot-password-init', authController.getSecurityQuestion);
 router.post('/auth/reset-password', authController.resetPassword);
+router.get('/auth/profile', verifyToken, authController.getProfile);
 router.put('/auth/update-profile', verifyToken, authController.updateProfile); // For Settings Page
 
 router.post('/auth/reset-master-key', authController.resetViaMasterKey);

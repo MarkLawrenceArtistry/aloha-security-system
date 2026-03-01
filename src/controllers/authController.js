@@ -194,8 +194,21 @@ const resetViaOtp = async (req, res) => {
     }
 };
 
+const getProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await get("SELECT username, email, security_question FROM users WHERE id = ?", [userId]);
+        
+        if (!user) return res.status(404).json({ success: false, data: "User not found." });
+        
+        res.status(200).json({ success: true, data: user });
+    } catch (err) {
+        res.status(500).json({ success: false, data: err.message });
+    }
+};
+
 // Update the exports at the bottom!
 module.exports = { 
     login, getSecurityQuestion, resetPassword, updateProfile, 
-    resetViaMasterKey, sendPasswordOtp, resetViaOtp 
+    resetViaMasterKey, sendPasswordOtp, resetViaOtp, getProfile 
 };

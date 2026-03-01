@@ -78,10 +78,18 @@
                             <i class="bi bi-question-circle"></i> Recovery Question
                         </div>
                         
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 15px; border-radius: 10px; margin-bottom: 20px;">
+                            <span style="font-size: 0.75rem; color: #166534; font-weight: 700; text-transform: uppercase;">Current Active Question:</span>
+                            <div id="current-sec-q" style="color: #15803d; font-weight: 600; margin-top: 2px;">Loading...</div>
+                            <div style="font-size: 0.7rem; color: #166534; margin-top: 6px; opacity: 0.8;">
+                                * For security purposes, your current answer is encrypted and hidden.
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
-                            <label>Select Security Question</label>
+                            <label>Update Security Question <span style="text-transform: none; font-weight: normal; color: #94a3b8;">(Leave blank to keep current)</span></label>
                             <select id="sec-q">
-                                <option value="">Choose a question...</option>
+                                <option value="">Choose a new question...</option>
                                 <option value="What is the name of your first pet?">What is the name of your first pet?</option>
                                 <option value="What city were you born in?">What city were you born in?</option>
                                 <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
@@ -90,8 +98,8 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Answer</label>
-                            <input type="text" id="sec-a" placeholder="Your answer">
+                            <label>New Answer</label>
+                            <input type="text" id="sec-a" placeholder="Enter new answer if changing question">
                         </div>
 
                         <button type="submit" class="btn-primary">
@@ -228,6 +236,7 @@
 
             // Load email settings
             loadEmailSettings();
+            loadProfile();
 
             // =========================================================
             // LOGOUT INTERCEPTION
@@ -534,6 +543,26 @@
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+                });
+                
+                const json = await res.json();
+                if (json.success && json.data) {
+                    const currentQ = document.getElementById('current-sec-q');
+                    if (currentQ) {
+                        currentQ.innerText = json.data.security_question || "None set. Please set a recovery question.";
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to load profile:', err);
+                const currentQ = document.getElementById('current-sec-q');
+                if (currentQ) currentQ.innerText = "Error loading data.";
             }
         }
     </script>
