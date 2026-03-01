@@ -492,26 +492,96 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 1. AFK AUTO-LOGOUT SYSTEM (30 Minutes)
     // ============================================================
-    let afkTimer;
-    const AFK_LIMIT = 30 * 60 * 1000; // 30 Minutes
+    let warningTimer;
+    let logoutTimer;
+    
+    // 29 Minutes warning, 30 Minutes logout
+    const WARNING_TIME = 29 * 60 * 1000; 
+    const LOGOUT_TIME = 30 * 60 * 1000; 
 
-    function resetAfkTimer() {
-        clearTimeout(afkTimer);
-        if (localStorage.getItem('admin_token')) { // Only run if logged in
-            afkTimer = setTimeout(() => {
-                alert("Session expired due to inactivity.");
-                logout();
-            }, AFK_LIMIT);
-        }
+    // Inject Modal HTML dynamically so we don't edit every .html file
+    const sessionModalHTML = `
+        <div id="session-modal" class="session-modal-overlay">
+            <div class="session-modal-box">
+                <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
+                <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
+                <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
+                    For security, your session will expire in <strong id="countdown-timer" style="color:#f97316;">60</strong> seconds due to inactivity.
+                </p>
+                <button id="btn-stay-active" class="btn-stay-login">
+                    <i class="bi bi-arrow-repeat"></i> I'm still working
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if(!document.getElementById('session-modal')) {
+        document.body.insertAdjacentHTML('beforeend', sessionModalHTML);
     }
 
-    // Listen for user activity to reset the timer
-    window.onload = resetAfkTimer;
-    document.onmousemove = resetAfkTimer;
-    document.onkeypress = resetAfkTimer;
-    document.onclick = resetAfkTimer;
-    document.onscroll = resetAfkTimer;
+    const sessionModal = document.getElementById('session-modal');
+    const stayActiveBtn = document.getElementById('btn-stay-active');
+    const countdownEl = document.getElementById('countdown-timer');
 
+    function startTimers() {
+        if (!localStorage.getItem('admin_token')) return; // Only if logged in
 
-    
+        // Clear existing
+        clearTimeout(warningTimer);
+        clearTimeout(logoutTimer);
+
+        // Set Warning
+        warningTimer = setTimeout(() => {
+            showSessionWarning();
+        }, WARNING_TIME);
+
+        // Set Hard Logout (in case they ignore the modal)
+        logoutTimer = setTimeout(() => {
+            performLogout();
+        }, LOGOUT_TIME);
+    }
+
+    function showSessionWarning() {
+        sessionModal.classList.add('active');
+        
+        // Start visual countdown in the modal text
+        let secondsLeft = 60;
+        const interval = setInterval(() => {
+            secondsLeft--;
+            if(countdownEl) countdownEl.innerText = secondsLeft;
+            if(secondsLeft <= 0 || !sessionModal.classList.contains('active')) clearInterval(interval);
+        }, 1000);
+    }
+
+    function performLogout() {
+        sessionModal.classList.remove('active');
+        alert("Session expired.");
+        logout();
+    }
+
+    function resetSession() {
+        // Hide modal if active
+        if (sessionModal.classList.contains('active')) {
+            sessionModal.classList.remove('active');
+        }
+        startTimers();
+    }
+
+    // Attach listeners
+    if (stayActiveBtn) {
+        stayActiveBtn.addEventListener('click', resetSession);
+    }
+
+    // Reset timers on user interaction (only if modal is NOT showing)
+    ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, () => {
+            if (!sessionModal.classList.contains('active')) {
+                // Debounce slightly to avoid performance hits
+                if (Math.random() > 0.5) startTimers(); 
+            }
+        });
+    });
+
+    // Start immediately
+    startTimers();
 });
