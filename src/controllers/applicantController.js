@@ -6,6 +6,7 @@ const path = require('path'); // Required for file paths
 const { run, get, all } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger');
 const { sendStatusEmail } = require('../utils/emailService');
+const PDFDocument = require('pdfkit');
 
 // POST /api/apply
 const apply = async (req, res) => {
@@ -150,11 +151,26 @@ const getAllApplicants = async (req, res) => {
         
         let query = `SELECT * FROM applicants`;
         let countQuery = `SELECT COUNT(*) as count FROM applicants`;
+        
         let whereClauses = [];
+        
+        if (status === 'Archived') {
+            if (req.user.role === 'Staff') {
+                return res.status(403).json({ success: false, data: "Access Denied: Admins only." });
+            }
+            whereClauses.push(`status = 'Archived'`);
+        } else {
+            whereClauses.push(`status != 'Archived'`);
+            if (status) {
+                whereClauses.push(`status = ?`);
+                params.push(status);
+                countParams.push(status);
+            }
+        }
+
         let params = [];
         let countParams = [];
 
-        // --- DYNAMIC WHERE CLAUSE ---
         if (search) {
             whereClauses.push(`(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR position_applied LIKE ?)`);
             const searchTerm = `%${search}%`;
@@ -189,10 +205,10 @@ const getAllApplicants = async (req, res) => {
         const countRes = await get(countQuery, countParams);
 
         // KPIs for Wireframe (These are general stats, should not be filtered by the search)
-        const totalRes = await get("SELECT COUNT(*) as count FROM applicants");
-        const maleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Male'");
-        const femaleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Female'");
-        const monthRes = await get("SELECT COUNT(*) as count FROM applicants WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')");
+        const totalRes = await get("SELECT COUNT(*) as count FROM applicants WHERE status != 'Archived'");
+        const maleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Male' AND status != 'Archived'");
+        const femaleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Female' AND status != 'Archived'");
+        const archivedRes = await get("SELECT COUNT(*) as count FROM applicants WHERE status = 'Archived'");
 
         res.status(200).json({
             success: true,
@@ -207,7 +223,7 @@ const getAllApplicants = async (req, res) => {
                     total: totalRes.count,
                     male: maleRes.count,
                     female: femaleRes.count,
-                    this_month: monthRes.count
+                    archived: archivedRes.count // Changed 'this_month' to 'archived'
                 }
             }
         });
@@ -297,11 +313,19 @@ const getDashboardStats = async (req, res) => {
         // CALCULATE TIME UNTIL MIDNIGHT (Next Maintenance)
         const now = new Date();
         const midnight = new Date(now);
-        midnight.setHours(24, 0, 0, 0); // Sets time to next midnight
+        midnight.setHours(24, 0, 0, 0); 
         const msUntilMidnight = midnight - now;
         const maintHours = Math.floor(msUntilMidnight / (1000 * 60 * 60));
         const maintMins = Math.floor((msUntilMidnight % (1000 * 60 * 60)) / (1000 * 60));
         const nextMaintenanceStr = `In ${maintHours}h ${maintMins}m`;
+
+        const oldestArchived = await get("SELECT updated_at FROM applicants WHERE status = 'Archived' ORDER BY updated_at ASC LIMIT 1");
+        let nextPurgeStr = "No pending purges";
+        if (oldestArchived) {
+            const purgeDate = new Date(new Date(oldestArchived.updated_at).getTime() + (90 * 24 * 60 * 60 * 1000));
+            const daysLeft = Math.ceil((purgeDate - new Date()) / (1000 * 60 * 60 * 24));
+            nextPurgeStr = daysLeft > 0 ? `In ${daysLeft} Days` : "Purge Pending";
+        }
 
         res.status(200).json({
             success: true,
@@ -315,7 +339,8 @@ const getDashboardStats = async (req, res) => {
                     uptime: uptimeStr,
                     db_size: dbSizeMB,
                     last_backup: lastBackup,
-                    next_maintenance: nextMaintenanceStr // Add this!
+                    next_maintenance: nextMaintenanceStr,
+                    next_purge: nextPurgeStr // <-- Add this to payload
                 },
                 chart: chartData, 
                 recent: recent
@@ -330,61 +355,28 @@ const getDashboardStats = async (req, res) => {
 const deleteApplicant = async (req, res) => {
     try {
         const { id } = req.params;
-        const { force } = req.query; // Check for ?force=true
+        const { reason } = req.body; // Catch the reason from the frontend
 
-        // 1. Get file paths first
-        const applicant = await get("SELECT resume_path, id_image_path, first_name, last_name FROM applicants WHERE id = ?", [id]);
-        
+        if (!reason) {
+            return res.status(400).json({ success: false, data: "A reason for deletion is required." });
+        }
+
+        const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [id]);
         if (!applicant) {
             return res.status(404).json({ success: false, data: "Applicant not found." });
         }
 
-        // --- FORCE DELETE LOGIC ---
-        if (force === 'true') {
-            // Check if user is authorized to do this (Admin only)
-            // Delete deployment records associated with this applicant
-            await run("DELETE FROM deployments WHERE applicant_id = ?", [id]);
-            await logAction(req, 'FORCE_DELETE_DEP', `Cascaded delete of deployments for applicant ID ${id}`);
-        }
-        // --- END FORCE DELETE ---
+        // 1. FREE THE BRANCH (Delete any active deployments for this user)
+        await run("DELETE FROM deployments WHERE applicant_id = ?", [id]);
 
-        // 2. Try to Delete from DB
-        try {
-            await run("DELETE FROM applicants WHERE id = ?", [id]);
-        } catch (dbErr) {
-            // GRACEFUL HANDLING: Check for Foreign Key Constraint
-            if (dbErr.message.includes('FOREIGN KEY constraint failed')) {
-                return res.status(409).json({ 
-                    success: false, 
-                    data: `Cannot delete ${applicant.first_name}: Has deployment records. Use 'Delete with Deployment' option.` 
-                });
-            }
-            throw dbErr;
-        }
+        // 2. SOFT DELETE (Change status to Archived and update timestamp)
+        await run("UPDATE applicants SET status = 'Archived', updated_at = CURRENT_TIMESTAMP WHERE id = ?", [id]);
 
-        // 3. Delete files if DB delete succeeded
-        const UPLOAD_PATH = process.env.VOLUME_PATH || path.join(__dirname, '../../public/uploads');
-        
-        const deleteFile = (urlPath) => {
-            if (!urlPath) return;
-            const filename = urlPath.split('/').pop();
-            const filePath = path.join(UPLOAD_PATH, filename);
-            fs.unlink(filePath, (err) => {
-                if (err && err.code !== 'ENOENT') console.error(`Failed to delete ${filePath}`, err);
-            });
-        };
+        // 3. AUDIT LOG WITH REASON
+        const logMsg = `Deleted applicant: ${applicant.first_name} ${applicant.last_name}. Reason: ${reason}`;
+        await logAction(req, 'DELETE_ARCHIVE', logMsg);
 
-        deleteFile(applicant.resume_path);
-        deleteFile(applicant.id_image_path);
-
-        // 4. Log it
-        const logMsg = force === 'true' 
-            ? `Force deleted applicant and records: ${applicant.first_name} ${applicant.last_name}`
-            : `Deleted applicant: ${applicant.first_name} ${applicant.last_name}`;
-            
-        await logAction(req, 'DELETE', logMsg);
-
-        res.status(200).json({ success: true, data: "Applicant deleted." });
+        res.status(200).json({ success: true, data: "Applicant archived successfully." });
 
     } catch (err) {
         console.error(err);
@@ -392,6 +384,65 @@ const deleteApplicant = async (req, res) => {
     }
 };
 
+const exportApplicantPdf = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const app = await get("SELECT * FROM applicants WHERE id = ?", [id]);
+        
+        if (!app) return res.status(404).json({ success: false, data: "Applicant not found." });
 
-// Update exports
-module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats, deleteApplicant };
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Dossier_${app.last_name}_${app.first_name}.pdf`);
+        doc.pipe(res);
+
+        // Header
+        doc.font('Helvetica-Bold').fontSize(20).fillColor('#0f172a').text('ALOHA SECURITY AGENCY', { align: 'center' });
+        doc.font('Helvetica').fontSize(12).fillColor('#64748b').text('Official Applicant Dossier (Archived Record)', { align: 'center' });
+        doc.moveDown(2);
+
+        // Details
+        doc.font('Helvetica-Bold').fontSize(14).fillColor('#0f172a').text('Personal Information');
+        doc.moveTo(50, doc.y + 5).lineTo(545, doc.y + 5).strokeColor('#e2e8f0').stroke();
+        doc.moveDown(1.5);
+
+        const drawRow = (label, value) => {
+            doc.font('Helvetica-Bold').fontSize(10).fillColor('#64748b').text(`${label}:`, { continued: true, width: 150 });
+            doc.font('Helvetica').fillColor('#0f172a').text(` ${value || 'N/A'}`);
+            doc.moveDown(0.5);
+        };
+
+        drawRow('Full Name', `${app.first_name} ${app.last_name}`);
+        drawRow('Email Address', app.email);
+        drawRow('Contact Number', app.contact_num);
+        drawRow('Birthdate', app.birthdate);
+        drawRow('Gender', app.gender);
+        drawRow('Address', app.address);
+        doc.moveDown(1);
+
+        doc.font('Helvetica-Bold').fontSize(14).fillColor('#0f172a').text('Professional Background');
+        doc.moveTo(50, doc.y + 5).lineTo(545, doc.y + 5).strokeColor('#e2e8f0').stroke();
+        doc.moveDown(1.5);
+
+        drawRow('Applied Position', app.position_applied);
+        drawRow('Years of Experience', `${app.years_experience} Years`);
+        drawRow('Previous Employer', app.previous_employer);
+        drawRow('Current Status', app.status);
+        drawRow('Application Date', new Date(app.created_at).toLocaleString());
+        drawRow('Last Updated', new Date(app.updated_at).toLocaleString());
+
+        doc.moveDown(3);
+        doc.font('Helvetica-Oblique').fontSize(9).fillColor('#94a3b8').text('This document was generated securely from the Aloha Security Management System and is strictly confidential.', { align: 'center' });
+
+        await logAction(req, 'EXPORT_PDF', `Exported dossier for Archived ID #${id}`);
+        doc.end();
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, data: "PDF Generation failed." });
+    }
+};
+
+// DON'T FORGET TO UPDATE MODULE.EXPORTS
+module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats, deleteApplicant, exportApplicantPdf };

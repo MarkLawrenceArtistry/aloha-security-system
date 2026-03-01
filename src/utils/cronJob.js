@@ -63,6 +63,40 @@ const startCronJob = () => {
             else console.log(`Audit Log Cleanup: Deleted ${this.changes} old logs.`);
         });
     }, { scheduled: true, timezone: "Asia/Manila" });
+
+    cron.schedule('0 2 * * *', () => {
+        console.log('Running cron: Hard deleting Archived records older than 3 months...');
+        
+        // Calculate 90 days ago
+        const retentionPeriod = 90 * 24 * 60 * 60 * 1000; 
+        const cutoffDate = new Date(Date.now() - retentionPeriod).toISOString();
+        const database = require('../database').getDB();
+
+        database.all("SELECT id, resume_path, id_image_path FROM applicants WHERE status = 'Archived' AND updated_at < ?", [cutoffDate], (err, rows) => {
+            if (err) return console.error("Cron job error:", err);
+            
+            rows.forEach(applicant => {
+                // Delete Files
+                const deleteFile = (urlPath) => {
+                    if (!urlPath) return;
+                    const filename = urlPath.split('/').pop();
+                    // Strip query params if they exist (e.g. ?t=TOKEN)
+                    const cleanFilename = filename.split('?')[0]; 
+                    const filePath = path.join(UPLOAD_PATH, cleanFilename);
+                    fs.unlink(filePath, (e) => { if (e && e.code !== 'ENOENT') console.error(`Failed to delete ${filePath}`, e); });
+                };
+                deleteFile(applicant.resume_path);
+                deleteFile(applicant.id_image_path);
+                
+                // Delete from DB permanently
+                database.run("DELETE FROM applicants WHERE id = ?", [applicant.id]);
+            });
+            
+            if (rows.length > 0) {
+                console.log(`Hard deleted ${rows.length} expired archived applications.`);
+            }
+        });
+    }, { scheduled: true, timezone: "Asia/Manila" });
 };
 
 module.exports = startCronJob;

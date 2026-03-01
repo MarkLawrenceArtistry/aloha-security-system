@@ -178,6 +178,7 @@ async function initDashboard() {
                 document.getElementById('sh-dbsize').innerText = data.system_health.db_size + ' MB';
                 document.getElementById('sh-backup').innerText = data.system_health.last_backup;
                 document.getElementById('sh-maintenance').innerText = data.system_health.next_maintenance;
+                if(document.getElementById('sh-purge')) document.getElementById('sh-purge').innerText = data.system_health.next_purge;
             }
             
             // Render Chart
@@ -249,13 +250,9 @@ function renderChart(chartData) {
 }
 
 function applyRBAC() {
-    const role = localStorage.getItem('admin_role'); // We will save this on login
+    const role = localStorage.getItem('admin_role'); 
     
-    // Elements to hide for Non-Admins
-    const protectedLinks = [
-        'users.html',
-        'audit-log.html'
-    ];
+    const protectedLinks = ['users.html', 'audit-log.html'];
 
     if (role !== 'Admin' && role !== 'Owner') {
         const navItems = document.querySelectorAll('.nav-item');
@@ -266,8 +263,11 @@ function applyRBAC() {
             }
         });
 
-        const deleteActions = document.getElementById('delete-actions');
-        if(deleteActions) deleteActions.style.display = 'none !important';
+        // Hide anything marked admin-only
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = 'none !important';
+            el.parentNode.removeChild(el); // Completely remove it from DOM to be safe
+        });
     }
 }
 

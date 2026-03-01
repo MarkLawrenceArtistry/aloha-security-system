@@ -120,6 +120,24 @@ function renderCards(data) {
     `).join('');
 }
 
+function updateDeleteButtonVisibility() {
+    // Check how many cards are selected
+    const checkedCount = document.querySelectorAll('.card-checkbox:checked').length;
+    const deleteActions = document.getElementById('delete-actions');
+    const deleteBtn = document.getElementById('btn-delete-custom');
+
+    if (deleteActions && deleteBtn) {
+        if (checkedCount > 0) {
+            // Show the button and update the number
+            deleteActions.style.display = 'flex';
+            deleteBtn.innerHTML = `<i class="bi bi-trash3-fill"></i> Delete Selected (${checkedCount})`;
+        } else {
+            // Hide the button
+            deleteActions.style.display = 'none';
+        }
+    }
+}
+
 // Card Selection Logic
 function toggleCardSelection(card, event) {
     if (event.target.closest('a') || event.target.closest('button')) return;
@@ -132,8 +150,10 @@ function toggleCardSelection(card, event) {
     const hiddenCheckbox = document.querySelector(`#applicants-body input[value="${checkbox.value}"]`);
     if (hiddenCheckbox) {
         hiddenCheckbox.checked = checkbox.checked;
-        hiddenCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
     }
+    
+    // Trigger visibility update
+    updateDeleteButtonVisibility();
 }
 
 // Handle "Select All" click
@@ -142,12 +162,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkAll) {
         checkAll.addEventListener('change', (e) => {
             const isChecked = e.target.checked;
+            
             // Visually select cards
             document.querySelectorAll('.facility-card').forEach(card => {
                 card.querySelector('.card-checkbox').checked = isChecked;
                 card.classList.toggle('is-selected', isChecked);
             });
-            // Multi-delete logic is handled by hidden table syncing in setupMultiDelete
+            
+            // Sync hidden table checkboxes
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = isChecked;
+            });
+
+            // Trigger visibility update
+            updateDeleteButtonVisibility();
         });
     }
 
@@ -168,7 +196,7 @@ function updateKPIs(stats) {
     if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = stats.total;
     if(document.getElementById('kpi-male')) document.getElementById('kpi-male').innerText = stats.male;
     if(document.getElementById('kpi-female')) document.getElementById('kpi-female').innerText = stats.female;
-    if(document.getElementById('kpi-month')) document.getElementById('kpi-month').innerText = stats.this_month;
+    if(document.getElementById('kpi-archived')) document.getElementById('kpi-archived').innerText = stats.archived;
 }
 
 function updatePagination(pagination) {
@@ -186,25 +214,69 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('prev-btn').addEventListener('click', () => { if(currentPage > 1) { currentPage--; fetchApplicants(); } });
     document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchApplicants(); });
 
-    // MULTI DELETE
-    setupMultiDelete({
-        tableBodyId: 'applicants-body',
-        checkAllId: 'check-all',
-        deleteBtnId: 'btn-delete-standard',
-        containerId: 'delete-actions',
-        apiBaseUrl: '/api/applicants',
-        entityName: 'applicants',
-        onSuccess: fetchApplicants
-    });
+    const deleteBtn = document.getElementById('btn-delete-custom');
+    const deleteModal = document.getElementById('delete-reason-modal');
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDelete = document.getElementById('confirm-delete');
+    const reasonInput = document.getElementById('delete-reason-input');
 
-    setupMultiDelete({
-        tableBodyId: 'applicants-body',
-        checkAllId: 'check-all',
-        deleteBtnId: 'btn-delete-force',
-        containerId: 'delete-actions',
-        apiBaseUrl: '/api/applicants',
-        urlSuffix: '?force=true',
-        entityName: 'applicants',
-        onSuccess: fetchApplicants
-    });
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length === 0) return;
+            
+            reasonInput.value = ''; // Reset input
+            reasonInput.style.borderColor = '#cbd5e1';
+            deleteModal.classList.add('active');
+        });
+    }
+
+    if (cancelDelete) {
+        cancelDelete.addEventListener('click', () => {
+            deleteModal.classList.remove('active');
+        });
+    }
+
+    if (confirmDelete) {
+        confirmDelete.addEventListener('click', async () => {
+            const reason = reasonInput.value.trim();
+            if (!reason) {
+                reasonInput.style.borderColor = 'red';
+                reasonInput.focus();
+                return;
+            }
+
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            
+            confirmDelete.innerHTML = "Deleting...";
+            confirmDelete.disabled = true;
+
+            const token = getToken();
+            const deletePromises = selectedIds.map(id => 
+                fetch(`/api/applicants/${id}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ reason: reason }) // Pass reason to backend
+                }).then(res => res.json())
+            );
+
+            await Promise.all(deletePromises);
+            
+            // Clean up UI
+            deleteModal.classList.remove('active');
+            confirmDelete.innerHTML = "Delete Records";
+            confirmDelete.disabled = false;
+            
+            // Reset checkboxes
+            const checkAll = document.getElementById('check-all');
+            if(checkAll) checkAll.checked = false;
+            document.getElementById('delete-actions').style.display = 'none';
+
+            // Refresh table
+            fetchApplicants();
+        });
+    }
 });

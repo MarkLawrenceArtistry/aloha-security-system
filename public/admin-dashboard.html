@@ -28,6 +28,7 @@
         <div class="sidebar-category">System</div>
         <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
         <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+        <a href="archive.html" class="nav-item admin-only"><i class="bi bi-archive-fill"></i> System Archive</a>
         
         <!-- ID preserved for backend logic interception -->
         <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
@@ -94,6 +95,15 @@
                     <div class="health-info">
                         <span class="label" style="color: #fdba74;">Session Timeout</span>
                         <span id="sh-session-timer" class="val" style="color: #ffffff; font-variant-numeric: tabular-nums;">30:00</span>
+                    </div>
+                </div>
+
+                <div class="health-pill" style="background: rgba(15, 23, 42, 0.8); border-color: rgba(255, 255, 255, 0.1);">
+                    <i class="bi bi-archive-fill" style="color: #94a3b8;"></i>
+                    <div class="health-info">
+                        <span class="label" style="color: #cbd5e1;">Next Data Purge</span>
+                        <span id="sh-purge" class="val" style="color: #ffffff;">--</span>
+                        <span style="font-size: 0.6rem; color: #64748b; margin-top: 2px;">Contact Admin to view</span>
                     </div>
                 </div>
             </div>

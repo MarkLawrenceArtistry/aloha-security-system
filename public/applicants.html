@@ -28,6 +28,7 @@
         <div class="sidebar-category">System</div>
         <a href="users.html" class="nav-item"><i class="bi bi-person-gear"></i> Users</a>
         <a href="settings.html" class="nav-item"><i class="bi bi-gear-fill"></i> Settings</a>
+        <a href="archive.html" class="nav-item admin-only"><i class="bi bi-archive-fill"></i> System Archive</a>
         <button id="logout-btn" class="nav-item logout-btn border-0 w-100 text-start cursor-pointer"><i class="bi bi-box-arrow-left"></i> Logout</button>
     </nav>
 
@@ -47,7 +48,7 @@
             <div class="stat-card">
                 <i class="bi bi-people-fill bg-icon"></i>
                 <div class="stat-number" id="kpi-total">-</div>
-                <div class="stat-label">Total Applicants</div>
+                <div class="stat-label">Total Active Records</div>
             </div>
             <div class="stat-card">
                 <i class="bi bi-gender-male bg-icon"></i>
@@ -59,10 +60,11 @@
                 <div class="stat-number" id="kpi-female">-</div>
                 <div class="stat-label">Female</div>
             </div>
+            <!-- CHANGED: This Month is now Total Archived -->
             <div class="stat-card">
-                <i class="bi bi-calendar-check-fill bg-icon"></i>
-                <div class="stat-number" id="kpi-month">-</div>
-                <div class="stat-label">This Month</div>
+                <i class="bi bi-archive-fill bg-icon"></i>
+                <div class="stat-number" id="kpi-archived">-</div>
+                <div class="stat-label">Total Archived</div>
             </div>
         </div>
 
@@ -80,12 +82,9 @@
                 </div>
                 
                 <!-- BUTTON GROUP FOR DELETION -->
-                <div id="delete-actions" style="display: none; gap: 10px;">
-                    <button id="btn-delete-standard" class="btn-reject" style="padding: 10px 16px; font-size: 0.85rem; background: #e53828;">
-                        <i class="bi bi-person-x-fill"></i> Delete Selected
-                    </button>
-                    <button id="btn-delete-force" class="btn-reject" style="padding: 10px 16px; font-size: 0.85rem; background: #7f1d1d; color: white;">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Force Delete (Deployed)
+                <div id="delete-actions" class="admin-only" style="display: none; gap: 10px;">
+                    <button id="btn-delete-custom" class="btn-reject" style="padding: 10px 16px; font-size: 0.85rem; background: #dc2626;">
+                        <i class="bi bi-trash3-fill"></i> Delete Selected Records
                     </button>
                 </div>
             </div>
@@ -133,6 +132,26 @@
             </div>
         </div>
     </main>
+
+    <div id="delete-reason-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning" style="color: #dc2626; background: #fef2f2;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3 class="custom-modal-title">Permanently Delete?</h3>
+            <p class="custom-modal-text" style="margin-bottom: 15px;">
+                You are about to delete these applicant records permanently. This action cannot be undone.
+            </p>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: #475569; text-transform: uppercase;">Reason for Deletion (Required)<span style="color:red;">*</span></label>
+                <textarea id="delete-reason-input" rows="3" placeholder="e.g., Requested by applicant, Duplicate entry, Falsified documents..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.9rem; margin-top: 5px; resize: none; outline: none;"></textarea>
+            </div>
+            <div class="custom-modal-actions">
+                <button id="cancel-delete" class="btn-modal-cancel">Cancel</button>
+                <button id="confirm-delete" class="btn-modal-confirm" style="background: #dc2626;">Delete Records</button>
+            </div>
+        </div>
+    </div>
 
     <!-- CUSTOM LOGOUT MODAL -->
     <div id="custom-logout-modal" class="custom-modal-overlay">
