@@ -670,6 +670,28 @@
         document.querySelectorAll('.btn-next').forEach(btn => {
             btn.addEventListener('click', () => {
                 const currentStep = btn.closest('.form-step');
+                const stepNum = parseInt(btn.getAttribute('data-step'));
+                
+                // --- EARLY AGE VALIDATION ON STEP 1 ---
+                if (stepNum === 1) {
+                    const birthdateInput = document.getElementById('birthdate').value;
+                    if (birthdateInput) {
+                        const bdate = new Date(birthdateInput);
+                        const ageDifMs = Date.now() - bdate.getTime();
+                        const ageDate = new Date(ageDifMs);
+                        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+                        
+                        if (age < 21) {
+                            alert("Age Requirement Not Met: You must be at least 21 years old to proceed with this application.");
+                            document.getElementById('birthdate').style.borderColor = "red";
+                            return; // Stops the function, prevents going to step 2
+                        } else {
+                            document.getElementById('birthdate').style.borderColor = ""; // Reset border
+                        }
+                    }
+                }
+                // --------------------------------------
+
                 const inputs = currentStep.querySelectorAll('input[required], select[required], textarea[required]');
                 let valid = true;
                 inputs.forEach(input => {

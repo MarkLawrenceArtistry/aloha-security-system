@@ -65,12 +65,12 @@ const apply = async (req, res) => {
 
         // 3. Validation: Duplicate Prevention (Name + Birthdate)
         const existing = await get(
-            "SELECT id FROM applicants WHERE first_name = ? AND last_name = ? AND birthdate = ?", 
-            [first_name, last_name, birthdate]
+            "SELECT id FROM applicants WHERE email = ? OR (first_name = ? AND last_name = ?)", 
+            [email, first_name, last_name]
         );
 
         if (existing) {
-            return res.status(409).json({success:false, data:"An application with this name and birthdate already exists."});
+            return res.status(409).json({success:false, data:"An application with this Email or Name already exists in our system."});
         }
 
         // 4. Insert to DB
