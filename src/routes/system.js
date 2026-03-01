@@ -117,4 +117,50 @@ router.get('/config', verifyToken, settingsController.getSystemSettings);
 router.post('/config', verifyToken, verifyAdmin, settingsController.updateSystemSettings);
 router.get('/public-config', settingsController.getPublicSettings);
 
+router.get('/encrypt-migration', verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        // Import directly inside the route to guarantee they are found
+        const { encrypt, hashData } = require('../utils/crypto');
+        const { getDB } = require('../database');
+        const db = getDB();
+        
+        // 1. Fetch all applicants
+        db.all("SELECT * FROM applicants", [], (err, rows) => {
+            if (err) return res.status(500).json({success:false, data: err.message});
+            
+            let count = 0;
+            
+            db.serialize(() => {
+                db.run("BEGIN TRANSACTION");
+                
+                rows.forEach(row => {
+                    // Check if already encrypted (contains ':' from the IV)
+                    if (row.email && !row.email.includes(':')) {
+                        const emailHash = hashData(row.email);
+                        const encEmail = encrypt(row.email);
+                        const encPhone = encrypt(row.contact_num);
+                        const encAddr = encrypt(row.address);
+                        const encBday = encrypt(row.birthdate);
+                        const encPrev = encrypt(row.previous_employer);
+
+                        db.run(`UPDATE applicants SET 
+                            email = ?, contact_num = ?, address = ?, 
+                            birthdate = ?, previous_employer = ?, email_hash = ? 
+                            WHERE id = ?`, 
+                            [encEmail, encPhone, encAddr, encBday, encPrev, emailHash, row.id]
+                        );
+                        count++;
+                    }
+                });
+
+                db.run("COMMIT");
+            });
+
+            res.json({ success: true, data: `Migration complete. Encrypted ${count} records.` });
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, data: `Internal Server Error: ${error.message}` });
+    }
+});
+
 module.exports = router;

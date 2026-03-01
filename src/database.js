@@ -171,6 +171,10 @@ const initDB = () => {
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('afk_timer', '30')`);
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('open_positions', 'Security Guard,Lady Guard,VIP Escort,CCTV Operator,Driver')`);
         
+        // [ADD THIS] - Column for searchable hashed emails
+        database.run(`ALTER TABLE applicants ADD COLUMN email_hash TEXT`, (err) => {});
+        database.run(`CREATE INDEX IF NOT EXISTS idx_email_hash ON applicants(email_hash)`);
+        
         console.log('Database tables initialized.');
     });
 };

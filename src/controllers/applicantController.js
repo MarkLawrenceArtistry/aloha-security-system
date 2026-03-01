@@ -7,6 +7,7 @@ const { run, get, all } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger');
 const { sendStatusEmail } = require('../utils/emailService');
 const PDFDocument = require('pdfkit');
+const { encrypt, decrypt, hashData } = require('../utils/crypto');
 
 // POST /api/apply
 const apply = async (req, res) => {
@@ -65,9 +66,11 @@ const apply = async (req, res) => {
         }
 
         // 3. Validation: Duplicate Prevention (Name + Birthdate)
+        const emailHash = hashData(email); // <--- Create Hash
+        
         const existing = await get(
-            "SELECT id FROM applicants WHERE email = ?", 
-            [email]
+            "SELECT id FROM applicants WHERE email_hash = ?", // <--- Check Hash
+            [emailHash]
         );
 
         if (existing) {
@@ -99,14 +102,21 @@ const apply = async (req, res) => {
                 birthdate, gender, address, position_applied, 
                 years_experience, previous_employer, 
                 resume_path, id_image_path, ip_address,
-                resume_hash, id_image_hash
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                resume_hash, id_image_hash, email_hash
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
-            first_name, last_name, email, contact_num, 
-            birthdate, gender, address, position_applied, 
-            years_experience, previous_employer, 
+            first_name, last_name, 
+            encrypt(email),          // <--- Encrypt
+            encrypt(contact_num),    // <--- Encrypt
+            encrypt(birthdate),      // <--- Encrypt
+            gender, 
+            encrypt(address),        // <--- Encrypt
+            position_applied, 
+            years_experience, 
+            encrypt(previous_employer), // <--- Encrypt
             resumePath, idImagePath, ip_address,
-            resumeHash, idHash // <--- Add the hashes here
+            resumeHash, idHash, 
+            emailHash                // <--- Store Hash
         ]);
 
         if (req.io) {
@@ -132,31 +142,31 @@ const checkStatus = async (req, res) => {
     try {
         const { email, id } = req.query;
 
-        if(!email && !id) {
-            return res.status(400).json({success:false, data:"Please provide an Application ID or Email to check status."});
+        let applicant = null;
+
+        if (id) {
+            applicant = await get("SELECT * FROM applicants WHERE id = ?", [id]);
+        } else if (email) {
+            // Hash the input email to find it in DB
+            const lookupHash = hashData(email);
+            applicant = await get("SELECT * FROM applicants WHERE email_hash = ?", [lookupHash]);
         }
-
-        // --- FIX STARTS HERE ---
-        // Changed specific columns to * so we get ALL details (address, phone, images, etc)
-        let query = "SELECT * FROM applicants WHERE ";
-        let params = [];
-
-        if(id) {
-            query += "id = ?";
-            params.push(id);
-        } else {
-            query += "email = ?";
-            params.push(email);
-        }
-
-        const applicant = await get(query, params);
-        // --- FIX ENDS HERE ---
 
         if(!applicant) {
             return res.status(404).json({success:false, data:"Application not found."});
         }
 
-        return res.status(200).json({success:true, data: applicant});
+        // DECRYPT DATA BEFORE SENDING BACK
+        const decryptedApplicant = {
+            ...applicant,
+            email: decrypt(applicant.email),
+            contact_num: decrypt(applicant.contact_num),
+            address: decrypt(applicant.address),
+            birthdate: decrypt(applicant.birthdate),
+            previous_employer: decrypt(applicant.previous_employer)
+        };
+
+        return res.status(200).json({success:true, data: decryptedApplicant});
 
     } catch(err) {
         return res.status(500).json({success:false, data:`Internal Server Error: ${err.message}`});
@@ -195,11 +205,11 @@ const getAllApplicants = async (req, res) => {
         }
 
         // --- 2. SEARCH FILTERING ---
-        if (search) {
-            whereClauses.push(`(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR position_applied LIKE ?)`);
-            const searchTerm = `%${search}%`;
-            params.push(searchTerm, searchTerm, searchTerm, searchTerm);
-            countParams.push(searchTerm, searchTerm, searchTerm, searchTerm);
+        if (search && search.includes('@')) {
+             const searchHash = hashData(search);
+             whereClauses.push(`email_hash = ?`);
+             params.push(searchHash);
+             countParams.push(searchHash);
         }
 
         // Apply WHERE to queries
@@ -213,7 +223,13 @@ const getAllApplicants = async (req, res) => {
         query += ` ORDER BY created_at ${sort === 'asc' ? 'ASC' : 'DESC'} LIMIT ? OFFSET ?`;
         params.push(limit, offset);
 
-        const applicants = await all(query, params);
+        const applicantsRaw = await all(query, params);
+        const applicants = applicantsRaw.map(app => ({
+            ...app,
+            email: decrypt(app.email),
+            contact_num: decrypt(app.contact_num),
+            address: decrypt(app.address),
+        }));
         const countRes = await get(countQuery, countParams);
 
         // --- 4. KPIs (Exclude Archived and Hired) ---
