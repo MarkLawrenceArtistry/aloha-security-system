@@ -495,95 +495,98 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 1. ROBUST REAL-TIME SESSION TIMEOUT SYSTEM
     // ============================================================
-    const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
-    const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
-    
-    let sessionExpiry = Date.now() + SESSION_DURATION_MS;
-    let tickerInterval;
+    const isLoginPage = window.location.pathname.includes('login.html');
+    if (!isLoginPage && localStorage.getItem('admin_token')) {
+        const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
+        const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
+        
+        let sessionExpiry = Date.now() + SESSION_DURATION_MS;
+        let tickerInterval;
 
-    // Inject Modal HTML dynamically
-    if(!document.getElementById('session-modal')) {
-        document.body.insertAdjacentHTML('beforeend', `
-            <div id="session-modal" class="session-modal-overlay" style="z-index: 2147483647;">
-                <div class="session-modal-box">
-                    <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
-                    <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
-                    <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
-                        For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds.
-                    </p>
-                    <button id="btn-stay-active" class="btn-stay-login">
-                        <i class="bi bi-arrow-repeat"></i> I'm still working
-                    </button>
+        // Inject Modal HTML dynamically
+        if(!document.getElementById('session-modal')) {
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="session-modal" class="session-modal-overlay" style="z-index: 2147483647;">
+                    <div class="session-modal-box">
+                        <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
+                        <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
+                        <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
+                            For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds.
+                        </p>
+                        <button id="btn-stay-active" class="btn-stay-login">
+                            <i class="bi bi-arrow-repeat"></i> I'm still working
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `);
-    }
-
-    const sessionModal = document.getElementById('session-modal');
-    const stayActiveBtn = document.getElementById('btn-stay-active');
-    const modalCountdownEl = document.getElementById('countdown-timer');
-    const dashboardTimerEl = document.getElementById('sh-session-timer');
-
-    function formatTime(ms) {
-        if (ms < 0) ms = 0;
-        const totalSeconds = Math.floor(ms / 1000);
-        return `${String(Math.floor(totalSeconds / 60)).padStart(2, '0')}:${String(totalSeconds % 60).padStart(2, '0')}`;
-    }
-
-    function tick() {
-        if (!localStorage.getItem('admin_token')) return;
-
-        const timeLeft = sessionExpiry - Date.now();
-
-        if (dashboardTimerEl) {
-            dashboardTimerEl.innerText = formatTime(timeLeft);
-            dashboardTimerEl.style.color = timeLeft <= WARNING_THRESHOLD_MS ? '#ef4444' : '#ffffff';
+            `);
         }
 
-        if (timeLeft <= 0) {
-            // Anti-sleep logic: If browser slept and skipped the warning, give them 15 seconds to react now
-            if (!sessionModal.classList.contains('active')) {
-                sessionExpiry = Date.now() + 15000; 
-                sessionModal.classList.add('active');
+        const sessionModal = document.getElementById('session-modal');
+        const stayActiveBtn = document.getElementById('btn-stay-active');
+        const modalCountdownEl = document.getElementById('countdown-timer');
+        const dashboardTimerEl = document.getElementById('sh-session-timer');
+
+        function formatTime(ms) {
+            if (ms < 0) ms = 0;
+            const totalSeconds = Math.floor(ms / 1000);
+            return `${String(Math.floor(totalSeconds / 60)).padStart(2, '0')}:${String(totalSeconds % 60).padStart(2, '0')}`;
+        }
+
+        function tick() {
+            if (!localStorage.getItem('admin_token')) return;
+
+            const timeLeft = sessionExpiry - Date.now();
+
+            if (dashboardTimerEl) {
+                dashboardTimerEl.innerText = formatTime(timeLeft);
+                dashboardTimerEl.style.color = timeLeft <= WARNING_THRESHOLD_MS ? '#ef4444' : '#ffffff';
+            }
+
+            if (timeLeft <= 0) {
+                // Anti-sleep logic: If browser slept and skipped the warning, give them 15 seconds to react now
+                if (!sessionModal.classList.contains('active')) {
+                    sessionExpiry = Date.now() + 15000; 
+                    sessionModal.classList.add('active');
+                } else {
+                    // Time actually ran out while modal was open
+                    clearInterval(tickerInterval);
+                    sessionModal.classList.remove('active');
+                    // NO ALERT, JUST LOGOUT SILENTLY
+                    localStorage.removeItem('admin_token');
+                    window.location.href = 'login.html'; 
+                }
+            } else if (timeLeft <= WARNING_THRESHOLD_MS) {
+                if (!sessionModal.classList.contains('active')) sessionModal.classList.add('active');
+                if (modalCountdownEl) modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
             } else {
-                // Time actually ran out while modal was open
-                clearInterval(tickerInterval);
-                sessionModal.classList.remove('active');
-                // NO ALERT, JUST LOGOUT SILENTLY
-                localStorage.removeItem('admin_token');
-                window.location.href = 'login.html'; 
+                if (sessionModal.classList.contains('active')) sessionModal.classList.remove('active');
             }
-        } else if (timeLeft <= WARNING_THRESHOLD_MS) {
-            if (!sessionModal.classList.contains('active')) sessionModal.classList.add('active');
-            if (modalCountdownEl) modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
-        } else {
-            if (sessionModal.classList.contains('active')) sessionModal.classList.remove('active');
         }
-    }
 
-    if (stayActiveBtn) {
-        stayActiveBtn.addEventListener('click', () => {
-            sessionExpiry = Date.now() + SESSION_DURATION_MS;
-            sessionModal.classList.remove('active');
-            tick(); 
+        if (stayActiveBtn) {
+            stayActiveBtn.addEventListener('click', () => {
+                sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                sessionModal.classList.remove('active');
+                tick(); 
+            });
+        }
+
+        let throttleTimer;
+        ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                if (sessionModal.classList.contains('active')) return;
+                if (!throttleTimer) {
+                    throttleTimer = setTimeout(() => {
+                        sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                        throttleTimer = null;
+                    }, 1000);
+                }
+            });
         });
+
+        tickerInterval = setInterval(tick, 1000);
+        tick();
     }
-
-    let throttleTimer;
-    ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
-        document.addEventListener(evt, () => {
-            if (sessionModal.classList.contains('active')) return;
-            if (!throttleTimer) {
-                throttleTimer = setTimeout(() => {
-                    sessionExpiry = Date.now() + SESSION_DURATION_MS;
-                    throttleTimer = null;
-                }, 1000);
-            }
-        });
-    });
-
-    tickerInterval = setInterval(tick, 1000);
-    tick();
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {

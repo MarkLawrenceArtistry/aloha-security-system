@@ -97,29 +97,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const offlinePill = document.createElement('div');
-    offlinePill.className = 'offline-pill';
-    offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
-    document.body.appendChild(offlinePill);
+    if (window.location.pathname.includes('application.html')) {
+        const offlinePill = document.createElement('div');
+        offlinePill.className = 'offline-pill';
+        offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+        document.body.appendChild(offlinePill);
 
-    const updateOnlineStatus = () => {
-        if (!navigator.onLine) {
-            offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
-            offlinePill.classList.remove('online-flash');
-            offlinePill.classList.add('show');
-        } else {
-            // Flash green "Back online" before hiding
-            if (offlinePill.classList.contains('show')) {
-                offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
-                offlinePill.classList.add('online-flash');
-                setTimeout(() => {
-                    offlinePill.classList.remove('show');
-                }, 3000);
+        const updateOnlineStatus = () => {
+            if (!navigator.onLine) {
+                offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+                offlinePill.classList.remove('online-flash');
+                offlinePill.classList.add('show');
+            } else {
+                if (offlinePill.classList.contains('show')) {
+                    offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
+                    offlinePill.classList.add('online-flash');
+                    setTimeout(() => {
+                        offlinePill.classList.remove('show');
+                    }, 3000);
+                }
             }
-        }
-    };
+        };
 
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    if (!navigator.onLine) updateOnlineStatus();
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        if (!navigator.onLine) updateOnlineStatus();
+    }
 });

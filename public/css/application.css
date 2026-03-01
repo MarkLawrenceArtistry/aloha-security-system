@@ -207,6 +207,10 @@ body {
     transition: var(--transition);
 }
 
+.upload-card * {
+    pointer-events: none; /* Prevents children from interrupting the drag area */
+}
+
 /* Hover State */
 .upload-card:hover {
     border-color: var(--brand-red);

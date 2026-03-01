@@ -311,7 +311,7 @@
                     const floatingGuards = rosterData.filter(app => !activeDeploymentIds.includes(app.id));
 
                     // Update KPIs
-                    document.getElementById('roster-total').innerText = appRes.data.stats.total; // Use total from API or appRes.data.applicants.length
+                    document.getElementById('roster-total').innerText = rosterData.length; 
                     document.getElementById('roster-deployed').innerText = activeDeploymentIds.length;
                     document.getElementById('roster-floating').innerText = floatingGuards.length;
 
