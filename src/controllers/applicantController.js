@@ -146,31 +146,35 @@ const checkStatus = async (req, res) => {
 // GET /api/applicants (Protected)
 const getAllApplicants = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = '', sort = 'desc', status } = req.query; // <-- Add 'status'
+        const { page = 1, limit = 10, search = '', sort = 'desc', status } = req.query;
         const offset = (page - 1) * limit;
         
         let query = `SELECT * FROM applicants`;
         let countQuery = `SELECT COUNT(*) as count FROM applicants`;
         
         let whereClauses = [];
-        
-        if (status === 'Archived') {
-            if (req.user.role === 'Staff') {
-                return res.status(403).json({ success: false, data: "Access Denied: Admins only." });
-            }
-            whereClauses.push(`status = 'Archived'`);
-        } else {
-            whereClauses.push(`status != 'Archived'`);
-            if (status) {
-                whereClauses.push(`status = ?`);
-                params.push(status);
-                countParams.push(status);
-            }
-        }
-
         let params = [];
         let countParams = [];
 
+        // --- 1. STATUS & ROLE FILTERING ---
+        if (status === 'Archived') {
+            if (req.user.role === 'Staff') return res.status(403).json({ success: false, data: "Admins only." });
+            whereClauses.push(`status = 'Archived'`);
+        } 
+        else if (status === 'Hired') {
+            whereClauses.push(`status = 'Hired'`); // Used by Roster page
+        }
+        else if (status) {
+            whereClauses.push(`status = ?`); // Pending, Rejected, For Interview
+            params.push(status);
+            countParams.push(status);
+        }
+        else {
+            // Default Applicants page (No status clicked): Hide Hired and Archived
+            whereClauses.push(`status NOT IN ('Archived', 'Hired')`);
+        }
+
+        // --- 2. SEARCH FILTERING ---
         if (search) {
             whereClauses.push(`(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR position_applied LIKE ?)`);
             const searchTerm = `%${search}%`;
@@ -178,36 +182,24 @@ const getAllApplicants = async (req, res) => {
             countParams.push(searchTerm, searchTerm, searchTerm, searchTerm);
         }
 
-        if (status) {
-            whereClauses.push(`status = ?`);
-            params.push(status);
-            countParams.push(status);
-        }
-
+        // Apply WHERE to queries
         if (whereClauses.length > 0) {
             const whereString = ` WHERE ` + whereClauses.join(' AND ');
             query += whereString;
             countQuery += whereString;
         }
-        // --- END DYNAMIC WHERE CLAUSE ---
 
-        // Sorting logic
-        if (sort === 'alpha') {
-            query += ` ORDER BY last_name ASC`;
-        } else {
-            query += ` ORDER BY created_at ${sort === 'asc' ? 'ASC' : 'DESC'}`;
-        }
-        
-        query += ` LIMIT ? OFFSET ?`;
+        // --- 3. SORTING ---
+        query += ` ORDER BY created_at ${sort === 'asc' ? 'ASC' : 'DESC'} LIMIT ? OFFSET ?`;
         params.push(limit, offset);
 
         const applicants = await all(query, params);
         const countRes = await get(countQuery, countParams);
 
-        // KPIs for Wireframe (These are general stats, should not be filtered by the search)
-        const totalRes = await get("SELECT COUNT(*) as count FROM applicants WHERE status != 'Archived'");
-        const maleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Male' AND status != 'Archived'");
-        const femaleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Female' AND status != 'Archived'");
+        // --- 4. KPIs (Exclude Archived and Hired) ---
+        const totalRes = await get("SELECT COUNT(*) as count FROM applicants WHERE status NOT IN ('Archived', 'Hired')");
+        const maleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Male' AND status NOT IN ('Archived', 'Hired')");
+        const femaleRes = await get("SELECT COUNT(*) as count FROM applicants WHERE gender = 'Female' AND status NOT IN ('Archived', 'Hired')");
         const archivedRes = await get("SELECT COUNT(*) as count FROM applicants WHERE status = 'Archived'");
 
         res.status(200).json({
@@ -223,11 +215,12 @@ const getAllApplicants = async (req, res) => {
                     total: totalRes.count,
                     male: maleRes.count,
                     female: femaleRes.count,
-                    archived: archivedRes.count // Changed 'this_month' to 'archived'
+                    archived: archivedRes.count
                 }
             }
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, data: err.message });
     }
 };

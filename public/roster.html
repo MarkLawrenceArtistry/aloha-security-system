@@ -49,11 +49,21 @@
                     <i class="bi bi-search"></i>
                     <input type="text" id="roster-search" class="search-input-modern" placeholder="Search guard name...">
                 </div>
-                <div>
+                
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="btn-delete-custom" class="btn-reject admin-only" style="display: none; padding: 10px 16px; font-size: 0.85rem; background: #dc2626; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        <i class="bi bi-trash3-fill"></i> Delete Selected
+                    </button>
                     <a href="deploy-form.html" class="btn-toolbar-add">
                         <i class="bi bi-send-check"></i> Assign Duty
                     </a>
                 </div>
+            </div>
+            
+            <!-- Select All Checkbox -->
+            <div class="select-all-bar admin-only" style="padding: 12px 25px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
+                <input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer; accent-color: #e53828;">
+                <label for="check-all" style="font-size: 0.85rem; font-weight: 700; color: #475569; cursor: pointer; user-select: none;">Select All On Page</label>
             </div>
 
             <div class="facility-grid" id="roster-grid">
@@ -61,6 +71,26 @@
             </div>
         </div>
     </main>
+
+    <div id="delete-reason-modal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div class="modal-icon-warning" style="color: #dc2626; background: #fef2f2;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3 class="custom-modal-title">Archive Records?</h3>
+            <p class="custom-modal-text" style="margin-bottom: 15px;">
+                You are about to remove these guards from the roster and archive their data.
+            </p>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: #475569; text-transform: uppercase;">Reason for Deletion (Required)<span style="color:red;">*</span></label>
+                <textarea id="delete-reason-input" rows="3" placeholder="e.g., Resigned, Terminated, AWOL..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.9rem; margin-top: 5px; resize: none; outline: none;"></textarea>
+            </div>
+            <div class="custom-modal-actions">
+                <button id="cancel-delete" class="btn-modal-cancel">Cancel</button>
+                <button id="confirm-delete" class="btn-modal-confirm" style="background: #dc2626;">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- CUSTOM LOGOUT MODAL -->
     <div id="custom-logout-modal" class="custom-modal-overlay">
@@ -94,6 +124,96 @@
                 );
                 renderRoster(filtered, query);
             });
+
+            const grid = document.getElementById('roster-grid');
+            const deleteBtn = document.getElementById('btn-delete-custom');
+            const checkAll = document.getElementById('check-all');
+            
+            window.toggleCardSelection = function(card, event) {
+                if (event.target.closest('a') || event.target.closest('button')) return;
+                
+                const checkbox = card.querySelector('.card-checkbox');
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('is-selected', checkbox.checked);
+                
+                updateDeleteVisibility();
+            };
+
+            function updateDeleteVisibility() {
+                const count = document.querySelectorAll('.card-checkbox:checked').length;
+                const deleteBtn = document.getElementById('btn-delete-custom');
+                const assignBtn = document.querySelector('.btn-toolbar-add'); // Grab Assign Duty Button
+                
+                if (count > 0) {
+                    deleteBtn.style.display = 'inline-flex';
+                    deleteBtn.innerHTML = `<i class="bi bi-trash3-fill"></i> Delete Selected (${count})`;
+                    if (assignBtn) assignBtn.style.display = 'none'; // Hide Assign Duty
+                } else {
+                    deleteBtn.style.display = 'none';
+                    if (assignBtn) assignBtn.style.display = 'inline-flex'; // Show Assign Duty
+                }
+            }
+
+            if (checkAll) {
+                checkAll.addEventListener('change', (e) => {
+                    document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = e.target.checked);
+                    updateDeleteVisibility();
+                });
+            }
+
+            if (grid) {
+                grid.addEventListener('change', (e) => {
+                    if(e.target.classList.contains('card-checkbox')) updateDeleteVisibility();
+                });
+            }
+
+            const deleteModal = document.getElementById('delete-reason-modal');
+            const cancelDelete = document.getElementById('cancel-delete');
+            const confirmDelete = document.getElementById('confirm-delete');
+            const reasonInput = document.getElementById('delete-reason-input');
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    reasonInput.value = '';
+                    reasonInput.style.borderColor = '#cbd5e1';
+                    deleteModal.classList.add('active');
+                });
+            }
+
+            if (cancelDelete) cancelDelete.addEventListener('click', () => deleteModal.classList.remove('active'));
+
+            if (confirmDelete) {
+                confirmDelete.addEventListener('click', async () => {
+                    const reason = reasonInput.value.trim();
+                    if (!reason) {
+                        reasonInput.style.borderColor = 'red';
+                        return;
+                    }
+
+                    const selectedIds = Array.from(document.querySelectorAll('.card-checkbox:checked')).map(cb => cb.value);
+                    confirmDelete.innerHTML = "Processing...";
+                    confirmDelete.disabled = true;
+
+                    const token = getToken();
+                    const deletePromises = selectedIds.map(id => 
+                        fetch(`/api/applicants/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ reason: reason })
+                        }).then(res => res.json())
+                    );
+
+                    await Promise.all(deletePromises);
+                    
+                    deleteModal.classList.remove('active');
+                    confirmDelete.innerHTML = "Confirm";
+                    confirmDelete.disabled = false;
+                    if(checkAll) checkAll.checked = false;
+                    deleteBtn.style.display = 'none';
+                    
+                    fetchRoster(); // Refresh
+                });
+            }
 
             // --- Intercept Logout Safely ---
             const logoutSidebarBtn = document.getElementById('logout-btn');
@@ -173,8 +293,15 @@
                 const animDelay = `animation-delay: ${index * 0.05}s;`;
                 
                 return `
-                    <div class="deployment-card" style="${animDelay}">
-                        <div class="tag-container">
+                    <div class="deployment-card" style="${animDelay}; cursor: pointer;" onclick="toggleCardSelection(this, event)">
+                        
+                        <!-- NEW SELECTION OVERLAY -->
+                        <div class="selection-overlay admin-only">
+                            <input type="checkbox" class="card-checkbox" value="${app.id}" onclick="event.stopPropagation()">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+
+                        <div class="tag-container" style="margin-bottom: 12px; display: flex; justify-content: flex-end;">
                             <div class="card-tag secured">
                                 <i class="bi bi-shield-check"></i> Cleared for Duty
                             </div>

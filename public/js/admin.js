@@ -477,7 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 4. SMART FETCH (Network First -> LocalStorage Fallback)
     // ============================================================
-    
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
@@ -489,109 +488,91 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    
+
+
+
     // ============================================================
-    // 1. AFK AUTO-LOGOUT SYSTEM (30 Minutes)
+    // 1. ROBUST REAL-TIME SESSION TIMEOUT SYSTEM
     // ============================================================
     const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
-    const WARNING_THRESHOLD_MS = 60 * 1000; // Show modal at 60 seconds left
+    const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
     
     let sessionExpiry = Date.now() + SESSION_DURATION_MS;
     let tickerInterval;
 
     // Inject Modal HTML dynamically
-    const sessionModalHTML = `
-        <div id="session-modal" class="session-modal-overlay">
-            <div class="session-modal-box">
-                <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
-                <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
-                <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
-                    For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds due to inactivity.
-                </p>
-                <button id="btn-stay-active" class="btn-stay-login">
-                    <i class="bi bi-arrow-repeat"></i> I'm still working
-                </button>
-            </div>
-        </div>
-    `;
-    
     if(!document.getElementById('session-modal')) {
-        document.body.insertAdjacentHTML('beforeend', sessionModalHTML);
+        document.body.insertAdjacentHTML('beforeend', `
+            <div id="session-modal" class="session-modal-overlay" style="z-index: 2147483647;">
+                <div class="session-modal-box">
+                    <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
+                    <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
+                    <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
+                        For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds.
+                    </p>
+                    <button id="btn-stay-active" class="btn-stay-login">
+                        <i class="bi bi-arrow-repeat"></i> I'm still working
+                    </button>
+                </div>
+            </div>
+        `);
     }
 
     const sessionModal = document.getElementById('session-modal');
     const stayActiveBtn = document.getElementById('btn-stay-active');
     const modalCountdownEl = document.getElementById('countdown-timer');
-    const dashboardTimerEl = document.getElementById('sh-session-timer'); // Only exists on dashboard
+    const dashboardTimerEl = document.getElementById('sh-session-timer');
 
     function formatTime(ms) {
         if (ms < 0) ms = 0;
         const totalSeconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        return `${String(Math.floor(totalSeconds / 60)).padStart(2, '0')}:${String(totalSeconds % 60).padStart(2, '0')}`;
     }
 
     function tick() {
-        if (!localStorage.getItem('admin_token')) return; // Stop if logged out
+        if (!localStorage.getItem('admin_token')) return;
 
         const timeLeft = sessionExpiry - Date.now();
 
-        // 1. Update Dashboard UI (if it exists)
         if (dashboardTimerEl) {
             dashboardTimerEl.innerText = formatTime(timeLeft);
-            // Turn text red if under 1 minute
-            if (timeLeft <= WARNING_THRESHOLD_MS) {
-                dashboardTimerEl.style.color = '#ef4444';
-            } else {
-                dashboardTimerEl.style.color = '#ffffff';
-            }
+            dashboardTimerEl.style.color = timeLeft <= WARNING_THRESHOLD_MS ? '#ef4444' : '#ffffff';
         }
 
-        // 2. Handle Logic based on time left
         if (timeLeft <= 0) {
-            clearInterval(tickerInterval);
-            sessionModal.classList.remove('active');
-            alert("Session expired due to inactivity.");
-            logout();
-        } else if (timeLeft <= WARNING_THRESHOLD_MS) {
-            // Show modal and update its internal seconds counter
+            // Anti-sleep logic: If browser slept and skipped the warning, give them 15 seconds to react now
             if (!sessionModal.classList.contains('active')) {
+                sessionExpiry = Date.now() + 15000; 
                 sessionModal.classList.add('active');
-            }
-            if (modalCountdownEl) {
-                modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
-            }
-        } else {
-            // Ensure modal is hidden if time is safe (e.g. after a reset)
-            if (sessionModal.classList.contains('active')) {
+            } else {
+                // Time actually ran out while modal was open
+                clearInterval(tickerInterval);
                 sessionModal.classList.remove('active');
+                // NO ALERT, JUST LOGOUT SILENTLY
+                localStorage.removeItem('admin_token');
+                window.location.href = 'login.html'; 
             }
+        } else if (timeLeft <= WARNING_THRESHOLD_MS) {
+            if (!sessionModal.classList.contains('active')) sessionModal.classList.add('active');
+            if (modalCountdownEl) modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
+        } else {
+            if (sessionModal.classList.contains('active')) sessionModal.classList.remove('active');
         }
     }
 
-    function resetSession() {
-        sessionExpiry = Date.now() + SESSION_DURATION_MS;
-        if (sessionModal.classList.contains('active')) {
-            sessionModal.classList.remove('active');
-        }
-        // Force an immediate UI update so it doesn't lag for a second
-        tick(); 
-    }
-
-    // Attach listener to Modal Button
     if (stayActiveBtn) {
-        stayActiveBtn.addEventListener('click', resetSession);
+        stayActiveBtn.addEventListener('click', () => {
+            sessionExpiry = Date.now() + SESSION_DURATION_MS;
+            sessionModal.classList.remove('active');
+            tick(); 
+        });
     }
 
-    // Reset session on user activity (Throttle so we don't calculate on every single pixel of mouse movement)
     let throttleTimer;
     ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
         document.addEventListener(evt, () => {
-            // Do NOT reset if the warning modal is currently showing. 
-            // Force them to click the "I'm still working" button to acknowledge.
             if (sessionModal.classList.contains('active')) return;
-
-            // Only update the expiry time max once per second to save CPU
             if (!throttleTimer) {
                 throttleTimer = setTimeout(() => {
                     sessionExpiry = Date.now() + SESSION_DURATION_MS;
@@ -601,74 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Start Ticking
     tickerInterval = setInterval(tick, 1000);
-    tick(); // Run immediately once
-
-    if (typeof io !== 'undefined' && getToken()) {
-        const socket = io();
-
-        socket.on('new_application', (data) => {
-            console.log("Real-time update: New Application received", data);
-            
-            // 1. Show sleek notification toast
-            showRealTimeToast('Incoming Application', `<strong>${data.name}</strong> just applied for <strong>${data.position}</strong>.`);
-
-            // 2. Auto-refresh data on the current page if the functions exist
-            if (typeof initDashboard === 'function') initDashboard();
-            if (typeof fetchApplicants === 'function') fetchApplicants();
-        });
-    }
-
-    // Universal Toast function for Global Admin
-    function showRealTimeToast(title, message) {
-        let container = document.getElementById('global-toast-container');
-        
-        // Create container if it doesn't exist
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'global-toast-container';
-            container.style.cssText = "position: fixed; top: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 12px;";
-            document.body.appendChild(container);
-        }
-
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            background: #ffffff; padding: 16px 20px; border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            display: flex; align-items: center; gap: 15px; min-width: 320px;
-            border-left: 4px solid #3b82f6;
-            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Inter', sans-serif;
-        `;
-        
-        // Add animation styles dynamically if not present
-        if(!document.getElementById('toast-keyframes')) {
-            const style = document.createElement('style');
-            style.id = 'toast-keyframes';
-            style.innerHTML = `
-                @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-                @keyframes fadeOutRight { to { transform: translateX(100%); opacity: 0; } }
-            `;
-            document.head.appendChild(style);
-        }
-
-        toast.innerHTML = `
-            <div style="width: 38px; height: 38px; border-radius: 10px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
-                <i class="bi bi-bell-fill"></i>
-            </div>
-            <div style="flex: 1;">
-                <h4 style="margin: 0 0 4px 0; font-size: 0.9rem; font-weight: 800; color: #0f172a;">${title}</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.4;">${message}</p>
-            </div>
-        `;
-
-        container.appendChild(toast);
-
-        // Remove after 5 seconds
-        setTimeout(() => {
-            toast.style.animation = "fadeOutRight 0.3s ease forwards";
-            setTimeout(() => toast.remove(), 300);
-        }, 5000);
-    }
+    tick();
 });

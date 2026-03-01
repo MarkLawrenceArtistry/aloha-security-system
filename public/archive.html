@@ -30,11 +30,18 @@
     </nav>
 
     <main class="main-content">
+        
         <div class="page-header-modern">
             <div class="header-icon" style="color: #475569; background: #f1f5f9;"><i class="bi bi-archive-fill"></i></div>
             <div>
                 <h1 style="font-family: 'Helvetica Display'; font-weight: 800; font-size: 1.6rem; color: #0f172a;">Legal Archive</h1>
                 <p style="color: #64748b; font-size: 0.95rem;">Read-only repository of soft-deleted records. Subject to 3-month hard deletion policy.</p>
+            </div> <br>
+            <div class="toolbar-modern" style="background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
+                <div style="position: relative; flex: 1; max-width: 400px;">
+                    <i class="bi bi-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="text" id="archive-search" placeholder="Search archive by name or position..." style="width: 100%; padding: 12px 15px 12px 40px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; background: #f8fafc; font-family: inherit;">
+                </div>
             </div>
         </div>
 
@@ -78,8 +85,9 @@
         let archiveData = [];
 
         async function fetchArchive() {
+            const searchVal = document.getElementById('archive-search') ? document.getElementById('archive-search').value : '';
             try {
-                const res = await fetch('/api/applicants?status=Archived&limit=100', {
+                const res = await fetch(`/api/applicants?status=Archived&limit=100&search=${encodeURIComponent(searchVal)}`, {
                     headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
                 const json = await res.json();
@@ -98,12 +106,16 @@
                             <td style="padding: 16px 25px; font-weight: 700; color: #0f172a;">${app.first_name} ${app.last_name}</td>
                             <td style="padding: 16px 25px; color: #475569;">${app.position_applied}</td>
                             <td style="padding: 16px 25px; color: #ef4444; font-size: 0.85rem;"><i class="bi bi-clock-history"></i> ${new Date(app.updated_at).toLocaleDateString()}</td>
-                            <td style="padding: 16px 25px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
-                                <!-- NEW RESTORE BUTTON -->
-                                <button onclick="restoreApplicant(${app.id})" style="background: #ecfdf5; border: 1px solid #10b981; color: #10b981; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+                            <td style="padding: 16px 25px; text-align: right; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+                                <!-- RESTORE OPTIONS -->
+                                <button onclick="restoreApplicant(${app.id}, 'Pending')" style="background: #fffbeb; border: 1px solid #f59e0b; color: #d97706; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;" title="Restore to Pending"><i class="bi bi-hourglass-split"></i> To Pending</button>
                                 
-                                <button onclick="viewDetails(${app.id})" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;"><i class="bi bi-eye"></i> View</button>
-                                <button onclick="downloadPdf(${app.id})" style="background: #e53828; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;"><i class="bi bi-file-pdf-fill"></i> PDF</button>
+                                <button onclick="restoreApplicant(${app.id}, 'Hired')" style="background: #ecfdf5; border: 1px solid #10b981; color: #10b981; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;" title="Restore to Active Roster"><i class="bi bi-check-circle"></i> To Hired</button>
+                                
+                                <!-- VIEW & EXPORT -->
+                                <button onclick="viewDetails(${app.id})" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;" title="View Details"><i class="bi bi-eye"></i></button>
+                                
+                                <button onclick="downloadPdf(${app.id})" style="background: #e53828; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;" title="Export PDF"><i class="bi bi-file-pdf-fill"></i></button>
                             </td>
                         </tr>
                     `).join('');
@@ -139,8 +151,8 @@
             document.getElementById('view-modal').style.display = 'flex';
         }
 
-        async function restoreApplicant(id) {
-            if(!confirm("Restore this applicant? They will be returned to the main tracking list under 'Pending' status.")) return;
+        async function restoreApplicant(id, status) {
+            if(!confirm(`Are you sure you want to restore this applicant to '${status}' status?`)) return;
 
             try {
                 const res = await fetch(`/api/applicants/${id}/status`, {
@@ -149,13 +161,15 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${getToken()}`
                     },
-                    body: JSON.stringify({ status: 'Pending', message: 'Restored from Archive' })
+                    body: JSON.stringify({ 
+                        status: status, 
+                        message: `Manually restored from Archive directly to ${status}` 
+                    })
                 });
                 
                 const json = await res.json();
                 if(json.success) {
-                    alert("Applicant successfully restored!");
-                    fetchArchive(); // Refresh list to remove them
+                    fetchArchive(); // Refresh list to remove them from archive view
                 } else {
                     alert("Failed to restore.");
                 }
@@ -193,7 +207,11 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchArchive);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchArchive();
+            const searchInput = document.getElementById('archive-search');
+            if (searchInput) searchInput.addEventListener('input', fetchArchive);
+        });
     </script>
 </body>
 </html>

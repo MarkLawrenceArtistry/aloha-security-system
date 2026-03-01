@@ -50,11 +50,22 @@
 
         <div class="log-table-wrapper stagger-2">
             <!-- Search Toolbar -->
-            <div class="toolbar-modern">
-                <div class="search-wrapper">
+            <div class="toolbar-modern" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div class="search-wrapper" style="flex: 1; min-width: 250px;">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="search-input" class="search-input-modern" placeholder="Search logs by action, admin username, or details...">
+                    <input type="text" id="search-input" class="search-input-modern" placeholder="Search logs...">
                 </div>
+                <select id="action-filter" class="search-input-modern" style="width: auto; padding-left: 15px; cursor: pointer;">
+                    <option value="">All Actions</option>
+                    <option value="CREATE">Creates / Adds</option>
+                    <option value="UPDATE">Updates / Edits</option>
+                    <option value="DELETE">Deletions</option>
+                    <option value="LOGIN">Auth / Logins</option>
+                </select>
+                <select id="sort-select" class="search-input-modern" style="width: auto; padding-left: 15px; cursor: pointer;">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
             </div>
 
             <!-- Table -->
@@ -114,13 +125,14 @@
             if(!token) { window.location.href = 'login.html'; return; }
 
             const search = document.getElementById('search-input').value;
+            const filter = document.getElementById('action-filter').value;
+            const sort = document.getElementById('sort-select').value;
             const tbody = document.getElementById('logs-body');
             
-            // Modern Loading State
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;"><i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display:inline-block; margin-right: 8px;"></i> Fetching secure logs...</td></tr>';
 
             try {
-                const res = await fetch(`/api/audit/logs?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}`, {
+                const res = await fetch(`/api/audit/logs?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}&filter=${filter}&sort=${sort}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await res.json();
@@ -188,6 +200,9 @@
             fetchLogs();
             document.getElementById('prev-btn').addEventListener('click', () => { if(currentPage > 1) { currentPage--; fetchLogs(); } });
             document.getElementById('next-btn').addEventListener('click', () => { currentPage++; fetchLogs(); });
+            document.getElementById('search-input').addEventListener('input', () => { currentPage = 1; fetchLogs(); });
+            document.getElementById('action-filter').addEventListener('change', () => { currentPage = 1; fetchLogs(); });
+            document.getElementById('sort-select').addEventListener('change', () => { currentPage = 1; fetchLogs(); });
             
             // Search Input with reset to page 1
             document.getElementById('search-input').addEventListener('input', () => {
