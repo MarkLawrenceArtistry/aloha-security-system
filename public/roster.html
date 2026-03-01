@@ -42,12 +42,36 @@
             </div>
         </div>
 
+        <div class="stats-grid stagger-2" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <i class="bi bi-person-check-fill bg-icon"></i>
+                <div class="stat-number" id="roster-total">-</div>
+                <div class="stat-label">Total Active Guards</div>
+            </div>
+            <div class="stat-card">
+                <i class="bi bi-shield-fill bg-icon"></i>
+                <div class="stat-number" id="roster-deployed">-</div>
+                <div class="stat-label">Currently Deployed</div>
+            </div>
+            <div class="stat-card">
+                <i class="bi bi-hourglass-bottom bg-icon"></i>
+                <div class="stat-number" id="roster-floating">-</div>
+                <div class="stat-label">Awaiting Assignment</div>
+            </div>
+        </div>
+
         <!-- Main Content Wrapper -->
-        <div class="content-wrapper-modern stagger-2">
-            <div class="toolbar-modern">
-                <div class="search-wrapper">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="roster-search" class="search-input-modern" placeholder="Search guard name...">
+        <div class="toolbar-modern">
+                <div class="search-wrapper" style="display: flex; gap: 15px;">
+                    <div style="position: relative; flex: 1;">
+                        <i class="bi bi-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                        <input type="text" id="roster-search" class="search-input-modern" style="padding-left: 40px; width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; height: 45px; outline: none;" placeholder="Search guard name...">
+                    </div>
+                    <select id="roster-sort" class="search-input-modern" style="padding-left: 15px; width: auto; border: 1px solid #cbd5e1; border-radius: 10px; height: 45px; outline: none; cursor: pointer;">
+                        <option value="desc">Newest Hired</option>
+                        <option value="asc">Oldest Hired</option>
+                        <option value="alpha">Alphabetical (A-Z)</option>
+                    </select>
                 </div>
                 
                 <div style="display: flex; gap: 10px; align-items: center;">
@@ -252,23 +276,56 @@
         async function fetchRoster() {
             const token = localStorage.getItem('admin_token');
             const grid = document.getElementById('roster-grid');
+            
+            // Get inputs
+            const searchInput = document.getElementById('roster-search');
+            const sortInput = document.getElementById('roster-sort');
+            const searchVal = searchInput ? searchInput.value : '';
+            const sortVal = sortInput ? sortInput.value : 'desc';
+
             grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #64748b;"><i class="bi bi-arrow-clockwise" style="animation: spin 1s infinite linear; display:inline-block; margin-right:8px;"></i> Loading personnel...</div>';
 
             try {
-                // CHANGED: Use fetchData (assumes it is in your js/admin.js)
-                const json = await fetchData('/api/applicants?status=Hired&limit=500', {
+                // Fetch Applicants (Hired)
+                const appRes = await fetchData(`/api/applicants?status=Hired&limit=500&search=${encodeURIComponent(searchVal)}&sort=${sortVal}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
-                if(json.success) {
-                    rosterData = json.data.applicants;
-                    renderRoster(rosterData, '');
+                // Fetch Deployments to cross-reference who is active
+                const depRes = await fetchData(`/api/deployments?limit=500`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                let activeDeploymentIds = [];
+                if (depRes.success) {
+                    activeDeploymentIds = depRes.data.deployments
+                        .filter(d => d.status === 'Active')
+                        .map(d => d.applicant_id);
+                }
+
+                if(appRes.success) {
+                    rosterData = appRes.data.applicants;
+                    
+                    // Filter out guards who are currently deployed! (Roster should only show available guards)
+                    // If you want to show ALL hired guards, remove this filter line.
+                    const floatingGuards = rosterData.filter(app => !activeDeploymentIds.includes(app.id));
+
+                    // Update KPIs
+                    document.getElementById('roster-total').innerText = appRes.data.stats.total; // Use total from API or appRes.data.applicants.length
+                    document.getElementById('roster-deployed').innerText = activeDeploymentIds.length;
+                    document.getElementById('roster-floating').innerText = floatingGuards.length;
+
+                    renderRoster(floatingGuards, searchVal);
                 }
             } catch (err) {
                 console.error(err);
                 grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #ef4444;">Failed to load roster data.</div>';
             }
         }
+
+        // Add listeners outside
+        document.getElementById('roster-search').addEventListener('input', fetchRoster);
+        document.getElementById('roster-sort').addEventListener('change', fetchRoster);
 
         function highlightText(text, query) {
             if (!query) return text;

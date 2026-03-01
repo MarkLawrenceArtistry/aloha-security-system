@@ -282,15 +282,34 @@ const getDashboardStats = async (req, res) => {
             ? path.join(process.env.VOLUME_PATH, 'aloha_database.db')
             : path.join(__dirname, '../../aloha_database.db');
 
+        const UPLOAD_PATH = process.env.VOLUME_PATH 
+            ? path.join(process.env.VOLUME_PATH, 'uploads')
+            : path.join(__dirname, '../../public/uploads');
+
+        let totalSizeBytes = 0;
+
+        // Get DB Size
+        if (fs.existsSync(DB_PATH)) {
+            const stats = fs.statSync(DB_PATH);
+            totalSizeBytes += stats.size;
+        }
+
+        // Get Uploads Folder Size
+        if (fs.existsSync(UPLOAD_PATH)) {
+            const files = fs.readdirSync(UPLOAD_PATH);
+            files.forEach(file => {
+                const filePath = path.join(UPLOAD_PATH, file);
+                const stats = fs.statSync(filePath);
+                if (stats.isFile()) totalSizeBytes += stats.size;
+            });
+        }
+
+        const totalSizeMB = (totalSizeBytes / (1024 * 1024)).toFixed(2);
+        // ------------------------------------
+        
         const AUTO_BACKUP_PATH = process.env.VOLUME_PATH
             ? path.join(process.env.VOLUME_PATH, 'aloha_auto_backup.db')
             : path.join(__dirname, '../../aloha_auto_backup.db');
-
-        let dbSizeMB = "0.00";
-        if (fs.existsSync(DB_PATH)) {
-            const stats = fs.statSync(DB_PATH);
-            dbSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
-        }
 
         let lastBackup = "No automated backup yet";
         if (fs.existsSync(AUTO_BACKUP_PATH)) {
@@ -330,7 +349,7 @@ const getDashboardStats = async (req, res) => {
                 },
                 system_health: {
                     uptime: uptimeStr,
-                    db_size: dbSizeMB,
+                    db_size: totalSizeMB,
                     last_backup: lastBackup,
                     next_maintenance: nextMaintenanceStr,
                     next_purge: nextPurgeStr // <-- Add this to payload

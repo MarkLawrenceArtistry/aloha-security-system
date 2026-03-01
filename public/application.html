@@ -494,6 +494,51 @@
             const formFields = form.querySelectorAll('input, select, textarea, .address-part');
             const DRAFT_KEY = 'aloha_application_draft';
 
+            // Load Draft FIRST so flatpickr can use the saved value
+            let savedDate = null;
+            const loadDraft = () => {
+                const draft = localStorage.getItem(DRAFT_KEY);
+                if (draft) {
+                    const data = JSON.parse(draft);
+                    for (const key in data) {
+                        const field = form.querySelector(`[name="${key}"]`);
+                        if (field && data[key]) field.value = data[key];
+                        if (key === 'birthdate') savedDate = data[key]; // Catch date
+                    }
+                }
+            };
+            loadDraft();
+
+            // Initialize Flatpickr WITH saved date
+            const fp = flatpickr("#birthdate", {
+                altInput: true,
+                altFormat: "F j, Y", 
+                dateFormat: "Y-m-d",
+                defaultDate: savedDate, // Restores saved date visually
+                maxDate: new Date().fp_incr(-21 * 365), 
+                disableMobile: "true",
+                onChange: function(selectedDates, dateStr, instance) {
+                    saveDraft(); // Save draft when date changes
+                }
+            });
+
+            // Save Draft Function
+            const saveDraft = () => {
+                const formData = new FormData(form);
+                const formObject = Object.fromEntries(formData.entries());
+                delete formObject.resume;
+                delete formObject.id_image;
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(formObject));
+            };
+
+            // Attach listeners to ALL inputs (both input and change events for dropdowns)
+            formFields.forEach(field => {
+                if (field.type !== 'file') {
+                    field.addEventListener('input', saveDraft);
+                    field.addEventListener('change', saveDraft); 
+                }
+            });
+
             const numberFields = ['contact_num', 'years_experience'];
 
             numberFields.forEach(id => {
@@ -541,25 +586,6 @@
                     });
                 }
             });
-
-            const saveDraft = () => {
-                const formData = new FormData(form);
-                const formObject = Object.fromEntries(formData.entries());
-                delete formObject.resume;
-                delete formObject.id_image;
-                localStorage.setItem(DRAFT_KEY, JSON.stringify(formObject));
-            };
-
-            const loadDraft = () => {
-                const draft = localStorage.getItem(DRAFT_KEY);
-                if (draft) {
-                    const data = JSON.parse(draft);
-                    for (const key in data) {
-                        const field = form.querySelector(`[name="${key}"]`);
-                        if (field && data[key]) field.value = data[key];
-                    }
-                }
-            };
 
             loadDraft();
             formFields.forEach(field => {
@@ -792,35 +818,40 @@
 
             card.addEventListener('click', () => input.click());
 
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                card.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+
+            // Add highlight
             ['dragenter', 'dragover'].forEach(eventName => {
-                card.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    card.classList.add('drag-over');
-                });
+                card.addEventListener(eventName, () => card.classList.add('drag-over'));
             });
 
+            // Remove highlight
             ['dragleave', 'drop'].forEach(eventName => {
-                card.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    card.classList.remove('drag-over');
-                });
+                card.addEventListener(eventName, () => card.classList.remove('drag-over'));
             });
 
+            // Handle the Drop
             card.addEventListener('drop', (e) => {
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
+                    // Update the input files
                     input.files = files;
-                    label.textContent = files[0].name;
-                    card.style.borderColor = 'var(--brand-black)'; // Indicate file dropped
+                    // Update UI text
+                    label.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> ${files[0].name}</span>`;
+                    card.style.borderColor = 'var(--brand-red)';
                 }
             });
 
+            // Handle Manual Click Upload
             input.addEventListener('change', (e) => {
                 if (input.files.length > 0) {
-                    label.textContent = input.files[0].name;
-                    card.style.borderColor = 'var(--brand-black)'; // Indicate file selected
+                    label.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> ${input.files[0].name}</span>`;
+                    card.style.borderColor = 'var(--brand-red)'; 
                 }
             });
         });
