@@ -88,6 +88,13 @@ const apply = async (req, res) => {
             resumePath, idImagePath, ip_address // <--- Pass the IP variable here
         ]);
 
+        if (req.io) {
+            req.io.emit('new_application', {
+                name: `${first_name} ${last_name}`,
+                position: position_applied
+            });
+        }
+
         return res.status(201).json({success:true, data: {
             message: "Application submitted successfully!",
             applicant_id: result.lastID

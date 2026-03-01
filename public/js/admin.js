@@ -604,4 +604,71 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start Ticking
     tickerInterval = setInterval(tick, 1000);
     tick(); // Run immediately once
+
+    if (typeof io !== 'undefined' && getToken()) {
+        const socket = io();
+
+        socket.on('new_application', (data) => {
+            console.log("Real-time update: New Application received", data);
+            
+            // 1. Show sleek notification toast
+            showRealTimeToast('Incoming Application', `<strong>${data.name}</strong> just applied for <strong>${data.position}</strong>.`);
+
+            // 2. Auto-refresh data on the current page if the functions exist
+            if (typeof initDashboard === 'function') initDashboard();
+            if (typeof fetchApplicants === 'function') fetchApplicants();
+        });
+    }
+
+    // Universal Toast function for Global Admin
+    function showRealTimeToast(title, message) {
+        let container = document.getElementById('global-toast-container');
+        
+        // Create container if it doesn't exist
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'global-toast-container';
+            container.style.cssText = "position: fixed; top: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 12px;";
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background: #ffffff; padding: 16px 20px; border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: flex; align-items: center; gap: 15px; min-width: 320px;
+            border-left: 4px solid #3b82f6;
+            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Inter', sans-serif;
+        `;
+        
+        // Add animation styles dynamically if not present
+        if(!document.getElementById('toast-keyframes')) {
+            const style = document.createElement('style');
+            style.id = 'toast-keyframes';
+            style.innerHTML = `
+                @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+                @keyframes fadeOutRight { to { transform: translateX(100%); opacity: 0; } }
+            `;
+            document.head.appendChild(style);
+        }
+
+        toast.innerHTML = `
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <div style="flex: 1;">
+                <h4 style="margin: 0 0 4px 0; font-size: 0.9rem; font-weight: 800; color: #0f172a;">${title}</h4>
+                <p style="margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.4;">${message}</p>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Remove after 5 seconds
+        setTimeout(() => {
+            toast.style.animation = "fadeOutRight 0.3s ease forwards";
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
 });
