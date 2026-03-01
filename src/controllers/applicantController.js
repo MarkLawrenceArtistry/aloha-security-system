@@ -282,13 +282,13 @@ const getAllApplicants = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, message } = req.body; // <-- Accept 'message' for interview instructions
+        const { status, message } = req.body; 
 
         if (!id || !status) {
             return res.status(400).json({ success: false, data: "ID and Status are required." });
         }
 
-        // 1. Get Applicant Details (Email is needed for sending)
+        // 1. Get Applicant Details 
         const applicant = await get("SELECT * FROM applicants WHERE id = ?", [id]);
         if (!applicant) {
             return res.status(404).json({ success: false, data: "Applicant not found." });
@@ -300,7 +300,10 @@ const updateStatus = async (req, res) => {
         const details = `Admin User ID #${req.user.id} changed status of ${applicant.first_name} ${applicant.last_name} to "${status}".`;
         await logAction(req, 'STATUS_UPDATE', details);
 
-        // 3. Send Email (Async, don't await so UI doesn't freeze)
+        // 3. DECRYPT EMAIL BEFORE SENDING!
+        applicant.email = decrypt(applicant.email);
+
+        // 4. Send Email 
         sendStatusEmail(applicant, status, message);
 
         res.status(200).json({ success: true, data: `Applicant status updated to ${status}` });

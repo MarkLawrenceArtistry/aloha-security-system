@@ -5,6 +5,7 @@ const { run, all, get } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 const PDFDocument = require('pdfkit');
 const { sendDeploymentEmail } = require('../utils/emailService');
+const { decrypt } = require('../utils/crypto'); // 1. ADD THIS IMPORT
 
 const deployGuard = async (req, res) => {
     try {
@@ -46,8 +47,13 @@ const deployGuard = async (req, res) => {
         await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [applicant_id]);
 
         if (applicant && branch) {
+            // 2. DECRYPT THE EMAIL HERE BEFORE SENDING
+            applicant.email = decrypt(applicant.email); 
+
             const details = `Admin User ID #${req.user.id} deployed ${applicant.first_name} ${applicant.last_name} to branch "${branch.name}".`;
             await logAction(req, 'DEPLOYMENT_CREATE', details);
+            
+            // Now Brevo will receive a proper email address
             sendDeploymentEmail(applicant, branch);
         }
 

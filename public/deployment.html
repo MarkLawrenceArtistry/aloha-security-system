@@ -170,7 +170,8 @@
         window.fetchDeployments = async function() {
             const searchField = document.getElementById('search-input');
             const sortField = document.getElementById('sort-select');
-            const search = searchField ? searchField.value : '';
+            // FIX: Safely encode the search query for the API
+            const search = searchField ? encodeURIComponent(searchField.value) : '';
             const sort = sortField ? sortField.value : 'desc';
             
             try {
@@ -214,6 +215,32 @@
                 if(grid) grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #ef4444;">Failed to load data. Please refresh.</div>';
             }
         };
+
+        function applyFilters() {
+            const searchField = document.getElementById('search-input');
+            const searchQuery = searchField ? searchField.value.toLowerCase() : '';
+
+            filteredDeployments = allDeployments.filter(d => {
+                const statusMatch = currentFilter === 'all' || d.status === currentFilter;
+                
+                // FIX: Combine first and last name so full-name searches work properly
+                const fullName = `${d.first_name} ${d.last_name}`.toLowerCase();
+                const textMatch = !searchQuery || 
+                                  fullName.includes(searchQuery) || 
+                                  d.branch_name.toLowerCase().includes(searchQuery);
+                                  
+                return statusMatch && textMatch;
+            });
+
+            const totalPages = Math.ceil(filteredDeployments.length / itemsPerPage);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            
+            updatePagination({ current_page: currentPage, total_pages: totalPages || 1 });
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const paginatedItems = filteredDeployments.slice(start, start + itemsPerPage);
+            renderTable(paginatedItems);
+        }
 
         function applyFilters() {
             const searchField = document.getElementById('search-input');
@@ -399,6 +426,26 @@
             const totalPages = Math.ceil(filteredDeployments.length / itemsPerPage);
             if(currentPage < totalPages) { currentPage++; applyFilters(); }
         });
+
+        let searchTimeout;
+        const searchInputEl = document.getElementById('search-input');
+        if (searchInputEl) {
+            searchInputEl.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    fetchDeployments(); // Triggers backend fetch + frontend UI update
+                }, 300); // 300ms debounce prevents lagging while typing
+            });
+        }
+
+        const sortSelectEl = document.getElementById('sort-select');
+        if (sortSelectEl) {
+            sortSelectEl.addEventListener('change', () => {
+                currentPage = 1;
+                fetchDeployments(); 
+            });
+        }
 
         async function endDeployment(id) {
             if(!confirm("Are you sure you want to end this guard's deployment?")) return;
