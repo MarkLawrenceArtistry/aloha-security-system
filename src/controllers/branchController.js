@@ -6,21 +6,19 @@ const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 
 const createBranch = async (req, res) => {
     try {
-        const { name, location, required_guards } = req.body;
+        const { name, location, required_guards, contact_person } = req.body;
 
         if (!name || !location) {
             return res.status(400).json({ success: false, data: "Name and Location are required." });
         }
 
         const result = await run(
-            "INSERT INTO branches (name, location, required_guards) VALUES (?, ?, ?)",
-            [name, location, required_guards || 1]
+            "INSERT INTO branches (name, location, required_guards, contact_person) VALUES (?, ?, ?, ?)",
+            [name, location, required_guards || 1, contact_person || null]
         );
 
-        // --- AUDIT LOG ---
         const details = `Admin User ID #${req.user.id} created a new branch: "${name}" (ID: ${result.lastID}).`;
         await logAction(req, 'BRANCH_CREATE', details);
-        // --- END LOG ---
 
         res.status(201).json({ 
             success: true, 
@@ -73,17 +71,15 @@ const getBranches = async (req, res) => {
 const updateBranch = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, location, required_guards } = req.body;
+        const { name, location, required_guards, contact_person } = req.body;
 
         await run(
-            "UPDATE branches SET name = ?, location = ?, required_guards = ? WHERE id = ?",
-            [name, location, required_guards, id]
+            "UPDATE branches SET name = ?, location = ?, required_guards = ?, contact_person = ? WHERE id = ?",
+            [name, location, required_guards, contact_person, id]
         );
 
-        // --- AUDIT LOG ---
         const details = `Admin User ID #${req.user.id} updated branch ID #${id} to Name: "${name}".`;
         await logAction(req, 'BRANCH_UPDATE', details);
-        // --- END LOG ---
 
         res.status(200).json({ success: true, data: "Branch updated successfully" });
     } catch (err) {

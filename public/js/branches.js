@@ -71,6 +71,8 @@ async function handleFormSubmit(e) {
     const name = document.getElementById('branch-name').value;
     const location = document.getElementById('branch-location').value;
     const guards = document.getElementById('branch-guards').value;
+    const contactInput = document.getElementById('branch-contact');
+    const contact_person = contactInput ? contactInput.value : '';
 
     const method = id ? 'PUT' : 'POST';
     const url = id ? `${API_BASE}/${id}` : API_BASE;
@@ -82,7 +84,7 @@ async function handleFormSubmit(e) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getToken()}`
             },
-            body: JSON.stringify({ name, location, required_guards: guards })
+            body: JSON.stringify({ name, location, required_guards: guards, contact_person })
         });
         
         if (res.ok) {
@@ -110,15 +112,19 @@ function openModal() {
     document.getElementById('branch-modal').style.display = 'flex';
     document.getElementById('branch-form').reset();
     document.getElementById('branch-id').value = '';
+    const contactInput = document.getElementById('branch-contact');
+    if (contactInput) contactInput.value = '';
     document.getElementById('modal-title').innerText = 'Add Branch';
 }
 
-function editBranch(id, name, location, guards) {
+function editBranch(id, name, location, guards, contact_person = '') {
     openModal();
     document.getElementById('branch-id').value = id;
     document.getElementById('branch-name').value = name;
     document.getElementById('branch-location').value = location;
     document.getElementById('branch-guards').value = guards;
+    const contactInput = document.getElementById('branch-contact');
+    if (contactInput) contactInput.value = contact_person || '';
     document.getElementById('modal-title').innerText = 'Edit Branch';
 }
 
