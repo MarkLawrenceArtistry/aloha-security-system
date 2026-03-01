@@ -64,13 +64,14 @@
             </div>
         </div>
     </nav>
+    
     <!-- Main Hero -->
-    <main class="hero-wrapper">
+    <main class="hero-wrapper position-relative">
         <!-- Animated Background Shape -->
         <div class="hero-bg-shape" data-aos="fade-down-left" data-aos-duration="1500"></div>
-        <div class="container">
+        <div class="container position-relative z-2">
             <div class="row align-items-center">
-                <div class="col-lg-6 order-2 order-lg-1">
+                <div class="col-lg-6 order-2 order-lg-1 hero-text-col">
                     <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000">
                         Your Safety, <br><span>Our </span> Priority 
                     </h1>
@@ -78,15 +79,16 @@
                     <p class="hero-desc" data-aos="fade-up" data-aos-delay="400">
                         We provide professional, reliable, and well-trained personnel to safeguard your people, property, and business in Zamboanga City since 2002.
                     </p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start" data-aos="fade-up" data-aos-delay="500">
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-0" data-aos="fade-up" data-aos-delay="500">
                         <a href="application.html" class="btn btn-brand btn-get-quote">Join Our Team</a>
                         <button class="btn btn-brand btn-check-status" onclick="location.href='status-result.html'">Check Status</button>
                     </div>
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
                     <div class="hero-image-container" data-aos="zoom-in-left" data-aos-duration="1200">
-                        <div class="logo-wrapper">
-                            <img src="resources/secu.png" alt="Aloha Logo" class="hero-logo-img">
+                        <div class="logo-wrapper w-100 d-flex justify-content-center justify-content-lg-end">
+                            <!-- Changed to logo.png -->
+                            <img src="resources/logo.png" alt="Aloha Logo" class="hero-logo-img">
                         </div>
                     </div>
                 </div>
@@ -112,12 +114,12 @@
     </section>
 
     <!-- Cards Section -->
-    <section class="overlap-section">
+    <section class="overlap-section position-relative z-2">
         <div class="container-fluid p-0">
             <div class="row g-0">
-                <div class="col-lg-6 p-0 position-relative min-h-cards">
+                <div class="col-lg-6 p-0 position-relative min-h-cards d-flex align-items-stretch">
                     
-                    <div id="leftSideCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel">
+                    <div id="leftSideCarousel" class="carousel slide carousel-fade w-100" data-bs-ride="carousel">
                         <div class="carousel-indicators justify-content-start ps-5 mb-5" style="margin-left: 10px;">
                             <button type="button" data-bs-target="#leftSideCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
                             <button type="button" data-bs-target="#leftSideCarousel" data-bs-slide-to="1"></button>
@@ -125,7 +127,6 @@
                         </div>
 
                         <div class="carousel-inner h-100">
-                            
                             <!-- SLIDE 1  -->
                             <div class="carousel-item active h-100 bg-light-section" style="background-image: url('resources/stock\ photos\ 3.jpg'); background-size: cover; background-position: center;">
                                 <div class="carousel-overlay"></div> 
@@ -161,6 +162,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- SLIDE 3 -->
                             <div class="carousel-item h-100 bg-light-section" style="background-image: url('resources/stock-photos.jpg'); background-size: cover; background-position: center;">
                                 <div class="carousel-overlay"></div>
                                 
@@ -177,7 +179,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Controls -->
@@ -195,6 +196,7 @@
                 <!-- Right Cards Side -->
                 <div class="col-lg-6 position-relative min-h-cards">
                     <div class="cards-staircase-wrapper">
+                        <!-- Card 1 -->
                         <div class="stair-card card-red position-1">
                             <div data-aos="zoom-in" data-aos-delay="0">
                                 <i class="bi bi-person-badge fs-1 mb-3"></i>
@@ -220,15 +222,12 @@
                                 <p class="small opacity-75">Specialized VIP protection and escort services for high-profile clients.</p>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
     </section>
-
-    
 
     <!-- REQUIREMENTS -->
     <section class="requirements-section position-relative py-5">
@@ -279,21 +278,128 @@
         </div>
     </section>
 
+<!-- ============================================== -->
+    <!-- NEW SECTION: BUSINESS PARTNERSHIPS             -->
     <!-- ============================================== -->
-    <!-- NEW SECTION: TESTIMONIALS (Social Proof)   -->
-    <!-- ============================================== -->
-    <section class="testimonials-section py-5">
+    <section class="partners-section py-5 position-relative z-2">
         <div class="container py-5">
             
-            <!-- Section Header -->
+            <!-- Header -->
+            <div class="text-center mb-5" data-aos="fade-down">
+                <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Trusted By The Best</p>
+                <h2 class="display-5 fw-black">Our Esteemed Partners</h2>
+                <p class="text-muted mx-auto mt-3" style="max-width: 650px;">
+                    We are proud to provide top-tier security services to Zamboanga's most respected institutions, government agencies, and businesses.
+                </p>
+            </div>
+            
+            <!-- Partners Grid -->
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center align-items-stretch mt-2">
+                
+                <!-- Partner 1: RD Pawnshop -->
+                <div class="col" data-aos="zoom-in" data-aos-delay="0">
+                    <div class="partner-card position-relative">
+                        <!-- Icon (Replace with <img> for their actual logo if you want) -->
+                        <i class="bi bi-shop text-danger fs-1 mb-3"></i>
+                        <span class="partner-name">RD Pawnshop</span>
+
+                        <!-- Hover Modal Reveal -->
+                        <div class="partner-hover-modal">
+                            <img src="resources/rdpawnshop.jpg" alt="RD Pawnshop Establishment" class="partner-modal-img">
+                            <div class="partner-modal-body">
+                                <h6 class="fw-bold mb-1 text-dark">RD Pawnshop</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.4;">Ensuring the safety of valuable assets, staff, and daily transactions across multiple regional branches.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner 2: DSWD Zamboanga -->
+                <div class="col" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="partner-card position-relative">
+                        <i class="bi bi-people-fill text-danger fs-1 mb-3"></i>
+                        <span class="partner-name">DSWD Zamboanga</span>
+
+                        <!-- Hover Modal Reveal -->
+                        <div class="partner-hover-modal">
+                            <img src="resources/dswd.jpg" alt="DSWD Establishment" class="partner-modal-img">
+                            <div class="partner-modal-body">
+                                <h6 class="fw-bold mb-1 text-dark">DSWD Zamboanga</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.4;">Providing strict perimeter control and crowd management for vital public assistance programs.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner 3: Ateneo de Zamboanga -->
+                <div class="col" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="partner-card position-relative">
+                        <i class="bi bi-bank2 text-danger fs-1 mb-3"></i>
+                        <span class="partner-name">Ateneo de Zamboanga</span>
+
+                        <!-- Hover Modal Reveal -->
+                        <div class="partner-hover-modal">
+                            <img src="resources/AteneoDezamboanga.jpg" alt="Ateneo Establishment" class="partner-modal-img">
+                            <div class="partner-modal-body">
+                                <h6 class="fw-bold mb-1 text-dark">Ateneo University</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.4;">Maintaining a secure, safe, and conducive learning environment for students and faculty.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner 4: Zamboanga Water District -->
+                <div class="col" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="partner-card position-relative">
+                        <i class="bi bi-droplet-half text-danger fs-1 mb-3"></i>
+                        <span class="partner-name">Zamboanga<br>Water District</span>
+
+                        <!-- Hover Modal Reveal -->
+                        <div class="partner-hover-modal">
+                            <img src="resources/zamboangawaterdistrict.jpg" alt="Water District Establishment" class="partner-modal-img">
+                            <div class="partner-modal-body">
+                                <h6 class="fw-bold mb-1 text-dark">Water District</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.4;">Safeguarding critical utility infrastructure and public water reservoirs 24/7.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner 5: Zamcelco -->
+                <div class="col" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="partner-card position-relative">
+                        <i class="bi bi-lightning-charge-fill text-danger fs-1 mb-3"></i>
+                        <span class="partner-name">ZAMCELCO</span>
+
+                        <!-- Hover Modal Reveal -->
+                        <div class="partner-hover-modal">
+                            <img src="resources/zamcelco.jpg" alt="ZAMCELCO Establishment" class="partner-modal-img">
+                            <div class="partner-modal-body">
+                                <h6 class="fw-bold mb-1 text-dark">ZAMCELCO</h6>
+                                <p class="small text-muted mb-0" style="line-height: 1.4;">Securing electrical grid facilities and administrative offices against unauthorized access.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+  <!-- ============================================== -->
+    <!-- TESTIMONIALS (Social Proof)                    -->
+    <!-- ============================================== -->
+    <section class="testimonials-section py-5 position-relative z-2">
+        <div class="container py-5">
+            
             <div class="row mb-5">
                 <div class="col-lg-6" data-aos="fade-right">
                     <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Client Feedback</p>
-                    <h2 class="display-4 fw-black">Trusted by Zamboanga's<br>Finest Businesses</h2>
+                    <h2 class="display-4 fw-black">Trusted by Zamboanga's<br>Finest Institutions</h2>
                 </div>
                 <div class="col-lg-6 d-flex align-items-end justify-content-lg-end" data-aos="fade-left">
                     <p class="text-muted text-lg-end mb-0" style="max-width: 400px;">
-                        We don't just provide security; we build lasting partnerships based on trust and performance.
+                        We don't just provide security; we build lasting partnerships based on trust, integrity, and performance.
                     </p>
                 </div>
             </div>
@@ -301,93 +407,79 @@
             <!-- Testimonial Cards -->
             <div class="row g-4">
                 
-                <!-- Client 1 -->
+                <!-- Client 1: Water District -->
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                     <div class="testimonial-card">
-                        <!-- Big Quote Icon Background -->
                         <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
-                        
                         <div class="d-flex align-items-center mb-4 position-relative z-1">
-                            <!-- Placeholder for Client Image -->
                             <div class="client-img-circle bg-secondary bg-opacity-10">
                                 <i class="bi bi-person-fill text-muted fs-3"></i>
                             </div>
                             <div class="ms-3">
-                                <h5 class="fw-bold mb-0">Maria Gonzalez</h5>
-                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Retail Manager</small>
+                                <h5 class="fw-bold mb-0">Renaldo R. Cabilin</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Water District</small>
                             </div>
                         </div>
-                        
                         <div class="position-relative z-1">
                             <div class="stars mb-3 text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                 <i class="bi bi-star-fill"></i>
                             </div>
                             <p class="text-muted" style="line-height: 1.7;">
-                                "Aloha Security has completely transformed how we handle safety at our mall. Their guards are always sharp, polite, and on time. Highly recommended!"
+                                "Aloha Security has been instrumental in safeguarding our critical utility infrastructure. Their personnel are vigilant, reliable, and highly professional 24/7."
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Client 2 -->
+                <!-- Client 2: RD Pawnshop -->
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                     <div class="testimonial-card">
                         <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
-                        
                         <div class="d-flex align-items-center mb-4 position-relative z-1">
                             <div class="client-img-circle bg-secondary bg-opacity-10">
                                 <i class="bi bi-person-fill text-muted fs-3"></i>
                             </div>
                             <div class="ms-3">
-                                <h5 class="fw-bold mb-0">Engr. R. Lim</h5>
-                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Construction Head</small>
+                                <h5 class="fw-bold mb-0">Rodrigo Rivera</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">RD Pawnshop</small>
                             </div>
                         </div>
-                        
                         <div class="position-relative z-1">
                             <div class="stars mb-3 text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                 <i class="bi bi-star-fill"></i>
                             </div>
                             <p class="text-muted" style="line-height: 1.7;">
-                                "Security is critical in our construction sites. Aloha's team is strict with protocols and very professional. We haven't had a single incident since hiring them."
+                                "Trust and security are everything in our business. Aloha provides us with the absolute peace of mind we need, ensuring the safety of our branches, staff, and clients."
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Client 3 -->
+                <!-- Client 3: Ateneo de Zamboanga -->
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
                     <div class="testimonial-card">
                         <div class="quote-bg-icon"><i class="bi bi-quote"></i></div>
-                        
                         <div class="d-flex align-items-center mb-4 position-relative z-1">
                             <div class="client-img-circle bg-secondary bg-opacity-10">
                                 <i class="bi bi-person-fill text-muted fs-3"></i>
                             </div>
                             <div class="ms-3">
-                                <h5 class="fw-bold mb-0">Sarah Jenkins</h5>
-                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Event Organizer</small>
+                                <h5 class="fw-bold mb-0">Roberto Yap</h5>
+                                <small class="text-danger fw-bold text-uppercase" style="font-size: 0.75rem;">Ateneo de Zamboanga</small>
                             </div>
                         </div>
-                        
                         <div class="position-relative z-1">
                             <div class="stars mb-3 text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                 <i class="bi bi-star-fill"></i>
                             </div>
                             <p class="text-muted" style="line-height: 1.7;">
-                                "We hired Aloha for a large corporate event. They were invisible when needed but present when it mattered. True professionals."
+                                "Maintaining a safe and conducive learning environment is our top priority. Aloha's guards are not just strict with campus protocols, they are also disciplined and courteous."
                             </p>
                         </div>
                     </div>
@@ -396,70 +488,190 @@
             </div>
         </div>
     </section>
-
-
-
+<!-- ============================================== -->
+    <!-- NEW SECTION: ACHIEVEMENTS & AWARDS             -->
     <!-- ============================================== -->
-    <!-- NEW SECTION: STATS & PARTNERS (Dark Mode)  -->
-    <!-- ============================================== -->
-    <section class="stats-section py-5 text-white position-relative">
+    <section class="achievements-section py-5 position-relative z-2">
         <!-- Background Overlay -->
-        <div class="stats-bg-pattern"></div>
+        <div class="achievements-bg-shape"></div>
         
         <div class="container position-relative z-2 py-5">
-            
-            <!-- 1. THE NUMBERS (Animated Counter) -->
-            <div class="row text-center g-4 mb-5 pb-5 border-bottom border-secondary">
-                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="0">
-                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="22">0</span>+</h2>
-                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Years Experience</p>
-                </div>
-                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
-                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="150">0</span>+</h2>
-                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Active Guards</p>
-                </div>
-                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
-                    <h2 class="display-3 fw-black text-danger"><span class="counter" data-target="50">0</span>+</h2>
-                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Business Partners</p>
-                </div>
-                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
-                    <h2 class="display-3 fw-black text-danger">100%</h2>
-                    <p class="text-uppercase letter-spacing-2 opacity-75 small">Client Satisfaction</p>
-                </div>
-            </div>
-
-            <!-- 2. TRUSTED BY (Logos) -->
-            <div class="row align-items-center justify-content-center text-center">
-                <div class="col-12 mb-4">
-                    <p class="small text-uppercase fw-bold text-muted letter-spacing-2">Trusted by Zamboanga's Best</p>
-                </div>
+            <div class="row align-items-center g-5">
                 
-                <!-- Logo Grid (Replace icons with actual client logos if you have them) -->
-                <div class="col-lg-10">
-                    <div class="row justify-content-center align-items-center g-5 grayscale-logos">
-                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="100">
-                            <i class="bi bi-building fs-1 text-white opacity-50"></i>
+                <!-- Text & List Column -->
+                <div class="col-lg-6" data-aos="fade-right">
+                    <p class="text-uppercase fw-bold letter-spacing-2 mb-2 section-subtitle">Excellence Recognized</p>
+                    <h2 class="display-4 fw-black mb-4 section-title">Our Achievements<br>& Awards</h2>
+                    <p class="lead mb-5 section-desc">
+                        Decades of unwavering commitment to security, precision, and excellence have earned Aloha Security Agency prestigious recognition across the industry.
+                    </p>
+                    
+                    <div class="achievement-list">
+                        <div class="achievement-item" data-aos="fade-up" data-aos-delay="100">
+                            <i class="bi bi-trophy-fill award-icon"></i>
+                            <span><strong>Golden Globe Annual Awards</strong> - Recognized for Business Excellence & Outstanding Filipino Achievers.</span>
                         </div>
-                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="200">
-                            <i class="bi bi-shop fs-1 text-white opacity-50"></i>
+                        <div class="achievement-item" data-aos="fade-up" data-aos-delay="200">
+                            <i class="bi bi-award-fill award-icon"></i>
+                            <span><strong>Plaque of Appreciation</strong> - Presented by Ateneo de Zamboanga University for unwavering support and commitment to service.</span>
                         </div>
-                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="300">
-                            <i class="bi bi-bank fs-1 text-white opacity-50"></i>
-                        </div>
-                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="400">
-                            <i class="bi bi-hospital fs-1 text-white opacity-50"></i>
-                        </div>
-                        <div class="col-4 col-md-2" data-aos="zoom-in" data-aos-delay="500">
-                            <i class="bi bi-airplane fs-1 text-white opacity-50"></i>
+                        <div class="achievement-item" data-aos="fade-up" data-aos-delay="300">
+                            <i class="bi bi-star-fill award-icon"></i>
+                            <span><strong>Premier Security Company</strong> - Recognized as a top-tier agency for outstanding private and commercial security operations.</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
+                <!-- Media/Glassmorphism Column (CAROUSEL) -->
+                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                    <div class="achievement-media-card">
+                        
+                        <!-- Bootstrap Carousel -->
+                        <div id="awardsCarousel" class="carousel slide carousel-fade rounded-4 overflow-hidden" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                <button type="button" data-bs-target="#awardsCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                                <button type="button" data-bs-target="#awardsCarousel" data-bs-slide-to="1"></button>
+                                <button type="button" data-bs-target="#awardsCarousel" data-bs-slide-to="2"></button>
+                            </div>
+                            
+                            <div class="carousel-inner">
+                                <!-- Award Image 1 -->
+                                <div class="carousel-item active">
+                                    <img src="resources/award1.jpg" class="d-block w-100 achievement-carousel-img" alt="Golden Globe Solo">
+                                </div>
+                                <!-- Award Image 2 -->
+                                <div class="carousel-item">
+                                    <img src="resources/award2.jpg" class="d-block w-100 achievement-carousel-img" alt="Golden Globe Group">
+                                </div>
+                                <!-- Award Image 3 -->
+                                <div class="carousel-item">
+                                    <img src="resources/award3.jpg" class="d-block w-100 achievement-carousel-img" alt="Ateneo de Zamboanga Plaque">
+                                </div>
+                            </div>
+
+                            <button class="carousel-control-prev" type="button" data-bs-target="#awardsCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 shadow" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#awardsCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-dark rounded-circle p-2 shadow" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                        <div class="achievement-badges">
+                            <span class="achievement-badge"><i class="bi bi-award-fill"></i> Multi-Awarded</span>
+                            <span class="achievement-badge"><i class="bi bi-patch-check-fill"></i> Trusted Excellence</span>
+                        </div>
+                        <p class="achievement-note mb-0 mt-3">Aloha Security General Manager Ms. Evelyn C. Catingub receiving prestigious accolades.</p>
+                    </div>
+                </div>
+                
+            </div>
         </div>
     </section>
 
-        <!-- ============================================== -->
+    <!-- ============================================== -->
+    <!-- NEW SECTION: FAQ (Frequently Asked Questions)  -->
+    <!-- ============================================== -->
+    <section class="faq-section py-5 position-relative z-2 bg-light-section">
+        <div class="container py-5">
+            <div class="row g-5">
+                
+                <!-- Left Side: Title & Description (Sticky on Desktop) -->
+                <div class="col-lg-5" data-aos="fade-right">
+                    <div class="sticky-lg-top" style="top: 120px; z-index: 10;">
+                        <p class="text-uppercase text-danger fw-bold letter-spacing-2 mb-2">Got Questions?</p>
+                        <h2 class="display-5 fw-black mb-4">Frequently Asked<br>Questions</h2>
+                        <p class="text-muted mb-4" style="line-height: 1.8;">
+                            Everything you need to know about our security services, deployment process, and how we protect what matters most to you.
+                        </p>
+                        <a href="#" class="btn btn-outline-dark rounded-pill fw-bold px-4 py-2 mt-2">Contact Support</a>
+                    </div>
+                </div>
+
+                <!-- Right Side: Modern Accordion -->
+                <div class="col-lg-7" data-aos="fade-left" data-aos-delay="200">
+                    <div class="accordion custom-modern-accordion" id="alohaFaq">
+                        
+                        <!-- FAQ Item 1 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Are your security guards licensed and trained?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#alohaFaq">
+                                <div class="accordion-body text-muted">
+                                    Yes. All Aloha Security personnel undergo rigorous background checks, psychological evaluations, and extensive physical training. They are fully licensed by the PNP-SOSIA and attend regular retraining seminars to maintain high performance.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 2 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    What areas do you currently cover?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#alohaFaq">
+                                <div class="accordion-body text-muted">
+                                    We provide comprehensive security services extensively throughout Zamboanga City and its neighboring municipalities. We are continuously expanding to serve more businesses in the region.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 3 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Do you offer customized security plans for businesses?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#alohaFaq">
+                                <div class="accordion-body text-muted">
+                                    Absolutely. We understand that a retail store has different needs compared to a construction site. We conduct a **Free Risk Analysis** to tailor a complete security solutions package specific to your operational requirements.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 4 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    Can you provide security for special events?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#alohaFaq">
+                                <div class="accordion-body text-muted">
+                                    Yes, we offer specialized short-term deployment for corporate gatherings, concerts, VIP protection, and private events. Our team blends in when needed and asserts authority when it matters.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 5 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    How can I apply to become a security guard?
+                                </button>
+                            </h2>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#alohaFaq">
+                                <div class="accordion-body text-muted">
+                                    You can easily start your application online by clicking the "Apply Now" button at the top of the page. You will need to bring your complete physical requirements (Clearances, Licenses, etc.) to our main office in Guiwan, Zamboanga City for the final assessment.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================== -->
     <!-- FINAL CTA (Call To Action) - The Final Push    -->
     <!-- ============================================== -->
     <section class="cta-section text-white text-center">
@@ -470,7 +682,7 @@
                 <p class="lead mb-5 opacity-75" data-aos="fade-up" data-aos-delay="200">
                     Join the leading security agency in Zamboanga or get a quote for your business today.
                 </p>
-                <div class="d-flex justify-content-center gap-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="d-flex flex-wrap justify-content-center gap-3" data-aos="fade-up" data-aos-delay="300">
                     <a href="application.html" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-danger">Apply Now</a>
                     <a href="#" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold">Contact Us</a>
                 </div>
@@ -478,24 +690,22 @@
         </div>
     </section>
 
-   <!-- ============================================== -->
-    <!-- FOOTER SECTION (Responsive Fix)            -->
+    <!-- ============================================== -->
+    <!-- FOOTER SECTION                             -->
     <!-- ============================================== -->
     <footer class="footer-section text-white position-relative overflow-hidden">
         <div class="container pt-5 pb-4">
-            
-            <!-- Changed g-5 to g-4 to prevent side overflow on mobile -->
             <div class="row g-4 justify-content-between">
                 
-                <!-- Col 1: Brand & Social (Full width on mobile for better focus) -->
-                <div class="col-lg-4 col-md-12 mb-md-4">
+                <!-- Col 1: Brand & Social -->
+                <div class="col-lg-4 col-md-12 mb-md-4 text-center text-lg-start">
                     <a href="#" class="d-inline-block mb-4">
                         <img src="resources/logo.png" alt="Aloha Logo" height="60">
                     </a>
                     <p class="text-white-50 mb-4 pe-lg-5" style="line-height: 1.8;">
                         Providing top-tier security solutions in Zamboanga City since 2002. Your safety is our unwavering priority.
                     </p>
-                    <div class="social-links d-flex gap-2">
+                    <div class="social-links d-flex gap-2 justify-content-center justify-content-lg-start">
                         <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
                         <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
                         <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
@@ -503,8 +713,8 @@
                     </div>
                 </div>
 
-                <!-- Col 2: Quick Links (6 cols on mobile to sit side-by-side with Services) -->
-                <div class="col-lg-2 col-6">
+                <!-- Col 2: Quick Links -->
+                <div class="col-lg-2 col-6 text-center text-lg-start">
                     <h5 class="fw-bold mb-4 text-white">Quick Links</h5>
                     <ul class="list-unstyled footer-links">
                         <li><a href="index.html">Home</a></li>
@@ -515,8 +725,8 @@
                     </ul>
                 </div>
 
-                <!-- Col 3: Services (6 cols on mobile) -->
-                <div class="col-lg-3 col-6">
+                <!-- Col 3: Services -->
+                <div class="col-lg-3 col-6 text-center text-lg-start">
                     <h5 class="fw-bold mb-4 text-white">Services</h5>
                     <ul class="list-unstyled footer-links">
                         <li><a href="#">Static Guards</a></li>
@@ -527,21 +737,21 @@
                     </ul>
                 </div>
 
-                <!-- Col 4: Contact Info (Full width on mobile) -->
-                <div class="col-lg-3 col-md-12">
+                <!-- Col 4: Contact Info -->
+                <div class="col-lg-3 col-md-12 text-center text-lg-start">
                     <h5 class="fw-bold mb-4 text-white mt-4 mt-lg-0">Contact Us</h5>
-                    <ul class="list-unstyled contact-info text-white-50">
+                    <ul class="list-unstyled contact-info text-white-50 d-inline-block text-start">
                         <li class="d-flex mb-3">
                             <i class="bi bi-geo-alt-fill text-danger me-3 flex-shrink-0 mt-1"></i>
                             <span>108, Old Highway, Guiwan,<br>Zamboanga City</span>
                         </li>
                         <li class="d-flex mb-3">
                             <i class="bi bi-telephone-fill text-danger me-3 flex-shrink-0 mt-1"></i>
-                            <span>(062) 991-XXXX</span>
+                            <span>09543542772</span>
                         </li>
                         <li class="d-flex mb-3">
                             <i class="bi bi-envelope-fill text-danger me-3 flex-shrink-0 mt-1"></i>
-                            <span>info@alohasecurity.com</span>
+                            <span>aloha_scty@yahoo.com</span>
                         </li>
                     </ul>
                 </div>
@@ -554,7 +764,7 @@
             <div class="container">
                 <div class="row align-items-center text-center text-md-start">
                     <div class="col-md-6 mb-2 mb-md-0">
-                        <p class="mb-0 small text-white-50">&copy; 2026 Aloha Security Agency.</p>
+                        <p class="mb-0 small text-white-50">&copy; 2026 Aloha Security Agency. All Rights Reserved.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <a href="#" class="text-white-50 small text-decoration-none me-3 hover-white">Privacy</a>
@@ -569,20 +779,10 @@
     <button onclick="scrollToTop()" id="backToTop" class="btn-back-to-top" title="Go to top">
         <i class="bi bi-arrow-up fs-5"></i>
     </button>
+    
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  
-    <!-- AOS ANIMATION LIBRARY JS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script type="module" src="js/main.js"></script> 
     <script src="js/index.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered!', reg.scope))
-                    .catch(err => console.error('Service Worker Failed!', err));
-            });
-        }
-    </script>
 </body>
 </html>
