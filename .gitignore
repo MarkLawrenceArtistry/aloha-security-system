@@ -3,3 +3,4 @@ package-lock.json
 node_modules
 aloha_database.db
 public/uploads
+aloha_auto_backup.db

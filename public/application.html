@@ -693,20 +693,33 @@
                 
                 // --- EARLY AGE VALIDATION ON STEP 1 ---
                 if (stepNum === 1) {
+                    // A. Age Validation
                     const birthdateInput = document.getElementById('birthdate').value;
                     if (birthdateInput) {
                         const bdate = new Date(birthdateInput);
-                        const ageDifMs = Date.now() - bdate.getTime();
-                        const ageDate = new Date(ageDifMs);
-                        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-                        
+                        const age = Math.abs(new Date(Date.now() - bdate.getTime()).getUTCFullYear() - 1970);
                         if (age < 21) {
-                            alert("Age Requirement Not Met: You must be at least 21 years old to proceed with this application.");
+                            alert("Age Requirement Not Met: You must be at least 21 years old.");
                             document.getElementById('birthdate').style.borderColor = "red";
-                            return; // Stops the function, prevents going to step 2
+                            return; 
                         } else {
-                            document.getElementById('birthdate').style.borderColor = ""; // Reset border
+                            document.getElementById('birthdate').style.borderColor = ""; 
                         }
+                    }
+
+                    // B. Anti-Gibberish Validation
+                    const fName = document.getElementById('first_name').value.trim();
+                    const lName = document.getElementById('last_name').value.trim();
+                    
+                    // Regex 1: Checks for 4 of the exact same letter in a row (e.g., "aaaa")
+                    const identicalChars = /([a-zA-Z])\1{3,}/; 
+                    // Regex 2: Checks for 5 consonants in a row (e.g., "bcdfgh")
+                    const manyConsonants = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}/;
+
+                    if (identicalChars.test(fName) || identicalChars.test(lName) || 
+                        manyConsonants.test(fName) || manyConsonants.test(lName)) {
+                        alert("Invalid Name Detected: Please enter your real legal name. Spam or gibberish is not allowed.");
+                        return; // Stops them from moving to next step
                     }
                 }
                 // --------------------------------------

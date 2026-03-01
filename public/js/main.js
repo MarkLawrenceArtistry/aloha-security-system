@@ -98,23 +98,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (window.location.pathname.includes('application.html')) {
+        // 1. Inject styles directly to bypass Service Worker cache issues
+        if (!document.getElementById('offline-pill-styles')) {
+            const style = document.createElement('style');
+            style.id = 'offline-pill-styles';
+            style.innerHTML = `
+                .offline-pill {
+                    position: fixed; bottom: 24px; left: 24px;
+                    background: #232323; color: #fff;
+                    padding: 12px 20px; border-radius: 30px;
+                    font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+                    display: flex; align-items: center; gap: 10px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                    z-index: 999999;
+                    transform: translateY(150px); opacity: 0; visibility: hidden;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+                .offline-pill.show { transform: translateY(0); opacity: 1; visibility: visible; }
+                .offline-pill.online-flash { background: #10b981; }
+                @media (max-width: 768px) {
+                    .offline-pill { bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150px); width: max-content; max-width: 90%; }
+                    .offline-pill.show { transform: translateX(-50%) translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         const offlinePill = document.createElement('div');
         offlinePill.className = 'offline-pill';
-        offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+        offlinePill.innerHTML = '<i class="bi bi-wifi-off" style="color:#f59e0b;"></i> <span>You are currently offline.</span>';
         document.body.appendChild(offlinePill);
 
         const updateOnlineStatus = () => {
             if (!navigator.onLine) {
-                offlinePill.innerHTML = '<i class="bi bi-wifi-off"></i> <span>You are currently offline.</span>';
+                offlinePill.innerHTML = '<i class="bi bi-wifi-off" style="color:#f59e0b;"></i> <span>You are currently offline.</span>';
                 offlinePill.classList.remove('online-flash');
                 offlinePill.classList.add('show');
             } else {
                 if (offlinePill.classList.contains('show')) {
-                    offlinePill.innerHTML = '<i class="bi bi-wifi"></i> <span>Back online.</span>';
+                    offlinePill.innerHTML = '<i class="bi bi-cloud-check-fill"></i> <span>Back online.</span>';
                     offlinePill.classList.add('online-flash');
-                    setTimeout(() => {
-                        offlinePill.classList.remove('show');
-                    }, 3000);
+                    setTimeout(() => offlinePill.classList.remove('show'), 3000);
                 }
             }
         };
