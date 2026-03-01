@@ -357,40 +357,74 @@
     </main>
 
     <div id="privacy-modal" class="modal-backdrop-custom">
-        <div class="modal-card-custom" style="max-width: 550px;">
+        <div class="modal-card-custom" style="max-width: 800px; text-align: left; padding: 30px;">
             <div class="text-center mb-3">
                 <div class="icon-circle-red mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
                     <i class="bi bi-shield-lock-fill"></i>
                 </div>
-                <h3 class="fw-black mb-1">Data Privacy Consent</h3>
-                <p class="text-muted small">Please read our terms carefully before submitting.</p>
+                <h3 class="fw-black mb-1">Privacy Policy & Terms of Processing</h3>
+                <p class="text-muted small">Last Updated: March 2026 | Compliant with R.A. 10173</p>
             </div>
             
-            <div class="privacy-scroll-box">
-                <h6>1. Collection of Personal Data</h6>
-                <p>By submitting this form, you authorize <strong>Aloha Security Agency</strong> to collect, process, and store your personal information, including your resume and government-issued ID, in strict compliance with the <strong>Data Privacy Act of 2012 (R.A. 10173)</strong>.</p>
+            <div class="privacy-scroll-box" style="max-height: 45vh; overflow-y: auto; padding: 20px; font-size: 0.85rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; color: #475569;">
                 
-                <h6>2. Purpose of Processing</h6>
-                <p>Your data will be used exclusively for recruitment evaluation, background verification, and potential deployment matching. It will not be sold or shared with unauthorized third parties.</p>
+                <p><strong>What this Privacy Policy Covers</strong><br>
+                This Privacy Policy (“Policy”) covers the information relating to you that we may collect, use, share, and process when you apply for a position through the Aloha Security Agency portal. By using our Services or submitting your application, you acknowledge that you understand and agree to the terms of this Policy. If you do not agree with this Policy, do not submit your application.</p>
 
-                <h6>3. Data Retention Policy</h6>
-                <p>For processing purposes, application data is held securely. Unsuccessful applications are moved to an encrypted archive after 72 hours and are subject to <strong>Hard Deletion after 3 months</strong> as stipulated in our internal company policy.</p>
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">1. Information We Collect</h6>
+                <p><strong>Information You Provide to Us:</strong> We collect personal data directly from you when you fill out the multi-step application form. This includes Identifiers (First Name, Last Name, Gender, Birthdate), Contact Information (Email Address, Mobile Number, Permanent Address), and Professional Background (Position Applied For, Years of Experience, Previous Employer).</p>
+                <p><strong>Files and Documents:</strong> We collect and process the digital files you upload, specifically your Curriculum Vitae/Resume and your Government-Issued Identification.</p>
+                <p><strong>Information We Collect Automatically:</strong> When you submit your application, our system automatically securely logs your IP Address and the timestamp of your submission for audit, security, and anti-spam purposes (e.g., enforcing our 2-hour rate limit).</p>
 
-                <h6>4. Your Rights (Right to be Forgotten)</h6>
-                <p>You have the right to access, rectify, or request the immediate deletion of your personal data from our database. To exercise your right to have your records removed, please contact our Data Protection Officer:</p>
-                <ul style="margin-bottom: 0; padding-left: 20px;">
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">2. Information We Do Not Collect</h6>
+                <p><strong>Sensitive Personal Information:</strong> Unless specifically required for deployment clearances later in the hiring phase, we do not intentionally collect "special category data" such as political opinions, religious beliefs, genetic data, or financial/bank account details during this initial application phase.</p>
+                <p><strong>Children's Data:</strong> Aloha Security strictly prohibits applications from individuals under the age of twenty-one (21). Our system actively blocks and rejects dates of birth that do not meet this statutory age requirement.</p>
+
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">3. How We Use Your Information</h6>
+                <p>We process your personal data under the lawful basis of legitimate business interest and pre-contractual necessity to:</p>
+                <ul style="padding-left: 20px; margin-bottom: 10px;">
+                    <li>Evaluate your qualifications and suitability for security deployment.</li>
+                    <li>Conduct preliminary background checks and identity verification.</li>
+                    <li>Communicate with you regarding interview schedules, status updates, and onboarding.</li>
+                    <li>Protect the security and integrity of our agency and our partner facilities.</li>
+                </ul>
+
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">4. How We Share Information</h6>
+                <p><strong>Strict No-Sale Policy:</strong> Aloha Security Agency is not in the business of selling your data. We do not sell your personal information to third-party advertisers or data brokers.</p>
+                <p><strong>Compliance with Enforcement Requests:</strong> We may share information about you with a third party if we believe that sharing is reasonably necessary to (a) respond to lawful requests by public authorities, including local law enforcement and the PNP-SOSIA; (b) enforce our Terms of Service; or (c) respond to an emergency involving public safety.</p>
+
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">5. Data Security, Storage, & Retention Policy</h6>
+                <p>We utilize industry-standard AES-256 cryptographic standards to encrypt your Personally Identifiable Information (PII) both in transit and at rest. However, no digital system is impenetrable, and we do not guarantee absolute system uptime due to third-party cloud infrastructure maintenance.</p>
+                <p>We enforce a strict, automated data lifecycle to ensure data minimization:</p>
+                <ul style="padding-left: 20px; margin-bottom: 10px;">
+                    <li><strong>Active Roster:</strong> Applications under review or hired personnel remain in our encrypted active database as long as necessary for employment.</li>
+                    <li><strong>Data Cleanup (72-Hour Soft Archive):</strong> If an application is reviewed and marked as "Rejected", the system's automated Cron Job performs a cleanup within <strong>72 hours</strong>. The record and all associated uploaded files are scrubbed from the active operational dashboard and transferred to a highly restricted, read-only Legal Archive Vault.</li>
+                    <li><strong>Hard Deletion (3-Month Rule):</strong> As officially stipulated in our Memorandum of Agreement (MOA) and our internal data retention policies, all archived/rejected applicant records are subjected to a permanent <strong>Hard Deletion exactly 3 months (90 days)</strong> after archiving. This automated action irreversibly destroys the database record, resume hashes, and ID image files from our servers.</li>
+                </ul>
+
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">6. Your Privacy Rights & Compliance</h6>
+                <p>In accordance with the <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong> and the guidelines set by the National Privacy Commission (NPC), you possess the following rights regarding your data:</p>
+                <ul style="padding-left: 20px; margin-bottom: 10px;">
+                    <li><strong>Right to be Informed:</strong> You have the right to know how your data is being processed (as outlined in this Policy).</li>
+                    <li><strong>Right to Access & Rectify:</strong> You may request access to your submitted data or request corrections to inaccuracies.</li>
+                    <li><strong>Right to Erasure (Right to be Forgotten):</strong> You may request the immediate deletion of your records prior to our automated 3-month hard deletion schedule, provided there are no pending legal or contractual obligations.</li>
+                </ul>
+
+                <h6 style="color:#0f172a; font-weight:800; margin-top:20px;">7. Contact the Data Protection Officer</h6>
+                <p>To exercise your rights, lodge a complaint, or inquire about this policy, please contact our DPO via the following channels:</p>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
                     <li><strong>Email:</strong> aloha_scty@yahoo.com</li>
-                    <li><strong>Phone:</strong> 09352854814</li>
-                    <li><strong>HQ:</strong> 108, Old highway, Guiwan, Zamobanga City 7000, Zamboanga City, Philippines, 7000</li>
+                    <li><strong>Hotline:</strong> 09352854814</li>
+                    <li><strong>Headquarters:</strong> 108 Old Highway, Guiwan, Zamboanga City, Philippines 7000</li>
                 </ul>
             </div>
 
-            <div class="d-grid gap-2">
-                <button type="button" id="btn-final-submit" class="btn btn-danger btn-lg fw-bold rounded-pill">
-                    I Agree & Submit Application
+            <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                <button type="button" id="btn-modal-close" class="btn btn-light text-muted rounded-pill px-4 py-3 fw-bold w-100" style="border: 1px solid #cbd5e1;">
+                    Decline & Review Form
                 </button>
-                <button type="button" id="btn-modal-close" class="btn btn-light btn-sm text-muted rounded-pill">
-                    Cancel & Review Data
+                <button type="button" id="btn-final-submit" class="btn btn-danger rounded-pill px-4 py-3 fw-bold w-100 shadow-sm" style="background: #e53828;">
+                    I Agree & Submit Application
                 </button>
             </div>
         </div>
