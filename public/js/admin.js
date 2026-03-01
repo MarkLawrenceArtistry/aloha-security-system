@@ -497,11 +497,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     const isLoginPage = window.location.pathname.includes('login.html');
     if (!isLoginPage && localStorage.getItem('admin_token')) {
-        const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
-        const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
         
+        let SESSION_DURATION_MS = 30 * 60 * 1000; // Default 30 Mins
         let sessionExpiry = Date.now() + SESSION_DURATION_MS;
         let tickerInterval;
+
+        // Fetch dynamic timer from settings
+        fetch('/api/system/config', {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+        }).then(res => res.json()).then(json => {
+            if(json.success && json.data.afk_timer) {
+                SESSION_DURATION_MS = parseInt(json.data.afk_timer) * 60 * 1000;
+                sessionExpiry = Date.now() + SESSION_DURATION_MS;
+            }
+        }).catch(e => console.error("Could not fetch AFK timer"));
+
+        const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
 
         // Inject Modal HTML dynamically
         if(!document.getElementById('session-modal')) {

@@ -111,6 +111,9 @@ router.get('/nuke-db', verifyToken, verifyAdmin, async (req, res) => {
     }
 });
 
-router.get('/master-report', verifyToken, verifyAdmin, reportController.generateMasterReport)
+router.get('/master-report', verifyToken, verifyAdmin, reportController.generateMasterReport);
+
+router.get('/config', verifyToken, settingsController.getSystemSettings);
+router.post('/config', verifyToken, verifyAdmin, settingsController.updateSystemSettings);
 
 module.exports = router;

@@ -155,6 +155,25 @@
                             </button>
                         </form>
                     </div>
+
+                    <div class="backup-card">
+                        <h4 style="color: #10b981;">
+                            <i class="bi bi-sliders" style="color: #10b981;"></i> Operational Parameters
+                        </h4>
+                        <form id="sys-config-form" style="margin-top: 15px;">
+                            <div class="form-group">
+                                <label>AFK Session Timeout (Minutes)</label>
+                                <input type="number" id="cfg-afk" min="5" max="120" required>
+                                <span style="font-size: 0.75rem; color: #64748b;">How long until inactive admins are logged out.</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Available Job Positions (Comma Separated)</label>
+                                <input type="text" id="cfg-pos" required placeholder="e.g. Guard, VIP Escort, Driver">
+                                <span style="font-size: 0.75rem; color: #64748b;">These will appear on the public application form.</span>
+                            </div>
+                            <button type="submit" class="btn-primary" style="background:#10b981;">Save Parameters</button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -566,6 +585,45 @@
                 if (currentQ) currentQ.innerText = "Error loading data.";
             }
         }
+
+        async function loadSystemConfig() {
+            try {
+                const res = await fetch('/api/system/config', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
+                });
+                const json = await res.json();
+                if(json.success) {
+                    document.getElementById('cfg-afk').value = json.data.afk_timer || 30;
+                    document.getElementById('cfg-pos').value = json.data.open_positions || "";
+                }
+            } catch(e) {}
+        }
+        loadSystemConfig();
+
+        // Save System Config
+        document.getElementById('sys-config-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = "Saving...";
+            
+            try {
+                await fetch('/api/system/config', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('admin_token')}` 
+                    },
+                    body: JSON.stringify({
+                        afk_timer: document.getElementById('cfg-afk').value,
+                        open_positions: document.getElementById('cfg-pos').value
+                    })
+                });
+                alert("Operational parameters updated!");
+            } catch(err) {
+                alert("Failed to save.");
+            }
+            btn.innerHTML = "Save Parameters";
+        });
     </script>
 </body>
 </html>
