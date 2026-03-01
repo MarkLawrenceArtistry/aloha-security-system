@@ -48,10 +48,11 @@
                 <button class="tab-btn active" onclick="switchTab('profile', this)">
                     <i class="bi bi-person-circle"></i> My Profile
                 </button>
+                <!-- Added IDs to these buttons for RBAC -->
                 <button class="tab-btn" onclick="switchTab('system', this)" id="system-tab-btn">
                     <i class="bi bi-cpu"></i> System Maintenance
                 </button>
-                <button class="tab-btn" onclick="switchTab('email', this)">
+                <button class="tab-btn" onclick="switchTab('email', this)" id="email-tab-btn">
                     <i class="bi bi-envelope"></i> Email Notifications
                 </button>
             </div>
@@ -133,7 +134,13 @@
                         <p class="warning-text"><i class="bi bi-exclamation-triangle-fill"></i> WARNING: This will overwrite current database and files. Ensure no one else is using the system.</p>
                         
                         <form id="restore-form">
-                            <input type="file" id="backup-file" accept=".zip" class="file-input">
+                            <!-- File Input now creates a Selected File Indicator -->
+                            <div class="file-input-wrapper" style="margin-bottom: 15px;">
+                                <input type="file" id="backup-file" accept=".zip" class="file-input" style="width: 100%;">
+                                <div id="file-name-display" style="font-size: 0.85rem; color: #10b981; font-weight: 600; margin-top: 5px; display: none;">
+                                    <i class="bi bi-check-circle-fill"></i> Selected: <span id="file-name-text"></span>
+                                </div>
+                            </div>
                             <button type="submit" class="btn-danger">
                                 <i class="bi bi-upload"></i> Upload & Restore
                             </button>
@@ -192,11 +199,31 @@
         // =========================================================
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Check RBAC for System Tab visibility
+            // 1. RBAC: Check Role for System & Email Tab Visibility
             const role = localStorage.getItem('admin_role');
             const systemTab = document.getElementById('system-tab-btn');
-            if (systemTab && role !== 'Admin' && role !== 'Owner') {
-                systemTab.style.display = 'none';
+            const emailTab = document.getElementById('email-tab-btn');
+            
+            // Only Admins/Owners can see these sensitive tabs
+            if (role !== 'Admin' && role !== 'Owner') {
+                if (systemTab) systemTab.style.display = 'none';
+                if (emailTab) emailTab.style.display = 'none';
+            }
+
+            // 2. File Input UX Indicator
+            const fileInput = document.getElementById('backup-file');
+            const fileNameDisplay = document.getElementById('file-name-display');
+            const fileNameText = document.getElementById('file-name-text');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files && this.files.length > 0) {
+                        fileNameText.textContent = this.files[0].name;
+                        fileNameDisplay.style.display = 'block';
+                    } else {
+                        fileNameDisplay.style.display = 'none';
+                    }
+                });
             }
 
             // Load email settings
@@ -412,6 +439,10 @@
         // LOAD EMAIL SETTINGS
         // =========================================================
         async function loadEmailSettings() {
+            // Guard: don't even try to fetch if not admin (backend protects it, but saves 1 call)
+            const role = localStorage.getItem('admin_role');
+            if (role !== 'Admin' && role !== 'Owner') return;
+
             try {
                 const res = await fetch('/api/system/email-settings', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
