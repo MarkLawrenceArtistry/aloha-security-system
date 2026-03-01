@@ -141,5 +141,63 @@ const sendOtpEmail = async (userEmail, userName, otp) => {
     }
 };
 
+const sendDeploymentEmail = async (applicant, branch) => {
+    if (!process.env.BREVO_API_KEY) {
+        console.log("⚠️ Skipped Deployment Email: No BREVO_API_KEY in .env");
+        return;
+    }
+
+    try {
+        let senderEmail = 'noreply@example.com';
+        let senderName = 'Aloha Security Deployment';
+
+        const dbEmail = await get("SELECT value FROM settings WHERE key = 'sender_email'");
+        const dbName = await get("SELECT value FROM settings WHERE key = 'sender_name'");
+
+        if (dbEmail) senderEmail = dbEmail.value;
+        if (dbName) senderName = dbName.value;
+
+        const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+        apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+
+        const contactInfo = branch.contact_person 
+            ? `<p style="margin: 5px 0;"><strong>Contact Person:</strong> ${branch.contact_person}</p>` 
+            : '';
+
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+                <div style="border-bottom: 3px solid #10b981; padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2 style="color: #10b981; margin: 0;">Notice of Deployment</h2>
+                </div>
+                <p>Dear <strong>${applicant.first_name} ${applicant.last_name}</strong>,</p>
+                <p>You have been officially assigned to a new post. Please review your deployment details below and report to the facility immediately.</p>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                    <h3 style="margin-top: 0; color: #0f172a;"><span style="color: #10b981;">📍</span> Facility Intelligence</h3>
+                    <p style="margin: 5px 0;"><strong>Branch Name:</strong> ${branch.name}</p>
+                    <p style="margin: 5px 0;"><strong>Location:</strong> ${branch.location}</p>
+                    ${contactInfo}
+                </div>
+
+                <p>If you have any questions, please contact the Aloha Security main office.</p>
+                <p style="color: #64748b; font-size: 0.85rem; margin-top: 30px;">Stay safe and maintain utmost professionalism.</p>
+            </div>
+        `;
+
+        const sendSmtpEmail = {
+            to: [{ email: applicant.email, name: `${applicant.first_name} ${applicant.last_name}` }],
+            sender: { email: senderEmail, name: senderName },
+            subject: "Your New Deployment Assignment - Aloha Security",
+            htmlContent: htmlContent
+        };
+
+        await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log(`✅ Deployment email sent to ${applicant.email} for branch ${branch.name}`);
+
+    } catch (error) {
+        console.error("❌ Deployment Email Error:", error.body || error.message);
+    }
+};
+
 // Update module.exports at the bottom
-module.exports = { sendStatusEmail, sendOtpEmail };
+module.exports = { sendStatusEmail, sendOtpEmail, sendDeploymentEmail };

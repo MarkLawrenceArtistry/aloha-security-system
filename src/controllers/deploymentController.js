@@ -4,6 +4,7 @@
 const { run, all, get } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger'); // <-- ADD THIS LINE
 const PDFDocument = require('pdfkit');
+const { sendDeploymentEmail } = require('../utils/emailService');
 
 const deployGuard = async (req, res) => {
     try {
@@ -22,11 +23,10 @@ const deployGuard = async (req, res) => {
             return res.status(409).json({ success: false, data: "Guard is already deployed." });
         }
 
-        // --- AUDIT LOG ---
-        // Get names for a better log message
-        const applicant = await get("SELECT first_name, last_name FROM applicants WHERE id = ?", [applicant_id]);
-        const branch = await get("SELECT name FROM branches WHERE id = ?", [branch_id]);
-        // --- END LOG PREP ---
+        // --- FETCH DATA FOR LOGS & EMAILS ---
+        // Added 'email' for the applicant, and 'location', 'contact_person' for the branch
+        const applicant = await get("SELECT first_name, last_name, email FROM applicants WHERE id = ?", [applicant_id]);
+        const branch = await get("SELECT name, location, contact_person FROM branches WHERE id = ?", [branch_id]);
 
         const result = await run(
             "INSERT INTO deployments (applicant_id, branch_id) VALUES (?, ?)",
@@ -35,12 +35,14 @@ const deployGuard = async (req, res) => {
 
         await run("UPDATE applicants SET status = 'Hired' WHERE id = ?", [applicant_id]);
 
-        // --- AUDIT LOG ---
         if (applicant && branch) {
+            // 1. Audit Log
             const details = `Admin User ID #${req.user.id} deployed ${applicant.first_name} ${applicant.last_name} to branch "${branch.name}".`;
             await logAction(req, 'DEPLOYMENT_CREATE', details);
+
+            // 2. Fire off the email asynchronously (don't await, so it doesn't slow down the UI response)
+            sendDeploymentEmail(applicant, branch);
         }
-        // --- END LOG ---
 
         res.status(201).json({ 
             success: true, 
