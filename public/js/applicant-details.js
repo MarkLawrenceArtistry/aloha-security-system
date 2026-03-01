@@ -51,17 +51,20 @@ async function loadApplicant() {
             `;
 
             // --- DOCUMENTS ---
+            const authQuery = `?t=${token}`;
+
             const resumeBtn = document.getElementById('resume-link');
             if (resumeBtn) {
-                resumeBtn.href = app.resume_path;
+                resumeBtn.href = app.resume_path + authQuery;
                 resumeBtn.removeAttribute('target');
                 resumeBtn.setAttribute('download', `Resume_${app.last_name}_${app.first_name}.pdf`);
             }
-            document.getElementById('id-img').src = app.id_image_path;
+            
+            document.getElementById('id-img').src = app.id_image_path + authQuery;
 
             const idDownloadBtn = document.getElementById('id-download');
             if (idDownloadBtn) {
-                idDownloadBtn.href = app.id_image_path; 
+                idDownloadBtn.href = app.id_image_path + authQuery; 
                 idDownloadBtn.setAttribute('download', `ID_${app.last_name}_${app.first_name}.jpg`); 
             }
 

@@ -49,8 +49,36 @@ const userRoutes = require('./routes/users.js');
 const systemRoutes = require('./routes/system.js');
 
 app.use(express.json());
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('./middleware/authMiddleware');
+
+app.get('/uploads/:filename', (req, res) => {
+    const token = req.query.t;
+    
+    if (!token) {
+        return res.status(403).send(`
+            <div style="text-align:center; padding:50px; font-family:sans-serif;">
+                <h2 style="color:red;">Access Denied</h2>
+                <p>You do not have permission to view this file.</p>
+            </div>
+        `);
+    }
+
+    try {
+        jwt.verify(token, JWT_SECRET);
+        
+        const filePath = path.join(UPLOAD_PATH, req.params.filename);
+        if (fs.existsSync(filePath)) {
+            res.sendFile(filePath);
+        } else {
+            res.status(404).send("File not found.");
+        }
+    } catch (err) {
+        return res.status(403).send("Access Denied: Invalid or expired session.");
+    }
+});
+
 app.use(express.static(path.join(__dirname, '../public')));
-app.use('/uploads', express.static(UPLOAD_PATH)); 
 app.use(cors());
 
 app.use('/api', applicantRoutes);
