@@ -599,4 +599,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    window.globalToast = function(title, message, type = 'info') {
+        let container = document.getElementById('global-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'global-toast-container';
+            container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 999999; display: flex; flex-direction: column; gap: 10px;';
+            document.body.appendChild(container);
+        }
+
+        const colors = { success: '#10b981', info: '#3b82f6', warning: '#f59e0b', error: '#ef4444' };
+        const color = colors[type] || colors.info;
+
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background: white; border-left: 4px solid ${color}; padding: 15px 20px;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; min-width: 250px;
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        `;
+        toast.innerHTML = `
+            <strong style="color: #0f172a; font-size: 0.9rem;">${title}</strong>
+            <span style="color: #64748b; font-size: 0.8rem; margin-top: 4px;">${message}</span>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Animate In
+        requestAnimationFrame(() => { toast.style.transform = 'translateX(0)'; });
+
+        // Animate Out & Remove
+        setTimeout(() => {
+            toast.style.transform = 'translateX(120%)';
+            setTimeout(() => toast.remove(), 400);
+        }, 5000);
+    };
+
+    // Connect Socket ONLY if logged in
+    if (!isLoginPage && localStorage.getItem('admin_token') && typeof io !== 'undefined') {
+        const socket = io();
+        
+        socket.on('connect', () => console.log('🟢 Real-time Socket Connected'));
+        
+        socket.on('new_application', (data) => {
+            // Show Notification
+            globalToast('🔔 New Application Received!', `${data.name} just applied for ${data.position}`, 'info');
+
+            // Auto-refresh tables if the function exists on the current page
+            if (typeof initDashboard === 'function') initDashboard();
+            if (typeof fetchApplicants === 'function') {
+                currentPage = 1; // Reset to page 1 to see the newest app
+                fetchApplicants();
+            }
+        });
+    }
 });

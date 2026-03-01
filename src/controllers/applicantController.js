@@ -66,12 +66,12 @@ const apply = async (req, res) => {
 
         // 3. Validation: Duplicate Prevention (Name + Birthdate)
         const existing = await get(
-            "SELECT id FROM applicants WHERE email = ? OR (first_name = ? AND last_name = ?)", 
-            [email, first_name, last_name]
+            "SELECT id FROM applicants WHERE email = ?", 
+            [email]
         );
 
         if (existing) {
-            return res.status(409).json({success:false, data:"An application with this Email or Name already exists in our system."});
+            return res.status(409).json({success:false, data:"An application with this email address already exists."});
         }
 
         // 4. Insert to DB
@@ -456,5 +456,45 @@ const exportApplicantPdf = async (req, res) => {
     }
 };
 
+const directHire = async (req, res) => {
+    try {
+        const { 
+            first_name, last_name, email, contact_num, 
+            birthdate, gender, address, position_applied, 
+            years_experience, previous_employer 
+        } = req.body;
+
+        // --- ADD STRICT EMAIL CHECK HERE ---
+        const existing = await get("SELECT id FROM applicants WHERE email = ?", [email]);
+        if (existing) {
+            return res.status(409).json({ success: false, data: "A guard with this email already exists in the system." });
+        }
+        // -----------------------------------
+        
+        // Files are optional for Admin Direct Imports
+        let resumePath = null;
+        let idImagePath = null;
+        if (req.files && req.files['resume']) resumePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['resume'][0].filename}`;
+        if (req.files && req.files['id_image']) idImagePath = `${req.protocol}://${req.get('host')}/uploads/${req.files['id_image'][0].filename}`;
+
+        const result = await run(`
+            INSERT INTO applicants (
+                first_name, last_name, email, contact_num, birthdate, gender, address, position_applied, 
+                years_experience, previous_employer, status, resume_path, id_image_path, ip_address 
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Hired', ?, ?, 'Admin_Import')
+        `, [
+            first_name, last_name, email, contact_num, birthdate, gender, address, position_applied, 
+            years_experience || 0, previous_employer || 'N/A', resumePath, idImagePath
+        ]);
+
+        await logAction(req, 'DIRECT_HIRE', `Admin imported existing guard: ${first_name} ${last_name}`);
+        
+        res.status(201).json({ success: true, data: "Guard added directly to active roster." });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ success: false, data: err.message });
+    }
+};
+
 // DON'T FORGET TO UPDATE MODULE.EXPORTS
-module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats, deleteApplicant, exportApplicantPdf };
+module.exports = { apply, checkStatus, getAllApplicants, updateStatus, getDashboardStats, deleteApplicant, exportApplicantPdf, directHire };

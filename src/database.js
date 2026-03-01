@@ -117,6 +117,7 @@ const initDB = () => {
             }
         });
 
+        
         // --- 4. Deployments ---
         database.run(`
             CREATE TABLE IF NOT EXISTS deployments (

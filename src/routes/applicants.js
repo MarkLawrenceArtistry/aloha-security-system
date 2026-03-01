@@ -18,6 +18,7 @@ router.get('/dashboard-stats', verifyToken, applicantController.getDashboardStat
 router.get('/applicants', verifyToken, applicantController.getAllApplicants);
 router.put('/applicants/:id/status', verifyToken, applicantController.updateStatus);
 router.delete('/applicants/:id', verifyToken, verifyAdmin, applicantController.deleteApplicant);
+router.post('/applicants/direct-hire', verifyToken, verifyAdmin, uploadFields, applicantController.directHire);
 
 router.get('/applicants/:id/pdf', verifyToken, verifyAdmin, applicantController.exportApplicantPdf);
 
