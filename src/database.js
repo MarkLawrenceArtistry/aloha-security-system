@@ -167,6 +167,9 @@ const initDB = () => {
 
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_email', 'noreply@alohasecurity.com')`);
         database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('sender_name', 'Aloha HR Team')`);
+
+        database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('afk_timer', '30')`);
+        database.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('open_positions', 'Security Guard,Lady Guard,VIP Escort,CCTV Operator,Driver')`);
         
         console.log('Database tables initialized.');
     });

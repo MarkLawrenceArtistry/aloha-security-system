@@ -533,17 +533,36 @@
                 });
 
             
-            fetch('/api/system/config', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token') || ''}` }
-            })
-            .then(res => res.json())
-            .then(json => {
-                if(json.success && json.data.open_positions) {
+            fetch('/api/system/public-config')
+                .then(res => res.json())
+                .then(json => {
                     const posSelect = document.getElementById('position_applied');
-                    const positions = json.data.open_positions.split(',');
-                    posSelect.innerHTML = positions.map(p => `<option value="${p.trim()}">${p.trim()}</option>`).join('');
-                }
-            }).catch(err => console.log("Using default positions."));
+                    let positions = [];
+
+                    if(json.success && json.data.open_positions) {
+                        positions = json.data.open_positions.split(',');
+                    } else {
+                        // Fallback defaults if API fails or is empty
+                        positions = ["Security Guard", "VIP Escort", "Lady Guard"];
+                    }
+
+                    // Clear and Populate
+                    posSelect.innerHTML = '<option value="" disabled selected>Select Position</option>';
+                    posSelect.innerHTML += positions.map(p => {
+                        const val = p.trim();
+                        return `<option value="${val}">${val}</option>`;
+                    }).join('');
+                })
+                .catch(err => {
+                    console.error("Error fetching positions:", err);
+                    // Hard fallback so the form isn't broken
+                    const posSelect = document.getElementById('position_applied');
+                    posSelect.innerHTML = `
+                        <option value="" disabled selected>Select Position</option>
+                        <option value="Security Guard">Security Guard</option>
+                        <option value="VIP Escort">VIP Escort</option>
+                    `;
+                });
 
             // 3. Extracted City Fetching Logic
             function fetchCities(code, type, savedCityToSelect = null) {
@@ -652,7 +671,6 @@
                 }
             });
 
-            loadDraft();
             formFields.forEach(field => {
                 if (field.type !== 'file') field.addEventListener('input', saveDraft);
             });

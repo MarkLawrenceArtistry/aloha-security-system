@@ -507,10 +507,16 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` }
         }).then(res => res.json()).then(json => {
             if(json.success && json.data.afk_timer) {
-                SESSION_DURATION_MS = parseInt(json.data.afk_timer) * 60 * 1000;
-                sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                // Ensure we parse the string to an integer
+                const minutes = parseInt(json.data.afk_timer, 10);
+                if (!isNaN(minutes) && minutes > 0) {
+                    SESSION_DURATION_MS = minutes * 60 * 1000;
+                    // Reset expiry based on new duration
+                    sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                    console.log(`Session timer updated to ${minutes} minutes`);
+                }
             }
-        }).catch(e => console.error("Could not fetch AFK timer"));
+        }).catch(e => console.error("Could not fetch AFK timer, using default 30m"));
 
         const WARNING_THRESHOLD_MS = 60 * 1000; // 60 seconds
 

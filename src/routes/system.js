@@ -115,5 +115,6 @@ router.get('/master-report', verifyToken, verifyAdmin, reportController.generate
 
 router.get('/config', verifyToken, settingsController.getSystemSettings);
 router.post('/config', verifyToken, verifyAdmin, settingsController.updateSystemSettings);
+router.get('/public-config', settingsController.getPublicSettings);
 
 module.exports = router;

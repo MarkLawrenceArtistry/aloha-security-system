@@ -1,11 +1,12 @@
 // src/controllers/settingsController.js
-const { get, run } = require('../utils/helper');
+const { get, run, all } = require('../utils/helper');
 const { logAction } = require('../utils/auditLogger');
 
 const getEmailSettings = async (req, res) => {
     try {
-        const email = await get("SELECT value FROM settings WHERE key = 'sender_email'");
-        const name = await get("SELECT value FROM settings WHERE key = 'sender_name'");
+        // FIX: Quotes added here too
+        const email = await get('SELECT "value" FROM settings WHERE "key" = ?', ['sender_email']);
+        const name = await get('SELECT "value" FROM settings WHERE "key" = ?', ['sender_name']);
         
         res.status(200).json({
             success: true,
@@ -15,6 +16,7 @@ const getEmailSettings = async (req, res) => {
             }
         });
     } catch (err) {
+        console.error("Email Settings Error:", err.message);
         res.status(500).json({ success: false, data: err.message });
     }
 };
@@ -36,9 +38,13 @@ const updateEmailSettings = async (req, res) => {
 
 const getSystemSettings = async (req, res) => {
     try {
-        const settings = await all("SELECT key, value FROM settings");
+        // FIX: Put quotes around "key" and "value" to avoid SQL reserved word conflicts
+        const settings = await all('SELECT "key", "value" FROM settings');
+        
         const data = {};
-        settings.forEach(s => data[s.key] = s.value);
+        if (settings) {
+            settings.forEach(s => data[s.key] = s.value);
+        }
         
         // Provide defaults if not set in DB yet
         if (!data.afk_timer) data.afk_timer = "30";
@@ -46,6 +52,7 @@ const getSystemSettings = async (req, res) => {
         
         res.status(200).json({ success: true, data });
     } catch (err) {
+        console.error("Settings Fetch Error:", err.message); // Log it so you can see it in VS Code terminal
         res.status(500).json({ success: false, data: err.message });
     }
 };
@@ -68,4 +75,30 @@ const updateSystemSettings = async (req, res) => {
     }
 };
 
-module.exports = { getEmailSettings, updateEmailSettings, getSystemSettings, updateSystemSettings };
+const getPublicSettings = async (req, res) => {
+    try {
+        // Only fetch open_positions, nothing sensitive
+        const positions = await get("SELECT value FROM settings WHERE key = 'open_positions'");
+        
+        // Default fallback if DB is empty
+        const defaultPositions = "Security Guard,Lady Guard,VIP Escort,CCTV Operator";
+        
+        res.status(200).json({ 
+            success: true, 
+            data: { 
+                open_positions: positions ? positions.value : defaultPositions 
+            } 
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, data: err.message });
+    }
+};
+
+// Update module.exports
+module.exports = { 
+    getEmailSettings, 
+    updateEmailSettings, 
+    getSystemSettings, 
+    updateSystemSettings, 
+    getPublicSettings // <-- Add this
+};
