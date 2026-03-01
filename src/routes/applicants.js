@@ -4,7 +4,7 @@ const applicantController = require('../controllers/applicantController');
 const authController = require('../controllers/authController');
 const upload = require('../middleware/upload');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
-const { applicationLimiter, loginLimiter } = require('../middleware/rateLimiter');
+const { applicationLimiter, loginLimiter, otpLimiter } = require('../middleware/rateLimiter');
 
 const uploadFields = upload.fields([{ name: 'resume', maxCount: 1 }, { name: 'id_image', maxCount: 1 }]);
 
@@ -27,7 +27,7 @@ router.get('/auth/profile', verifyToken, authController.getProfile);
 router.put('/auth/update-profile', verifyToken, authController.updateProfile); // For Settings Page
 
 router.post('/auth/reset-master-key', authController.resetViaMasterKey);
-router.post('/auth/forgot-password-otp-send', authController.sendPasswordOtp);
+router.post('/auth/forgot-password-otp-send', otpLimiter, authController.sendPasswordOtp);
 router.post('/auth/forgot-password-otp-verify', authController.resetViaOtp);
 
 

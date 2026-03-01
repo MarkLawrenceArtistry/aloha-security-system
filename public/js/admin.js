@@ -584,4 +584,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tickerInterval = setInterval(tick, 1000);
     tick();
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            // Check if Logout Modal is active
+            const logoutModal = document.getElementById('custom-logout-modal');
+            if (logoutModal && logoutModal.classList.contains('active')) {
+                e.preventDefault(); // Prevent default form submissions
+                const confirmBtn = document.getElementById('confirm-logout');
+                if (confirmBtn) confirmBtn.click();
+            }
+        }
+    });
 });

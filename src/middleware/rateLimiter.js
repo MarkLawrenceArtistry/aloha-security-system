@@ -27,4 +27,16 @@ const loginLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-module.exports = { applicationLimiter, loginLimiter };
+const otpLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 1, // Only 1 request allowed per minute
+    message: {
+        success: false,
+        data: "Please wait 1 minute before requesting another OTP code."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Update exports
+module.exports = { applicationLimiter, loginLimiter, otpLimiter };
