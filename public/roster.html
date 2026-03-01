@@ -128,40 +128,54 @@
             </div>
             <form id="direct-hire-form" style="padding: 25px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">First Name</label><input type="text" name="first_name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Last Name</label><input type="text" name="last_name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Email</label><input type="email" name="email" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Mobile</label><input type="text" name="contact_num" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Birthdate</label><input type="date" name="birthdate" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Gender</label>
-                        <select name="gender" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; background:white;">
+                    <div class="form-group-premium"><label>First Name</label><input type="text" name="first_name"  placeholder="Enter guard's first name" required></div>
+                    <div class="form-group-premium"><label>Last Name</label><input type="text" name="last_name" placeholder="Enter guard's last name" required></div>
+                    <div class="form-group-premium"><label>Email Address</label><input type="email" name="email" placeholder="Enter guard's email address" required></div>
+                    <div class="form-group-premium"><label>Mobile Number</label><input type="text" name="contact_num" placeholder="Enter guard's mobile number" required></div>
+                    <div class="form-group-premium"><label>Birthdate</label><input type="date" name="birthdate" placeholder="Enter guard's birth date" required></div>
+                    <div class="form-group-premium"><label>Gender</label>
+                        <select name="gender" required style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; outline:none; font-family:inherit;">
                             <option value="Male">Male</option><option value="Female">Female</option>
                         </select>
                     </div>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size:0.75rem; font-weight:bold; color:#475569;">Address</label>
-                    <input type="text" name="address" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                <div class="form-group-premium" style="margin-bottom: 15px;">
+                    <label>Full Address</label>
+                    <input type="text" name="address" required placeholder="Enter guard's full address">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Position</label>
-                        <select name="position_applied" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; background:white;">
+                    <div class="form-group-premium"><label>Position</label>
+                        <select name="position_applied" required style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; outline:none; font-family:inherit;">
                             <option value="Security Guard">Security Guard</option><option value="Lady Guard">Lady Guard</option><option value="VIP Escort">VIP Escort</option>
                         </select>
                     </div>
-                    <div><label style="font-size:0.75rem; font-weight:bold; color:#475569;">Experience (Years)</label><input type="number" name="years_experience" value="1" min="0" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
+                    <div class="form-group-premium"><label>Experience (Years)</label><input type="number" name="years_experience" value="1" min="0" required></div>
                 </div>
-                <!-- Optional Files -->
-                <div style="padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 20px;">
-                    <p style="margin:0 0 10px 0; font-size:0.8rem; font-weight:bold; color:#64748b;">Optional Documents (Skip if transferring legacy data)</p>
+
+                <!-- PRETTIFIED FILE UPLOADS -->
+                <div style="padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 25px;">
+                    <p style="margin:0 0 12px 0; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:#475569;"><i class="bi bi-folder-plus"></i> Optional Legacy Documents</p>
                     <div style="display:flex; gap:10px;">
-                        <input type="file" name="resume" accept=".pdf,.jpg,.png" style="font-size:0.75rem; width:50%;">
-                        <input type="file" name="id_image" accept=".jpg,.png" style="font-size:0.75rem; width:50%;">
+                        <!-- Resume Box -->
+                        <div style="flex:1; position: relative; transition: 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                            <input type="file" name="resume" accept=".pdf,.jpg,.png" style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;" onchange="document.getElementById('dh-res-label').innerText = this.files[0] ? this.files[0].name : 'Upload Resume'">
+                            <div style="padding: 12px 10px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-size: 0.8rem; color: #475569; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                <i class="bi bi-file-earmark-pdf-fill text-danger"></i> <span id="dh-res-label">Upload Resume</span>
+                            </div>
+                        </div>
+                        <!-- ID Box -->
+                        <div style="flex:1; position: relative; transition: 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                            <input type="file" name="id_image" accept=".jpg,.png" style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;" onchange="document.getElementById('dh-id-label').innerText = this.files[0] ? this.files[0].name : 'Upload ID Photo'">
+                            <div style="padding: 12px 10px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-size: 0.8rem; color: #475569; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                <i class="bi bi-person-vcard-fill text-primary"></i> <span id="dh-id-label">Upload ID Photo</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" onclick="closeDirectHireModal()" style="padding: 10px 20px; border-radius: 8px; background: #f1f5f9; border: none; font-weight: bold; cursor: pointer;">Cancel</button>
-                    <button type="submit" id="btn-submit-hire" style="padding: 10px 20px; border-radius: 8px; background: #10b981; color: white; border: none; font-weight: bold; cursor: pointer;">Import to Roster</button>
+                    <button type="button" onclick="closeDirectHireModal()" class="btn-cancel-premium">Cancel</button>
+                    <button type="submit" id="btn-submit-hire" class="btn-save-premium">Import to Roster</button>
                 </div>
             </form>
         </div>

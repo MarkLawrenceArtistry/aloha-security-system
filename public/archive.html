@@ -31,17 +31,27 @@
 
     <main class="main-content">
         
-        <div class="page-header-modern">
-            <div class="header-icon" style="color: #475569; background: #f1f5f9;"><i class="bi bi-archive-fill"></i></div>
-            <div>
-                <h1 style="font-family: 'Helvetica Display'; font-weight: 800; font-size: 1.6rem; color: #0f172a;">Legal Archive</h1>
-                <p style="color: #64748b; font-size: 0.95rem;">Read-only repository of soft-deleted records. Subject to 3-month hard deletion policy.</p>
-            </div> <br>
-            <div class="toolbar-modern" style="background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
-                <div style="position: relative; flex: 1; max-width: 400px;">
-                    <i class="bi bi-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                    <input type="text" id="archive-search" placeholder="Search archive by name or position..." style="width: 100%; padding: 12px 15px 12px 40px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; background: #f8fafc; font-family: inherit;">
-                </div>
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; box-shadow: 0 15px 30px -10px rgba(15,23,42,0.4); position: relative; overflow: hidden;">
+            <!-- Background Decoration -->
+            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(239,68,68,0.2); filter: blur(40px); border-radius: 50%;"></div>
+            
+            <div style="position: relative; z-index: 1;">
+                <h1 style="margin: 0 0 5px 0; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                    <i class="bi bi-archive-fill text-danger"></i> Legal Archive Vault
+                </h1>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.95rem;">Read-only repository of rejected or inactive personnel. Subject to strict 90-day hard deletion policy.</p>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 12px; text-align: center; position: relative; z-index: 1; min-width: 220px;">
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #fca5a5; font-weight: 800; display: block; margin-bottom: 5px;">Time Until Next Purge</span>
+                <div id="purge-timer" style="font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; color: #ffffff; letter-spacing: 2px;">--:--:--</div>
+            </div>
+        </div>
+
+        <div class="toolbar-modern" style="background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
+            <div style="position: relative; flex: 1; max-width: 400px;">
+                <i class="bi bi-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="archive-search" placeholder="Search archive by name or position..." style="width: 100%; padding: 12px 15px 12px 40px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; background: #f8fafc; font-family: inherit; font-size: 0.95rem; transition: 0.2s;">
             </div>
         </div>
 
@@ -95,6 +105,45 @@
                 const tbody = document.getElementById('archive-body');
                 if (json.success) {
                     archiveData = json.data.applicants;
+                    
+                    // --- LIVE PURGE TIMER LOGIC ---
+                    if (archiveData.length > 0) {
+                        // Find the oldest record (the one closest to 90 days old)
+                        // Data is sorted newest first by default usually, so we get the last item, or find oldest
+                        const oldestRecord = archiveData.reduce((oldest, current) => {
+                            return new Date(current.updated_at) < new Date(oldest.updated_at) ? current : oldest;
+                        });
+
+                        const purgeDate = new Date(new Date(oldestRecord.updated_at).getTime() + (90 * 24 * 60 * 60 * 1000));
+                        
+                        // Clear existing interval if there is one
+                        if(window.purgeInterval) clearInterval(window.purgeInterval);
+                        
+                        window.purgeInterval = setInterval(() => {
+                            const now = new Date().getTime();
+                            const distance = purgeDate - now;
+
+                            if (distance < 0) {
+                                document.getElementById('purge-timer').innerHTML = "PURGING...";
+                                clearInterval(window.purgeInterval);
+                                return;
+                            }
+
+                            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            // Format: 12d 04h 32m 15s
+                            document.getElementById('purge-timer').innerHTML = 
+                                `${String(days).padStart(2,'0')}d ${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m <span style="opacity:0.5">${String(seconds).padStart(2,'0')}s</span>`;
+                        }, 1000);
+                    } else {
+                        document.getElementById('purge-timer').innerHTML = "SAFE";
+                        if(window.purgeInterval) clearInterval(window.purgeInterval);
+                    }
+                    // --- END TIMER LOGIC ---
+
                     if(archiveData.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">Archive is completely empty.</td></tr>';
                         return;
