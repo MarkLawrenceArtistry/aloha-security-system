@@ -156,20 +156,31 @@
                 <div style="padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 25px;">
                     <p style="margin:0 0 12px 0; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:#475569;"><i class="bi bi-folder-plus"></i> Optional Legacy Documents</p>
                     <div style="display:flex; gap:10px;">
+                        
                         <!-- Resume Box -->
                         <div style="flex:1; position: relative; transition: 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <input type="file" name="resume" accept=".pdf,.jpg,.png" style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;" onchange="document.getElementById('dh-res-label').innerText = this.files[0] ? this.files[0].name : 'Upload Resume'">
+                            <!-- ADDED: onchange event to update label -->
+                            <input type="file" id="dh-resume" name="resume" accept=".pdf,.jpg,.png" 
+                                   style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;"
+                                   onchange="updateFileName(this, 'dh-res-label', 'Upload Resume')">
+                            
                             <div style="padding: 12px 10px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-size: 0.8rem; color: #475569; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                                 <i class="bi bi-file-earmark-pdf-fill text-danger"></i> <span id="dh-res-label">Upload Resume</span>
                             </div>
                         </div>
+
                         <!-- ID Box -->
                         <div style="flex:1; position: relative; transition: 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <input type="file" name="id_image" accept=".jpg,.png" style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;" onchange="document.getElementById('dh-id-label').innerText = this.files[0] ? this.files[0].name : 'Upload ID Photo'">
+                            <!-- ADDED: onchange event to update label -->
+                            <input type="file" id="dh-id" name="id_image" accept=".jpg,.png" 
+                                   style="opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 2;"
+                                   onchange="updateFileName(this, 'dh-id-label', 'Upload ID Photo')">
+                            
                             <div style="padding: 12px 10px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-size: 0.8rem; color: #475569; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                                 <i class="bi bi-person-vcard-fill text-primary"></i> <span id="dh-id-label">Upload ID Photo</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -519,6 +530,21 @@
                 fetchRoster(); // Refresh the grid automatically without reloading page
             } catch (err) {
                 alert("Error revoking guard.");
+            }
+        }
+
+        function updateFileName(input, labelId, defaultText) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files.length > 0) {
+                // Truncate if too long
+                let name = input.files[0].name;
+                if(name.length > 20) name = name.substring(0, 18) + '...';
+                
+                label.innerText = name;
+                label.style.color = '#10b981'; // Green color indicating success
+            } else {
+                label.innerText = defaultText;
+                label.style.color = '#475569'; // Reset color
             }
         }
     </script>
