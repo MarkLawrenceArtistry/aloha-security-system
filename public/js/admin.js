@@ -492,21 +492,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 1. AFK AUTO-LOGOUT SYSTEM (30 Minutes)
     // ============================================================
-    let warningTimer;
-    let logoutTimer;
+    const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
+    const WARNING_THRESHOLD_MS = 60 * 1000; // Show modal at 60 seconds left
     
-    // 29 Minutes warning, 30 Minutes logout
-    const WARNING_TIME = 29 * 60 * 1000; 
-    const LOGOUT_TIME = 30 * 60 * 1000; 
+    let sessionExpiry = Date.now() + SESSION_DURATION_MS;
+    let tickerInterval;
 
-    // Inject Modal HTML dynamically so we don't edit every .html file
+    // Inject Modal HTML dynamically
     const sessionModalHTML = `
         <div id="session-modal" class="session-modal-overlay">
             <div class="session-modal-box">
                 <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
                 <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
                 <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
-                    For security, your session will expire in <strong id="countdown-timer" style="color:#f97316;">60</strong> seconds due to inactivity.
+                    For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds due to inactivity.
                 </p>
                 <button id="btn-stay-active" class="btn-stay-login">
                     <i class="bi bi-arrow-repeat"></i> I'm still working
@@ -521,67 +520,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sessionModal = document.getElementById('session-modal');
     const stayActiveBtn = document.getElementById('btn-stay-active');
-    const countdownEl = document.getElementById('countdown-timer');
+    const modalCountdownEl = document.getElementById('countdown-timer');
+    const dashboardTimerEl = document.getElementById('sh-session-timer'); // Only exists on dashboard
 
-    function startTimers() {
-        if (!localStorage.getItem('admin_token')) return; // Only if logged in
-
-        // Clear existing
-        clearTimeout(warningTimer);
-        clearTimeout(logoutTimer);
-
-        // Set Warning
-        warningTimer = setTimeout(() => {
-            showSessionWarning();
-        }, WARNING_TIME);
-
-        // Set Hard Logout (in case they ignore the modal)
-        logoutTimer = setTimeout(() => {
-            performLogout();
-        }, LOGOUT_TIME);
+    function formatTime(ms) {
+        if (ms < 0) ms = 0;
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
-    function showSessionWarning() {
-        sessionModal.classList.add('active');
-        
-        // Start visual countdown in the modal text
-        let secondsLeft = 60;
-        const interval = setInterval(() => {
-            secondsLeft--;
-            if(countdownEl) countdownEl.innerText = secondsLeft;
-            if(secondsLeft <= 0 || !sessionModal.classList.contains('active')) clearInterval(interval);
-        }, 1000);
-    }
+    function tick() {
+        if (!localStorage.getItem('admin_token')) return; // Stop if logged out
 
-    function performLogout() {
-        sessionModal.classList.remove('active');
-        alert("Session expired.");
-        logout();
+        const timeLeft = sessionExpiry - Date.now();
+
+        // 1. Update Dashboard UI (if it exists)
+        if (dashboardTimerEl) {
+            dashboardTimerEl.innerText = formatTime(timeLeft);
+            // Turn text red if under 1 minute
+            if (timeLeft <= WARNING_THRESHOLD_MS) {
+                dashboardTimerEl.style.color = '#ef4444';
+            } else {
+                dashboardTimerEl.style.color = '#ffffff';
+            }
+        }
+
+        // 2. Handle Logic based on time left
+        if (timeLeft <= 0) {
+            clearInterval(tickerInterval);
+            sessionModal.classList.remove('active');
+            alert("Session expired due to inactivity.");
+            logout();
+        } else if (timeLeft <= WARNING_THRESHOLD_MS) {
+            // Show modal and update its internal seconds counter
+            if (!sessionModal.classList.contains('active')) {
+                sessionModal.classList.add('active');
+            }
+            if (modalCountdownEl) {
+                modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
+            }
+        } else {
+            // Ensure modal is hidden if time is safe (e.g. after a reset)
+            if (sessionModal.classList.contains('active')) {
+                sessionModal.classList.remove('active');
+            }
+        }
     }
 
     function resetSession() {
-        // Hide modal if active
+        sessionExpiry = Date.now() + SESSION_DURATION_MS;
         if (sessionModal.classList.contains('active')) {
             sessionModal.classList.remove('active');
         }
-        startTimers();
+        // Force an immediate UI update so it doesn't lag for a second
+        tick(); 
     }
 
-    // Attach listeners
+    // Attach listener to Modal Button
     if (stayActiveBtn) {
         stayActiveBtn.addEventListener('click', resetSession);
     }
 
-    // Reset timers on user interaction (only if modal is NOT showing)
+    // Reset session on user activity (Throttle so we don't calculate on every single pixel of mouse movement)
+    let throttleTimer;
     ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
         document.addEventListener(evt, () => {
-            if (!sessionModal.classList.contains('active')) {
-                // Debounce slightly to avoid performance hits
-                if (Math.random() > 0.5) startTimers(); 
+            // Do NOT reset if the warning modal is currently showing. 
+            // Force them to click the "I'm still working" button to acknowledge.
+            if (sessionModal.classList.contains('active')) return;
+
+            // Only update the expiry time max once per second to save CPU
+            if (!throttleTimer) {
+                throttleTimer = setTimeout(() => {
+                    sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                    throttleTimer = null;
+                }, 1000);
             }
         });
     });
 
-    // Start immediately
-    startTimers();
+    // Start Ticking
+    tickerInterval = setInterval(tick, 1000);
+    tick(); // Run immediately once
 });
