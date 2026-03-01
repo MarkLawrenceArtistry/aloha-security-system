@@ -360,29 +360,40 @@
     </main>
 
     <div id="privacy-modal" class="modal-backdrop-custom">
-        <div class="modal-card-custom">
+        <div class="modal-card-custom" style="max-width: 550px;">
             <div class="text-center mb-3">
-                <div class="icon-circle-red mx-auto mb-3">
+                <div class="icon-circle-red mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
                     <i class="bi bi-shield-lock-fill"></i>
                 </div>
-                <h3 class="fw-black">Data Privacy Consent</h3>
+                <h3 class="fw-black mb-1">Data Privacy Consent</h3>
+                <p class="text-muted small">Please read our terms carefully before submitting.</p>
             </div>
             
-            <div class="modal-body-text mb-4 text-center text-muted">
-                <p class="small">
-                    By clicking "Accept & Submit", you authorize <strong>Aloha Security Agency</strong> to process your personal data in accordance with the <strong>Data Privacy Act of 2012</strong>. 
-                </p>
-                <p class="small mb-0">
-                    Your data will be used solely for recruitment, background verification, and deployment purposes. We strictly protect your information from unauthorized access.
-                </p>
+            <div class="privacy-scroll-box">
+                <h6>1. Collection of Personal Data</h6>
+                <p>By submitting this form, you authorize <strong>Aloha Security Agency</strong> to collect, process, and store your personal information, including your resume and government-issued ID, in strict compliance with the <strong>Data Privacy Act of 2012 (R.A. 10173)</strong>.</p>
+                
+                <h6>2. Purpose of Processing</h6>
+                <p>Your data will be used exclusively for recruitment evaluation, background verification, and potential deployment matching. It will not be sold or shared with unauthorized third parties.</p>
+
+                <h6>3. Data Retention Policy</h6>
+                <p>For processing purposes, application data is held securely. Unsuccessful applications are moved to an encrypted archive after 72 hours and are subject to <strong>Hard Deletion after 3 months</strong> as stipulated in our internal company policy.</p>
+
+                <h6>4. Your Rights (Right to be Forgotten)</h6>
+                <p>You have the right to access, rectify, or request the immediate deletion of your personal data from our database. To exercise your right to have your records removed, please contact our Data Protection Officer:</p>
+                <ul style="margin-bottom: 0; padding-left: 20px;">
+                    <li><strong>Email:</strong> dpo@alohasecurity.com</li>
+                    <li><strong>Phone:</strong> (062) 991-XXXX</li>
+                    <li><strong>HQ:</strong> 108 Old Highway, Guiwan, Zamboanga City</li>
+                </ul>
             </div>
 
             <div class="d-grid gap-2">
                 <button type="button" id="btn-final-submit" class="btn btn-danger btn-lg fw-bold rounded-pill">
-                    Accept & Submit Application
+                    I Agree & Submit Application
                 </button>
                 <button type="button" id="btn-modal-close" class="btn btn-light btn-sm text-muted rounded-pill">
-                    Review Again
+                    Cancel & Review Data
                 </button>
             </div>
         </div>
