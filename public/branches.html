@@ -151,6 +151,10 @@
                             <label><i class="bi bi-map"></i> Physical Address</label>
                             <input type="text" id="branch-location" placeholder="Street, City, Postal Code" required>
                         </div>
+                        <div class="form-group-premium">
+                            <label><i class="bi bi-person-lines-fill"></i> Contact Person & Number (Optional)</label>
+                            <input type="text" id="branch-contact" placeholder="e.g. Juan Dela Cruz - 09123456789">
+                        </div>
                     </div>
 
                     <!-- Tab 2: Personnel -->
@@ -170,7 +174,7 @@
                 <div class="modal-footer-premium">
                     <button type="button" class="btn-cancel-premium" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-save-premium">
-                        <i class="bi bi-check-circle-fill"></i> Save Framework
+                        <i class="bi bi-check-circle-fill"></i> Save Branch
                     </button>
                 </div>
             </form>
@@ -377,6 +381,8 @@
                 const assigned = b.assigned;
                 const percent = Math.min(b.percent, 100);
                 const guardsList = personnelMap[b.name] || [];
+                // Handle escaping quotes for inline JS function
+                const safeContact = b.contact_person ? b.contact_person.replace(/'/g, "\\'") : '';
 
                 return `
                     <div class="facility-card" data-id="${b.id}" onclick="toggleCardSelection(this, event)">
@@ -396,6 +402,7 @@
                             <div class="facility-icon"><i class="bi bi-building"></i></div>
                             <h3 class="facility-name">${highlightText(b.name, searchQuery)}</h3>
                             <p class="facility-location"><i class="bi bi-geo-alt"></i> ${b.location}</p>
+                            ${b.contact_person ? `<p class="facility-location" style="margin-top:4px; font-weight:600;"><i class="bi bi-telephone-outbound"></i> ${b.contact_person}</p>` : ''}
                         </div>
 
                         <div class="capacity-info" style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #f1f5f9; margin-top: auto;">
@@ -417,7 +424,7 @@
                         </div>
 
                         <div style="margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
-                            <button onclick="event.stopPropagation(); editBranch(${b.id}, '${b.name}', '${b.location}', ${b.required_guards})" style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;">
+                            <button onclick="event.stopPropagation(); editBranch(${b.id}, '${b.name.replace(/'/g, "\\'")}', '${b.location.replace(/'/g, "\\'")}', ${b.required_guards}, '${safeContact}')" style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;">
                                 <i class="bi bi-pencil-square"></i> Edit Facility
                             </button>
                         </div>
@@ -465,8 +472,8 @@
         };
 
         const originalEditBranch = window.editBranch;
-        window.editBranch = function(id, name, location, guards) {
-            if (originalEditBranch) originalEditBranch(id, name, location, guards);
+        window.editBranch = function(id, name, location, guards, contact_person) {
+            if (originalEditBranch) originalEditBranch(id, name, location, guards, contact_person);
             document.getElementById('branch-modal').style.display = 'flex';
             switchTab('location');
         };
@@ -477,6 +484,7 @@
             const name = document.getElementById('branch-name').value;
             const location = document.getElementById('branch-location').value;
             const guards = document.getElementById('branch-guards').value;
+            const contact = document.getElementById('branch-contact').value;
 
             const method = id ? 'PUT' : 'POST';
             const url = id ? `/api/branches/${id}` : '/api/branches';
@@ -485,7 +493,7 @@
                 const res = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-                    body: JSON.stringify({ name, location, required_guards: guards })
+                    body: JSON.stringify({ name, location, required_guards: guards, contact_person: contact })
                 });
                 if (res.ok) {
                     closeModal(); fetchBranches();

@@ -54,20 +54,14 @@ async function loadApplicant() {
             const resumeBtn = document.getElementById('resume-link');
             if (resumeBtn) {
                 resumeBtn.href = app.resume_path;
-                
-                // Remove target="_blank" so it doesn't open a new tab
                 resumeBtn.removeAttribute('target');
-                
-                // Add 'download' attribute to force the file to save to disk
-                // We also give it a nice filename
                 resumeBtn.setAttribute('download', `Resume_${app.last_name}_${app.first_name}.pdf`);
             }
             document.getElementById('id-img').src = app.id_image_path;
 
             const idDownloadBtn = document.getElementById('id-download');
             if (idDownloadBtn) {
-                idDownloadBtn.href = app.id_image_path; // Set the link to the file
-                // Force download attribute so it doesn't just open
+                idDownloadBtn.href = app.id_image_path; 
                 idDownloadBtn.setAttribute('download', `ID_${app.last_name}_${app.first_name}.jpg`); 
             }
 
@@ -82,19 +76,19 @@ async function loadApplicant() {
     }
 }
 
+// --- NEW MODAL FUNCTIONS ---
+function openInterviewModal() {
+    document.getElementById('interview-modal').style.display = 'flex';
+    document.getElementById('interview-message').value = "Please visit our main office at 108 Old Highway, Guiwan, Zamboanga City. Bring your original documents."; // Reset default
+}
+
+window.closeInterviewModal = function() {
+    document.getElementById('interview-modal').style.display = 'none';
+}
+
 function setupButtons(id) {
-    const updateStatus = async (newStatus) => {
-        let message = null;
-
-        // NEW: Ask for instructions if setting interview
-        if (newStatus === 'For Interview') {
-            message = prompt("Enter interview instructions (Time, Date, Location):", 
-                             "Please visit our main office on Monday at 9:00 AM.");
-            if (message === null) return; // User cancelled
-        } else if (!confirm(`Mark this applicant as ${newStatus}?`)) {
-            return;
-        }
-
+    // Shared update status function
+    const updateStatus = async (newStatus, customMessage = null) => {
         try {
             const res = await fetch(`/api/applicants/${id}/status`, {
                 method: 'PUT',
@@ -102,11 +96,15 @@ function setupButtons(id) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ status: newStatus, message: message }) // Send message
+                body: JSON.stringify({ status: newStatus, message: customMessage }) 
             });
             const json = await res.json();
             if(json.success) {
-                alert('Status updated!');
+                // If it was an interview, close modal
+                if (newStatus === 'For Interview') {
+                    closeInterviewModal();
+                }
+                alert('Status updated successfully!');
                 location.reload();
             } else {
                 alert(json.data);
@@ -117,9 +115,52 @@ function setupButtons(id) {
         }
     };
 
-    document.getElementById('btn-hire').onclick = () => updateStatus('Hired');
-    document.getElementById('btn-interview').onclick = () => updateStatus('For Interview');
-    document.getElementById('btn-reject').onclick = () => updateStatus('Rejected');
+    // 1. Hire Button
+    const hireBtn = document.getElementById('btn-hire');
+    if (hireBtn) {
+        hireBtn.onclick = () => {
+            if (confirm("Are you sure you want to HIRE this applicant? This will make them available for deployment.")) {
+                updateStatus('Hired');
+            }
+        };
+    }
+
+    // 2. Reject Button
+    const rejectBtn = document.getElementById('btn-reject');
+    if (rejectBtn) {
+        rejectBtn.onclick = () => {
+            if (confirm("Are you sure you want to REJECT this applicant?")) {
+                updateStatus('Rejected');
+            }
+        };
+    }
+
+    // 3. Interview Button (Opens Modal)
+    const interviewBtn = document.getElementById('btn-interview');
+    if (interviewBtn) {
+        interviewBtn.onclick = () => {
+            openInterviewModal();
+        };
+    }
+
+    // 4. Modal Confirm Button
+    const confirmInterviewBtn = document.getElementById('btn-confirm-interview');
+    if (confirmInterviewBtn) {
+        // Remove old listeners just in case
+        const newBtn = confirmInterviewBtn.cloneNode(true);
+        confirmInterviewBtn.parentNode.replaceChild(newBtn, confirmInterviewBtn);
+        
+        newBtn.addEventListener('click', () => {
+            const msg = document.getElementById('interview-message').value;
+            if (!msg) {
+                alert("Please enter interview instructions.");
+                return;
+            }
+            newBtn.innerHTML = "Sending...";
+            newBtn.disabled = true;
+            updateStatus('For Interview', msg);
+        });
+    }
 }
 
 // Run on load

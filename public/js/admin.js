@@ -492,26 +492,116 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 1. AFK AUTO-LOGOUT SYSTEM (30 Minutes)
     // ============================================================
-    let afkTimer;
-    const AFK_LIMIT = 30 * 60 * 1000; // 30 Minutes
+    const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
+    const WARNING_THRESHOLD_MS = 60 * 1000; // Show modal at 60 seconds left
+    
+    let sessionExpiry = Date.now() + SESSION_DURATION_MS;
+    let tickerInterval;
 
-    function resetAfkTimer() {
-        clearTimeout(afkTimer);
-        if (localStorage.getItem('admin_token')) { // Only run if logged in
-            afkTimer = setTimeout(() => {
-                alert("Session expired due to inactivity.");
-                logout();
-            }, AFK_LIMIT);
+    // Inject Modal HTML dynamically
+    const sessionModalHTML = `
+        <div id="session-modal" class="session-modal-overlay">
+            <div class="session-modal-box">
+                <div class="session-icon"><i class="bi bi-hourglass-split"></i></div>
+                <h2 style="margin:0 0 10px 0; color:#0f172a; font-weight:800;">Are you still there?</h2>
+                <p style="color:#64748b; margin-bottom:30px; line-height:1.5;">
+                    For security, your session will expire in <strong id="countdown-timer" style="color:#f97316; font-size:1.2rem;">60</strong> seconds due to inactivity.
+                </p>
+                <button id="btn-stay-active" class="btn-stay-login">
+                    <i class="bi bi-arrow-repeat"></i> I'm still working
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if(!document.getElementById('session-modal')) {
+        document.body.insertAdjacentHTML('beforeend', sessionModalHTML);
+    }
+
+    const sessionModal = document.getElementById('session-modal');
+    const stayActiveBtn = document.getElementById('btn-stay-active');
+    const modalCountdownEl = document.getElementById('countdown-timer');
+    const dashboardTimerEl = document.getElementById('sh-session-timer'); // Only exists on dashboard
+
+    function formatTime(ms) {
+        if (ms < 0) ms = 0;
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function tick() {
+        if (!localStorage.getItem('admin_token')) return; // Stop if logged out
+
+        const timeLeft = sessionExpiry - Date.now();
+
+        // 1. Update Dashboard UI (if it exists)
+        if (dashboardTimerEl) {
+            dashboardTimerEl.innerText = formatTime(timeLeft);
+            // Turn text red if under 1 minute
+            if (timeLeft <= WARNING_THRESHOLD_MS) {
+                dashboardTimerEl.style.color = '#ef4444';
+            } else {
+                dashboardTimerEl.style.color = '#ffffff';
+            }
+        }
+
+        // 2. Handle Logic based on time left
+        if (timeLeft <= 0) {
+            clearInterval(tickerInterval);
+            sessionModal.classList.remove('active');
+            alert("Session expired due to inactivity.");
+            logout();
+        } else if (timeLeft <= WARNING_THRESHOLD_MS) {
+            // Show modal and update its internal seconds counter
+            if (!sessionModal.classList.contains('active')) {
+                sessionModal.classList.add('active');
+            }
+            if (modalCountdownEl) {
+                modalCountdownEl.innerText = Math.ceil(timeLeft / 1000);
+            }
+        } else {
+            // Ensure modal is hidden if time is safe (e.g. after a reset)
+            if (sessionModal.classList.contains('active')) {
+                sessionModal.classList.remove('active');
+            }
         }
     }
 
-    // Listen for user activity to reset the timer
-    window.onload = resetAfkTimer;
-    document.onmousemove = resetAfkTimer;
-    document.onkeypress = resetAfkTimer;
-    document.onclick = resetAfkTimer;
-    document.onscroll = resetAfkTimer;
+    function resetSession() {
+        sessionExpiry = Date.now() + SESSION_DURATION_MS;
+        if (sessionModal.classList.contains('active')) {
+            sessionModal.classList.remove('active');
+        }
+        // Force an immediate UI update so it doesn't lag for a second
+        tick(); 
+    }
 
+    // Attach listener to Modal Button
+    if (stayActiveBtn) {
+        stayActiveBtn.addEventListener('click', resetSession);
+    }
 
-    
+    // Reset session on user activity (Throttle so we don't calculate on every single pixel of mouse movement)
+    let throttleTimer;
+    ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, () => {
+            // Do NOT reset if the warning modal is currently showing. 
+            // Force them to click the "I'm still working" button to acknowledge.
+            if (sessionModal.classList.contains('active')) return;
+
+            // Only update the expiry time max once per second to save CPU
+            if (!throttleTimer) {
+                throttleTimer = setTimeout(() => {
+                    sessionExpiry = Date.now() + SESSION_DURATION_MS;
+                    throttleTimer = null;
+                }, 1000);
+            }
+        });
+    });
+
+    // Start Ticking
+    tickerInterval = setInterval(tick, 1000);
+    tick(); // Run immediately once
 });
